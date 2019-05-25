@@ -1,25 +1,13 @@
-import argparse
-import coloredlogs, logging
+import click
+import logging
+import click_log
 
 from json import load
 from enum import Enum
 from pathlib import Path
 
-# Define and parse arguments
-parser = argparse.ArgumentParser(description='''Collects and processes the dependencies
-    specified in the \'dependencies.json\' file.''')
-
-args = parser.parse_args()
-
-# Setup the logging
-field_styles = dict(coloredlogs.DEFAULT_FIELD_STYLES)
-field_styles['levelname'] = {
-    'color': 'white',
-    'background': 'black'
-}
-
-logger = logging.getLogger('collect_dependencies')
-coloredlogs.install(fmt='%(name)s - %(levelname)s - %(message)s', field_styles=field_styles)
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
 
 class DependencySourceType(Enum):
     """
@@ -79,7 +67,14 @@ def get_dependencies(directory):
 
         # Process the dependencies
         for depend in json_data['dependencies']:
-            
+            pass
 
-working_directory = Path().absolute()
-get_dependencies(working_directory)
+@click.command()
+@click_log.simple_verbosity_option(logger)
+def cli():
+    """
+    Collects and processes the dependencies specified in the 'dependencies.json' file.
+    
+    """
+
+    pass
