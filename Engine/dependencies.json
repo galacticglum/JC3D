@@ -1,0 +1,9 @@
+{
+    "container_directory_name": "Dependencies",
+    "dependencies": {
+        "glew": {
+            "url": "https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0-win32.zip/download",
+            "url_type": "archive"
+        }
+    }
+}

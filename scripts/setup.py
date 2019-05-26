@@ -6,7 +6,8 @@ setup(
     py_modules=['collect_dependencies'],
     install_requires=[
         'Click',
-        'Click-log'
+        'jsonschema',
+        'requests'
     ],
     entry_points='''
         [console_scripts]

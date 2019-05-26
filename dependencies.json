@@ -1,11 +1,5 @@
 {
     "subdirectories": [
         "./Engine"
-    ],
-    "dependencies": {
-        "glew": {
-            "url": "https://github.com/nigels-com/glew/archive/glew-2.1.0.zip",
-            "url_type": "archive"
-        }
-    }
+    ]
 }
