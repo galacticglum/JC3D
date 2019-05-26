@@ -104,10 +104,11 @@ class Dependency(object):
     
     """
 
-    def __init__(self, name, source_url, source_url_type):
+    def __init__(self, name, source_url, source_url_type, args):
         self.name = name
         self.source_url = source_url
         self.source_url_type = source_url_type
+        self.args = args
 
     def process(self, container_directory, force=False):
         """
@@ -182,7 +183,45 @@ class Dependency(object):
 
             logger.info(f'{colourized_name} - Extracting archive')
             with zipfile.ZipFile(tmp_file_handle.name) as zip_file:
-                with click.progressbar(zip_file.namelist(), label='Extracting...') as bar:
+                archive_extract_items = self.args.get('archive_extract_items', None)
+                file_list = []
+                
+                ARCHIVE_EXTRACT_ITEMS_SCHEMA = {
+                    'type': 'object',
+                    'properties': {
+                        'dirs': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'string'
+                            }
+                        },
+                        'files': {
+                            'type': 'array',
+                            'items': {
+                                'type': 'string'
+                            }
+                        }
+                    }
+                }
+
+                try:
+                    validate_json(instance=archive_extract_items, schema=ARCHIVE_EXTRACT_ITEMS_SCHEMA)
+                    dirs = archive_extract_items.get('dirs', list())
+                    files = archive_extract_items.get('files', list())
+
+                    if len(dirs) == len(files) == 0:
+                        raise
+
+                    for target_dir in dirs:
+                        for file in zip_file.namelist():
+                            if file.startswith(target_dir):
+                                file_list.append(file)
+
+                    file_list += files
+                except:
+                    file_list = zip_file.namelist()
+
+                with click.progressbar(file_list, label='Extracting...') as bar:
                     for name in bar:
                         zip_file.extract(name, destination_path)
 
@@ -197,7 +236,8 @@ class Dependency(object):
     def get_hash(self):
         return hashlib.md5(json.dumps({
             'source_url': self.source_url,
-            'source_url_type': self.source_url_type
+            'source_url_type': self.source_url_type,
+            'args': self.args
         }, sort_keys=True).encode('utf-8')).hexdigest()
 
     def __str__(self): return str((self.name, str(self.source_url_type), self.source_url))
@@ -281,7 +321,7 @@ def process_directory(directory, force):
 
                 source_url = dependencies[dependency_name]['url']
                 source_url_type = DependencySourceType.from_snake_case_name(dependencies[dependency_name]['url_type'])
-                dependency = Dependency(dependency_name, source_url, source_url_type)
+                dependency = Dependency(dependency_name, source_url, source_url_type, dependencies[dependency_name])
 
                 dependency.process(container_directory, force)
 
