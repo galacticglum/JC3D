@@ -130,7 +130,7 @@ class Dependency(object):
         if destination_path.is_dir():
             if lock_filepath.is_file():
                 # The lock file is stored as JSON
-                # lock_data = json.load(lock_filepath.open())
+                lock_data = json.load(lock_filepath.open())
                 if lock_data.get('dependency_hash') == dependency_hash:
                     logger.info(f'{colourized_name} - Skipped: dependency already installed')
                     return
