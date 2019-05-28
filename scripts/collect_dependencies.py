@@ -70,7 +70,9 @@ logger = logging.getLogger(__name__)
 
 initialize_logger_format(logger)
 
-DEFAULT_CONTAINER_DIRECTORY_NAME = 'dependencies'
+def get_container_directory(base_directory, directory_name=None, default_directory_name='dependencies'):
+    container_directory_name = default_directory_name if directory_name is None else directory_name
+    return Path(base_directory) / container_directory_name
 
 class DependencySourceType(IntEnum):
     Git = 1
@@ -110,7 +112,7 @@ class Dependency(object):
         self.source_url_type = source_url_type
         self.args = args
 
-    def process(self, container_directory, force=False):
+    def process(self, container_directory):
         """
         Processes the dependency.
 
@@ -126,13 +128,12 @@ class Dependency(object):
         dependency_hash = self.get_hash()
 
         if destination_path.is_dir():
-            if not force:
-                if lock_filepath.is_file():
-                    # The lock file is stored as JSON
-                    lock_data = json.load(lock_filepath.open())
-                    if lock_data.get('dependency_hash') == dependency_hash:
-                        logger.info(f'{colourized_name} - Skipped: dependency already installed')
-                        return
+            if lock_filepath.is_file():
+                # The lock file is stored as JSON
+                # lock_data = json.load(lock_filepath.open())
+                if lock_data.get('dependency_hash') == dependency_hash:
+                    logger.info(f'{colourized_name} - Skipped: dependency already installed')
+                    return
 
             shutil.rmtree(destination_path)
 
@@ -241,27 +242,19 @@ class Dependency(object):
         }, sort_keys=True).encode('utf-8')).hexdigest()
 
     def __str__(self): return str((self.name, str(self.source_url_type), self.source_url))
-    def __repr__(self): return self.__str__()
+    def __repr__(self): return self.__str__()   
 
-def find_dependencies_config(directory):
+def get_dependencies_config(directory):
     """
-    Finds the dependencies.json in the specified directory.
+    Retrieves the dependencies.json data in the specified directory.
 
     :param directory:
         The directory to search for dependencies.json.
     :returns:
-        A `pathlib.Path` object pointing to the dependencies.json file or `None`
+        A `dict` object containing the deserialized JSON data of the dependencies.json file or `None`
+        if the file could not be found.
 
     """
-
-    path = Path(directory, 'dependencies').with_suffix('.json')
-    return path if path.is_file() else None
-
-def process_directory(directory, force):
-    dependencies_config = find_dependencies_config(directory)
-    if dependencies_config == None:
-        logger.error(f'Could not find \'dependencies.json\' file in {directory}.')
-        return None
 
     DEPENDENCIES_CONFIG_SCHEMA = {
         'type': 'object',
@@ -281,6 +274,22 @@ def process_directory(directory, force):
         }
     }
 
+    dependencies_config = Path(directory, 'dependencies').with_suffix('.json')
+    if dependencies_config == None:
+        logger.error(f'Could not find \'dependencies.json\' file in {directory}.')
+        return None
+
+    with open(dependencies_config.absolute(), 'r') as dependencies_file:
+        json_data = json.load(dependencies_file)
+        
+        try:
+            validate_json(instance=json_data, schema=DEPENDENCIES_CONFIG_SCHEMA)
+            return json_data
+        except:
+            logger.exception(f'Invalid dependencies.json file (\'{dependencies_config.absolute()}\').')
+            return None
+
+def process_directory(directory):
     DEPENDENCY_SCHEMA = {
         'type': 'object',
         'properties': {
@@ -296,39 +305,37 @@ def process_directory(directory, force):
         'required': ['url', 'url_type']
     }
     
-    with open(dependencies_config.absolute(), 'r') as dependencies_file:
-        json_data = json.load(dependencies_file)
-        
+    json_data = get_dependencies_config(directory)
+    if json_data == None: return
+
+    # Process the dependencies  
+    dependencies = json_data.get('dependencies', dict())
+    container_directory = get_container_directory(directory, json_data.get('container_directory_name'))
+
+    for dependency_name in dependencies:
         try:
-            validate_json(instance=json_data, schema=DEPENDENCIES_CONFIG_SCHEMA)
+            validate_json(instance=dependencies[dependency_name], schema=DEPENDENCY_SCHEMA)
         except:
-            logger.exception(f'Invalid dependencies.json file (\'{dependencies_config.absolute()}\').')
-            exit(-1)
+            logger.exception(f'Invalid dependency in \'{dependencies_config.absolute()}\' with name \'{dependency_name}\'')
+            continue
 
-        if 'dependencies' in json_data:
-            dependencies = json_data['dependencies']
+        source_url = dependencies[dependency_name]['url']
+        source_url_type = DependencySourceType.from_snake_case_name(dependencies[dependency_name]['url_type'])
+        dependency = Dependency(dependency_name, source_url, source_url_type, dependencies[dependency_name])
 
-            container_directory_name = json_data.get('container_directory_name', DEFAULT_CONTAINER_DIRECTORY_NAME)
-            container_directory = Path(directory) / container_directory_name
+        dependency.process(container_directory)
 
-            # Process the dependencies
-            for dependency_name in dependencies:
-                try:
-                    validate_json(instance=dependencies[dependency_name], schema=DEPENDENCY_SCHEMA)
-                except:
-                    logger.exception(f'Invalid dependency in \'{dependencies_config.absolute()}\' with name \'{dependency_name}\'')
-                    continue
+    # Invoke processing on each subdirectory
+    subdirectories = json_data.get('subdirectories', list())
+    for subdirectory in subdirectories:
+        process_directory(Path(subdirectory).resolve())
 
-                source_url = dependencies[dependency_name]['url']
-                source_url_type = DependencySourceType.from_snake_case_name(dependencies[dependency_name]['url_type'])
-                dependency = Dependency(dependency_name, source_url, source_url_type, dependencies[dependency_name])
+def clean_directory(directory):
+    json_data = get_dependencies_config(directory)
+    if json_data == None: return
 
-                dependency.process(container_directory, force)
+    # for dependency_name in dependencies:
 
-        if 'subdirectories' in json_data:
-            subdirectories = json_data['subdirectories']
-            for subdirectory in subdirectories:
-                process_directory(Path(subdirectory).resolve(), force)
 
 def _set_level(ctx, param, value):
     x = getattr(logging, value.upper(), None)
@@ -337,14 +344,40 @@ def _set_level(ctx, param, value):
     
     logger.setLevel(x)
 
-@click.command()
+def get_cwd():
+    """
+    Retrieves the absolute path to the current working directory.
+
+    """
+    return Path().absolute()
+
+@click.group(invoke_without_command=True)
 @click.option('--force', '-f', is_flag=True, default=False, help='Cleans all existing dependencies and regathers them.')
 @click.option('--verbosity', '-v', default='INFO', help='Either CRITICAL, ERROR, WARNING, INFO, or DEBUG.', callback=_set_level)
-def cli(force, verbosity):
+@click.pass_context
+def cli(ctx, force, verbosity):
     """
     Collects and processes the dependencies specified in the 'dependencies.json' file.
     
     """
 
-    working_directory = Path().absolute()
-    process_directory(working_directory, force)
+    if ctx.invoked_subcommand is not None: return
+
+    directory = get_cwd()
+    if force:
+        clean_directory(directory)
+    
+    process_directory(directory)
+
+@cli.command()
+@click.option('--no-prompt', is_flag=True, default=False, help='Suppresses the confirmation prompt that is presented by the clean operation.')
+def clean(no_prompt):
+    """
+    Cleans all the dependencies in the working directory and any subdirectories.
+
+    """
+
+    if no_prompt or click.confirm(('Are you sure you want to clean the dependencies? '
+        'This will remove all dependencies in the current working directory and any subdirectories.')):
+
+        clean_directory(get_cwd())
