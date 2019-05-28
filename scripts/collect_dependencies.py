@@ -123,44 +123,78 @@ class Dependency(object):
     
     """
 
-    def __init__(self, name, source_url, source_url_type, args):
+    def __init__(self, name, source_url, source_url_type, args, container_directory):
         self.name = name
         self.source_url = source_url
         self.source_url_type = source_url_type
         self.args = args
 
         self.colourized_name = colourize_string(self.name, colorama.Fore.LIGHTWHITE_EX)
+        self.container_directory = container_directory
+        self.destination_path = Path(container_directory) / self.name
 
-    def process(self, container_directory):
+    def _get_lock_filepath(self):
+        """
+        Retrieves the filepath to this `Dependency` lock file.
+        """
+
+        # The lock file contains a hash of the Dependency object that was used to download
+        # the contents of the folder. If the hash in the lock file is not the same as the
+        # current one, the dependency is regathered.
+        return self.destination_path / 'dependency.lock'
+
+    def is_locked(self):
+        """
+        Indicates whether this `Dependency` is locked.
+
+        """
+
+        lock_filepath = self._get_lock_filepath()
+        if self.destination_path.is_dir():
+            if lock_filepath.is_file():
+                # The lock file is stored as JSON
+                lock_data = json.load(lock_filepath.open())
+                if lock_data.get('dependency_hash') == self.get_hash():
+                    return True
+
+        return False
+
+    def lock(self):
+        """
+        Locks this `Dependency`. Creates a new updated lock file.
+
+        """
+        # Create a new updated lock file
+        lock_filepath = self._get_lock_filepath()
+        json.dump({'dependency_hash': self.get_hash()}, lock_filepath.open('w+'))
+
+    def unlock(self):
+        """
+        Unlocks this `Dependency`. Removes the lock file if it exists.
+
+        """
+
+        # Delete the lock file
+        lock_filepath = self._get_lock_filepath()
+        if lock_filepath.is_file():
+            lock_filepath.unlink()
+
+    def process(self):
         """
         Processes the dependency.
 
         """
         
-        destination_path = Path(container_directory) / self.name
-        
-        # The lock file contains a hash of the Dependency object that was used to download
-        # the contents of the folder. If the hash in the lock file is not the same as the
-        # current one, the dependency is regathered.
-        lock_filepath = destination_path / 'dependency.lock'
-        dependency_hash = self.get_hash()
-
-        if destination_path.is_dir():
-            if lock_filepath.is_file():
-                # The lock file is stored as JSON
-                lock_data = json.load(lock_filepath.open())
-                if lock_data.get('dependency_hash') == dependency_hash:
-                    logger.info(f'{self.colourized_name} - Skipped: dependency already installed')
-                    return
-
-            _rmtree(destination_path)
+        if self.destination_path.is_dir():
+            if self.is_locked():
+                logger.info(f'{self.colourized_name} - Skipped: dependency already installed')
+                return
+            
+            _rmtree(self.destination_path)
 
         # Create the destination directory if it does not exist
-        destination_path.mkdir(parents=True, exist_ok=True)
-
-        # Delete the lock file
-        if lock_filepath.is_file():
-            lock_filepath.unlink()
+        self.destination_path.mkdir(parents=True, exist_ok=True)
+        self.unlock()
 
         # Get the source
         if self.source_url_type == DependencySourceType.Git:
@@ -234,10 +268,9 @@ class Dependency(object):
 
                 with click.progressbar(file_list, label='Extracting...') as bar:
                     for name in bar:
-                        zip_file.extract(name, destination_path)
+                        zip_file.extract(name, self.destination_path)
 
-        # Create a new updated lock file
-        json.dump({'dependency_hash': dependency_hash}, lock_filepath.open('w+'))
+        self.lock()
 
         # Delete temporary file
         tmp_file_path = Path(tmp_file_handle.name)
@@ -311,7 +344,9 @@ class DependencyDirectory(object):
 
                 source_url = dependencies[dependency_name]['url']
                 source_url_type = DependencySourceType.from_snake_case_name(dependencies[dependency_name]['url_type'])
-                dependency = Dependency(dependency_name, source_url, source_url_type, dependencies[dependency_name])
+                dependency = Dependency(dependency_name, source_url, source_url_type, 
+                    dependencies[dependency_name], self.container_directory)
+                
                 self.dependencies[dependency_name] = dependency
             except:
                 logger.exception(f'Invalid dependency in \'{dependencies_config.absolute()}\' with name \'{dependency_name}\'')
@@ -332,7 +367,7 @@ class DependencyDirectory(object):
         # Process the dependencies
         if not self.is_valid: return
         for dependency in self.dependencies.values():
-            dependency.process(self.container_directory)
+            dependency.process()
 
         # Invoke processing on each subdirectory
         for subdirectory in self.subdirectories:
