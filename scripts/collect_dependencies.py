@@ -129,6 +129,8 @@ class Dependency(object):
         self.source_url_type = source_url_type
         self.args = args
 
+        self.colourized_name = colourize_string(self.name, colorama.Fore.LIGHTWHITE_EX)
+
     def process(self, container_directory):
         """
         Processes the dependency.
@@ -136,8 +138,7 @@ class Dependency(object):
         """
         
         destination_path = Path(container_directory) / self.name
-        colourized_name = colourize_string(self.name, colorama.Fore.LIGHTWHITE_EX)
-
+        
         # The lock file contains a hash of the Dependency object that was used to download
         # the contents of the folder. If the hash in the lock file is not the same as the
         # current one, the dependency is regathered.
@@ -149,7 +150,7 @@ class Dependency(object):
                 # The lock file is stored as JSON
                 lock_data = json.load(lock_filepath.open())
                 if lock_data.get('dependency_hash') == dependency_hash:
-                    logger.info(f'{colourized_name} - Skipped: dependency already installed')
+                    logger.info(f'{self.colourized_name} - Skipped: dependency already installed')
                     return
 
             _rmtree(destination_path)
@@ -168,7 +169,7 @@ class Dependency(object):
         elif self.source_url_type == DependencySourceType.Archive:
             # Extract and build filesystem
             with tempfile.NamedTemporaryFile(delete=False) as tmp_file_handle:
-                logger.info(f'{colourized_name} - Downloading archive ({self.source_url})')
+                logger.info(f'{self.colourized_name} - Downloading archive ({self.source_url})')
 
                 start_time = time.time()
                 response = requests.get(self.source_url, stream=True)
@@ -191,7 +192,7 @@ class Dependency(object):
                 logger.exception(f'Invalid archive file provided for \'{self.name}\' dependency.')
                 return
 
-            logger.info(f'{colourized_name} - Extracting archive')
+            logger.info(f'{self.colourized_name} - Extracting archive')
             with zipfile.ZipFile(tmp_file_handle.name) as zip_file:
                 archive_extract_items = self.args.get('archive_extract_items', None)
                 file_list = []
