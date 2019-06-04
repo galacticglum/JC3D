@@ -522,46 +522,64 @@ Vector<n, T>& operator !=(const Vector<n, T>& left, const Vector<n, T>& right)
 #include <Math/Vector4.h>
 
 /**
- * Two-dimensional floating-point precision vector.
+ * @brief Two-dimensional vector with arbitrary element type.
  */
-typedef Vector<2, float> Vector2f;
+template<VECTOR_TYPENAME_TEMPLATE>
+using Vector2 = Vector<2, T>;
 
 /**
- * Three-dimensional floating-point precision vector.
+ * @brief Three-dimensional vector with arbitrary element type.
  */
-typedef Vector<3, float> Vector3f;
+template<VECTOR_TYPENAME_TEMPLATE>
+using Vector3 = Vector<3, T>;
 
 /**
- * Four-dimensional floating-point precision vector.
+ * @brief Four-dimensional vector with arbitrary element type.
  */
-typedef Vector<3, float> Vector4f;
+template<VECTOR_TYPENAME_TEMPLATE>
+using Vector4 = Vector<4, T>;
 
 /**
- * Two-dimensional double-precision vector.
+ * @brief Two-dimensional floating-point precision vector.
  */
-typedef Vector<2, double> Vector2d;
+typedef Vector2<float> Vector2f;
 
 /**
- * Three-dimensional double-precision vector.
+ * @brief Three-dimensional floating-point precision vector.
  */
-typedef Vector<3, double> Vector3d;
+typedef Vector3<float> Vector3f;
 
 /**
- * Four-dimensional double-precision vector.
+ * @brief Four-dimensional floating-point precision vector.
  */
-typedef Vector<3, double> Vector4d;
+typedef Vector4<float> Vector4f;
 
 /**
- * Two-dimensional integer vector.
+ * @brief Two-dimensional double-precision vector.
  */
-typedef Vector<2, int> Vector2i;
+typedef Vector2<double> Vector2d;
 
 /**
- * Three-dimensional integer vector.
+ * @brief Three-dimensional double-precision vector.
  */
-typedef Vector<3, int> Vector3i;
+typedef Vector3<double> Vector3d;
 
 /**
- * Four-dimensional integer vector.
+ * @brief Four-dimensional double-precision vector.
  */
-typedef Vector<3, int> Vector4i;
+typedef Vector4<double> Vector4d;
+
+/**
+ * @brief Two-dimensional integer vector.
+ */
+typedef Vector2<int> Vector2i;
+
+/**
+ * @brief Three-dimensional integer vector.
+ */
+typedef Vector3<int> Vector3i;
+
+/**
+ * @brief Four-dimensional integer vector.
+ */
+typedef Vector4<int> Vector4i;
