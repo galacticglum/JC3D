@@ -22,7 +22,7 @@
  * 
  * @tparam T the type of the vector elements.
  * @tparam Derived The type of the derived vector class.
- *		   @p Derived is assumed to be a @code Vector @endcode type.
+ *		   @p Derived is assumed to be a Vector type (base or subclass of Vector).
  */
 template<typename T, typename Derived>
 struct VectorBase
@@ -40,16 +40,13 @@ struct VectorBase
 	/**
 	 * @brief The size of this Vector.
 	 */
-	std::size_t Size() const
-	{
-		return std::extent<decltype(Derived::Data)>::value;
-	}
+	constexpr std::size_t Size = std::extent<decltype(Derived::Data)>::value;
 
 	/**
 	 * @brief The number of dimensions of this Vector.
-	 * @note This is the same as @code VectorBase.Size @endcode.
+	 * @note This is the same as VectorBase::Size.
 	 */
-	std::size_t Dimensions() const { return Size(); }
+	constexpr std::size_t Dimensions = Size;
 
 	/**
 	 * @brief Zero out this Vector.
@@ -82,6 +79,137 @@ struct VectorBase
 	 * @brief An iterator pointing to the end of this Vector.
 	 */
 	ConstIterator End() const { return End(); }
+
+	/**
+	 * @brief Gets the length of this Vector.
+	 * @note The length of a vector is defined as the square root of the square of the vector:
+	 *		 @f[|v| = \sqrt{\sum^n_{i=1} v_{i}^2},@f] where @f$v@f$ represents the vector and
+	 *		 @f$n@f$ represents its dimension. The magnitude is implemented as @f$\sqrt{v\cdot v}@f$.
+	 * @returns The length of this Vector.
+	 */
+	T Magnitude() const
+	{
+		return static_cast<T>(std::sqrt(SquareMagnitude()));
+	}
+
+	/**
+	 * @brief Gets the squared length of this Vector.
+	 * @returns The squared length of this Vector.
+	 */
+	T SquareMagnitude() const
+	{
+		const Derived& instance = GetDerived();
+		return Dot(instance, instance);
+	}
+
+	/**
+	 * @brief Makes this Vector have a magnitude of 1.
+	 * @note This will change this Vector. If you want to keep the vector unchanged,
+	 *		 use the Vector<n, T>::Normalized method instead.
+	 * @returns A reference to this Vector.
+	 */
+	Derived& Normalize()
+	{
+		const Derived& instance = GetDerived();
+
+		T magnitude = Magnitude();
+		if (magnitude == 0) return instance;
+
+		for (std::size_t i = 0; i < Size; ++i)
+		{
+			this[i] /= magnitude;
+		}
+
+		return instance;
+	}
+
+	/**
+	 * @brief Gets this Vector with a magnitude of 1.
+	 * @note This Vector remains unchanged. If you want to normalize the vector,
+	 *		 use the Vector<n, T>::Normalize method instead.
+	 *	@returns A normalized copy of this Vector.
+	 */
+	Derived Normalized() const
+	{
+		return Derived(GetDerived()).Normalize();
+	}
+
+	/**
+	 * @brief Performs an @p operation on each element of this Vector.
+	 * @param operation The operation to apply on each element.
+	 */
+	void Foreach(void(*operation)(std::size_t index, const T& element)) const
+	{
+		for (std::size_t i = 0; i < Size; ++i)
+		{
+			operation(i, this[i]);
+		}
+	}
+
+	/**
+	 * @brief Gets a copy of this Vector with negative elements.
+	 * @returns A copy of this Vector whose elements have been negated.
+	 */
+	Derived Negative() const
+	{
+		Derived result;
+		GetDerived().Foreach([](std::size_t index, const T& element)
+		{
+			result[index] = -element;
+		});
+
+		return result;
+	}
+
+	/**
+	 * @brief Dot product of two vectors.
+	 * @note The dot product is a value equal to the magnitudes of the two vectors multiplied
+	 *	     together and then multiplied by the cosine of the angle between them.
+	 * @returns The dot product of vector @p a and @p b.
+	 */
+	static T Dot(const Derived& a, const Derived& b)
+	{
+		T result;
+
+		const std::size_t size = a.Size;
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			result += a[i] * b[i];
+		}
+
+		return result;
+	}
+
+	/**
+	 * @brief Gets the distance between two vectors.
+	 * @note The distance between two vectors is the same as the magnitude of their difference.
+	 * @returns The distance between vector @p a and @p b.
+	 */
+	static T Distance(const Derived& a, const Derived&  b)
+	{
+		return (a - b).Magnitude();
+	}
+
+	/**
+	 * @brief Gets the square distance between two vectors.
+	 * @note The square distance between two vectors is the same as the square magnitude of their difference.
+	 * @returns The square distance between vector @p and @p b.
+	 */
+	static T SquareDistance(const Derived& a, const Derived&  b)
+	{
+		return (a - b).SquareMagnitude();
+	}
+
+	/**
+	 * @brief Linearly interpolates between two vectors.
+	 * @note Interpolates between the vectors @p a and @p b by the interpolant @p t.
+	 *		 The parameter @p t is clamped within the range [0, 1].
+	 *	@returns A new interpolated vector between @p a and @p b.
+	 */
+	static Derived Lerp(const Derived& a, const Derived& b, T t)
+	{
+		return a + (b - a) * t;
+	}
 
 	/**
 	 * @brief Gets the value of the element in this Vector at the specified @p index.
@@ -141,7 +269,7 @@ struct Vector : VectorBase<T, Vector<n, T>>
 	/**
 	 * @brief A default empty constructor that initializes a new Vector: default initializes all vector elements.
 	 */
-	Vector(): Data()
+	Vector() : Data()
 	{
 	}
 
@@ -158,164 +286,13 @@ struct Vector : VectorBase<T, Vector<n, T>>
 	}
 
 	/**
-	 * @brief Initializes a new Vector using an @code std::initializer_list<T> @endcode for accepting an arbitrary number of arguments.
-	 * @param args The @code std::initializer_list<T> @endcode used to initialize this Vector's elements.
+	 * @brief Initializes a new Vector using an std::initializer_list<T> for accepting an arbitrary number of arguments.
+	 * @param args The std::initializer_list<T> used to initialize this Vector's elements.
 	 */
 	Vector(const std::initializer_list<T> args)
 	{
 		assert(args.size() <= n);
 		Data = args;
-	}
-
-	/**
-	 * @brief Gets a copy of this Vector with negative elements.
-	 * @returns A copy of this Vector whose elements have been negated.
-	 */
-	Vector<n, T> Negative() const
-	{
-		Vector<n, T> result;
-		Foreach([](std::size_t index, const T& element)
-		{
-			result[index] = -element;
-		});
-
-		return result;
-	}
-
-	/**
-	 * @brief Gets the length of this Vector.
-	 * @note The length of a vector is defined as the square root of the square of the vector:
-	 *		 @f[|v| = \sqrt{\sum^n_{i=1} v_{i}^2},@f] where @f$v@f$ represents the vector and
-	 *		 @f$n@f$ represents its dimension. The magnitude is implemented as @f$\sqrt{v\cdot v}@f$.
-	 * @returns The length of this Vector.
-	 */
-	T Magnitude() const
-	{
-		return static_cast<T>(std::sqrt(SquareMagnitude()));
-	}
-
-	/**
-	 * @brief Gets the squared length of this Vector.
-	 * @retuens The squared length of this Vector.
-	 */
-	T SquareMagnitude() const
-	{
-		return Dot(this, this);
-	}
-
-	/**
-	 * @brief Makes this Vector have a magnitude of 1.
-	 * @note This will change this Vector. If you want to keep the vector unchanged, 
-	 *		 use the @code Vector<n, T>.Normalized @endcode method instead.
-	 * @returns A reference to this Vector.
-	 */
-	Vector<n, T>& Normalize()
-	{
-		T magnitude = Magnitude();
-		if (magnitude == 0) return this;
-
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			Data[i] /= magnitude;
-		}
-
-		return this;
-	}
-
-	/**
-	 * @brief Gets this Vector with a magnitude of 1.
-	 * @note This Vector remains unchanged. If you want to normalize the vector,
-	 *		 use the @code Vector<n, T>.Normalize @endcode method instead.
-	 *	@returns A normalized copy of this Vector.
-	 */
-	Vector<n, T> Normalized() const
-	{
-		return Vector<n, T>(this).Normalize();
-	}
-
-	/**
-	 * @brief Performs an @p operation on each element of this Vector.
-	 * @param operation The operation to apply on each element.
-	 */
-	void Foreach(void (*operation)(std::size_t index, const T& element)) const
-	{
-		for(std::size_t i = 0; i < n; ++i)
-		{
-			operation(i, Data[i]);
-		}
-	}
-
-	/**
-	 * @brief Gets the value of the element in this Vector at the specified @p index.
-	 * @param index The index of the element whose value to retrieve.
-	 * @returns A reference to the value of the element at the specified @p index.
-	 */
-	T& operator[] (const std::size_t index) { return GetAt(index); }
-
-	/**
-	 * @brief Gets the value of the element in this Vector at the specified @p index
-	 * @param index The index of the element whose value to retrieve.
-	 * @returns A reference to the value of the element at the specified @p index.
-	 */
-	const T& operator[] (const std::size_t index) const { return GetAt(index); }
-
-	/**
-	 * @brief Gets the value of the element in this Vector at the specified @p index.
-	 * @param index The index of the element whose value to retrieve.
-	 * @returns A reference to the value of the element at the specified @p index.
-	 */
-	const T& GetAt(const std::size_t index)
-	{
-		assert(index >= 0 && index < n);
-		return Data.at(index);
-	}
-
-	/**
-	 * @brief Dot product of two vectors.
-	 * @note The dot product is a value equal to the magnitudes of the two vectors multiplied
-	 *	     together and then multiplied by the cosine of the angle between them.
-	 * @returns The dot product of vector @p a and @p b.
-	 */
-	static T Dot(const Vector<n, T>& a, const Vector<n, T>& b)
-	{
-		T result;
-		for (std::size_t i = 0; i < n; ++i)
-		{
-			result += a[i] * b[i];
-		}
-
-		return result;
-	}
-
-	/**
-	 * @brief Gets the distance between two vectors.
-	 * @note The distance between two vectors is the same as the magnitude of their difference.
-	 * @returns The distance between vector @p a and @p b.
-	 */
-	static T Distance(const Vector<n, T>& a, const Vector<n, T>&  b)
-	{
-		return (a - b).Magnitude();
-	}
-
-	/**
-	 * @brief Gets the square distance between two vectors.
-	 * @note The square distance between two vectors is the same as the square magnitude of their difference.
-	 * @returns The square distance between vector @p and @p b.
-	 */
-	static T SquareDistance(const Vector<n, T>& a, const Vector<n, T>&  b)
-	{
-		return (a - b).SquareMagnitude();
-	}
-
-	/**
-	 * @brief Linearly interpolates between two vectors.
-	 * @note Interpolates between the vectors @p a and @p b by the interpolant @p t.
-	 *		 The parameter @p t is clamped within the range [0, 1].
-	 *	@returns A new interpolated vector between @p a and @p b.
-	 */
-	static Vector<n, T> Lerp(const Vector<n, T>& a, const Vector<n, T>& b, T t)
-	{
-		return a + (b - a) * t;
 	}
 };
 
