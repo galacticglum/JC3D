@@ -516,3 +516,52 @@ Vector<n, T>& operator !=(const Vector<n, T>& left, const Vector<n, T>& right)
 {
 	return !(left == right);
 }
+
+#include <Math/Vector2.h>
+#include <Math/Vector3.h>
+#include <Math/Vector4.h>
+
+/**
+ * Two-dimensional floating-point precision vector.
+ */
+typedef Vector<2, float> Vector2f;
+
+/**
+ * Three-dimensional floating-point precision vector.
+ */
+typedef Vector<3, float> Vector3f;
+
+/**
+ * Four-dimensional floating-point precision vector.
+ */
+typedef Vector<3, float> Vector4f;
+
+/**
+ * Two-dimensional double-precision vector.
+ */
+typedef Vector<2, double> Vector2d;
+
+/**
+ * Three-dimensional double-precision vector.
+ */
+typedef Vector<3, double> Vector3d;
+
+/**
+ * Four-dimensional double-precision vector.
+ */
+typedef Vector<3, double> Vector4d;
+
+/**
+ * Two-dimensional integer vector.
+ */
+typedef Vector<2, int> Vector2i;
+
+/**
+ * Three-dimensional integer vector.
+ */
+typedef Vector<3, int> Vector3i;
+
+/**
+ * Four-dimensional integer vector.
+ */
+typedef Vector<3, int> Vector4i;
