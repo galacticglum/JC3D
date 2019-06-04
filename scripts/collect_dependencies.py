@@ -386,7 +386,6 @@ class DependencyDirectory(object):
         for subdirectory in self.subdirectories:
             subdirectory.clean()
 
-
     @staticmethod
     def _get_dependencies_config(directory):
         """

@@ -3,10 +3,9 @@
  * File Name: Vector.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/03/2019
- * Modified Date: 06/03/2019
+ * Modified Date: 06/04/2019
  * Description: A generic n-dimensional vector implementation.
  */
-
 
 #pragma once
 
@@ -15,12 +14,14 @@
 #include <array>
 #include <cmath>
 
-// Macro definition for the generic vector template definition including typename restriction to only numeric types.
+/**
+ * @brief Macro definition for the generic vector template definition including typename restriction to only numeric types.
+ */
 #define VECTOR_TEMPLATE template <std::size_t n, typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
 
 /**
- * \class Vector Vector.h "Public/Math/Vector.h"
- * A generic vector implementation supporting arbitrary element types.
+ * @class Vector Vector.h "Public/Math/Vector.h"
+ * @brief A generic vector implementation supporting arbitrary element types.
  * 
  * @tparam n The size of the vector (dimensionality).
  * @tparam T The type of the vector elements.
@@ -29,19 +30,18 @@ VECTOR_TEMPLATE
 struct Vector
 {
 	/**
-	 * The \p Vector element data.
+	 * @brief The Vector element data.
 	 */
 	std::array<T, n> Data;
 
 	/**
-	 * A default empty constructor that initializes a new \p Vector: default initializes all vector elements.
+	 * @brief A default empty constructor that initializes a new Vector: default initializes all vector elements.
 	 */
 	Vector() {}
 
 	/**
-	 * Initializes a new \p Vector with a scalar value: all vector elements are initialized to the \p scalar value.
-	 * 
-	 * @param scalar The value of all the elements in this \p Vector.
+	 * @brief Initializes a new Vector with a scalar value: all vector elements are initialized to the @p scalar value.
+	 * @param scalar The value of all the elements in this Vector.
 	 */
 	explicit Vector(const T& scalar)
 	{
@@ -52,9 +52,8 @@ struct Vector
 	}
 
 	/**
-	 * Initializes a new Vector using an \p std::initializer_list<T> for accepting an arbitrary number of arguments.
-	 * 
-	 * @param args The \p std::initializer_list<T> used to initialize this Vector's elements.
+	 * @brief Initializes a new Vector using an @code std::initializer_list<T> @endcode for accepting an arbitrary number of arguments.
+	 * @param args The @code std::initializer_list<T> @endcode used to initialize this Vector's elements.
 	 */
 	Vector(const std::initializer_list<T> args)
 	{
@@ -63,7 +62,8 @@ struct Vector
 	}
 
 	/**
-	 * Gets a copy of this \p Vector with negative elements.
+	 * @brief Gets a copy of this Vector with negative elements.
+	 * @returns A copy of this Vector whose elements have been negated.
 	 */
 	Vector<n, T> Negative() const
 	{
@@ -77,18 +77,20 @@ struct Vector
 	}
 
 	/**
-	 * Gets the length of this \p Vector.
+	 * @brief Gets the length of this Vector.
 	 * @note The length of a vector is defined as the square root of the square of the vector:
-	 *		 \f[|v| = \sqrt{\sum^n_{i=1} v_{i}^2},\f] where \f$v\f$ represents the vector and
-	 *		 \f$n\f$ represents its dimension. The magnitude is implemented as \f$\sqrt{v\cdot v}\f$.
+	 *		 @f[|v| = \sqrt{\sum^n_{i=1} v_{i}^2},@f] where @f$v@f$ represents the vector and
+	 *		 @f$n@f$ represents its dimension. The magnitude is implemented as @f$\sqrt{v\cdot v}@f$.
+	 * @returns The length of this Vector.
 	 */
-	T Magntiude() const
+	T Magnitude() const
 	{
 		return static_cast<T>(std::sqrt(SquareMagnitude()));
 	}
 
 	/**
-	 * Gets the squared length of this \p Vector.
+	 * @brief Gets the squared length of this Vector.
+	 * @retuens The squared length of this Vector.
 	 */
 	T SquareMagnitude() const
 	{
@@ -96,12 +98,14 @@ struct Vector
 	}
 
 	/**
-	 * Makes this \p Vector have a magnitude of 1.
-	 * @note This will change this Vector. If you want to keep the vector unchanged, use the \p Vector<n, T>.Normalized method instead.
+	 * @brief Makes this Vector have a magnitude of 1.
+	 * @note This will change this Vector. If you want to keep the vector unchanged, 
+	 *		 use the @code Vector<n, T>.Normalized @endcode method instead.
+	 * @returns A reference to this Vector.
 	 */
 	Vector<n, T>& Normalize()
 	{
-		T magnitude = Magntiude();
+		T magnitude = Magnitude();
 		if (magnitude == 0) return this;
 
 		for (std::size_t i = 0; i < n; ++i)
@@ -113,8 +117,10 @@ struct Vector
 	}
 
 	/**
-	 * Gets this \p Vector with a magnitude of 1.
-	 * @note This \p Vector remains unchanged. If you want to normalize the vector, use the \p Vector<n, T>.Normalize method instead.
+	 * @brief Gets this Vector with a magnitude of 1.
+	 * @note This Vector remains unchanged. If you want to normalize the vector,
+	 *		 use the @code Vector<n, T>.Normalize @endcode method instead.
+	 *	@returns A normalized copy of this Vector.
 	 */
 	Vector<n, T> Normalized() const
 	{
@@ -122,8 +128,7 @@ struct Vector
 	}
 
 	/**
-	 * Performs an operation on each element of this \p Vector.
-	 * 
+	 * @brief Performs an @p operation on each element of this Vector.
 	 * @param operation The operation to apply on each element.
 	 */
 	void Foreach(void (*operation)(std::size_t index, const T& element)) const
@@ -135,28 +140,30 @@ struct Vector
 	}
 
 	/**
-	 * Gets the value of the element in this Vector at the specified index.
-	 * 
+	 * @brief Gets the value of the element in this Vector at the specified @p index.
 	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
 	 */
 	T& operator[] (const std::size_t index) { return GetAt(index); }
 
 	/**
-	 * Gets the value of the element in this Vector at the specified index.
-	 *
+	 * @brief Gets the value of the element in this Vector at the specified @p index
 	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
 	 */
 	const T& operator[] (const std::size_t index) const { return GetAt(index); }
 
 	/**
-	 * The number of dimensions that this Vector has.
+	 * @brief The number of dimensions that composes the Vector.
+	 * @returns The number of dimensions that composes the Vector.
 	 */
 	static std::size_t Dimensions() { return n; }
 
 	/**
-	 * Dot product of two vectors.
+	 * @brief Dot product of two vectors.
 	 * @note The dot product is a value equal to the magnitudes of the two vectors multiplied
 	 *	     together and then multiplied by the cosine of the angle between them.
+	 * @returns The dot product of vector @p a and @p b.
 	 */
 	static T Dot(const Vector<n, T>& a, const Vector<n, T>& b)
 	{
@@ -170,8 +177,9 @@ struct Vector
 	}
 
 	/**
-	 * Gets the distance between two vectors.
+	 * @brief Gets the distance between two vectors.
 	 * @note The distance between two vectors is the same as the magnitude of their difference.
+	 * @returns The distance between vector @p a and @p b.
 	 */
 	static T Distance(const Vector<n, T>& a, const Vector<n, T>&  b)
 	{
@@ -179,8 +187,9 @@ struct Vector
 	}
 
 	/**
-	 * Gets the square distance between two vectors.
+	 * @brief Gets the square distance between two vectors.
 	 * @note The square distance between two vectors is the same as the square magnitude of their difference.
+	 * @returns The square distance between vector @p and @p b.
 	 */
 	static T SquareDistance(const Vector<n, T>& a, const Vector<n, T>&  b)
 	{
@@ -188,10 +197,10 @@ struct Vector
 	}
 
 	/**
-	 * Linearly interpolates between two vectors.
-	 * 
-	 * Interpolates between the vectors \p a and \p y by the interpolant \y t.
-	 * The parameter \y t is clamped within the range [0, 1].
+	 * @brief Linearly interpolates between two vectors.
+	 * @note Interpolates between the vectors @p a and @p b by the interpolant @p t.
+	 *		 The parameter @p t is clamped within the range [0, 1].
+	 *	@returns A new interpolated vector between @p a and @p b.
 	 */
 	static Vector<n, T> Lerp(const Vector<n, T>& a, const Vector<n, T>& b, T t)
 	{
@@ -199,9 +208,9 @@ struct Vector
 	}
 private:
 	/**
-	 * Gets the value of the element in this Vector at the specified index.
-	 *
+	 * @brief Gets the value of the element in this Vector at the specified @p index.
 	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
 	 */
 	const T& GetAt(const std::size_t index)
 	{
