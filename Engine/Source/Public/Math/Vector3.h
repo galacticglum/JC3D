@@ -13,8 +13,8 @@
 #include <Math/Vector.h>
 
  /**
-  * @struct Vector Vector2.h "Public/Math/Vector2.h"
-  * @brief A specialized implementation of a two-dimensional vector
+  * @struct Vector Vector3.h "Public/Math/Vector3.h"
+  * @brief A specialized implementation of a three-dimensional vector
   *		 supporting arbitrary types.
   * @tparam T The type of the vector elements.
   */
@@ -47,7 +47,7 @@ struct Vector<3, T> : VectorBase<T, Vector<3, T>>
 	}
 
 	/**
-	 * @brief Initializes a new two-dimensional Vector with a scalar value: all vector elements are initialized to the @p scalar value.
+	 * @brief Initializes a new three-dimensional Vector with a scalar value: all vector elements are initialized to the @p scalar value.
 	 * @param scalar The value of all the elements in this Vector.
 	 */
 	explicit Vector(const T& scalar) : Vector()
