@@ -75,4 +75,17 @@ struct Vector<3, T> : VectorBase<T, Vector<3, T>>
 		assert(args.size() <= Dimensions);
 		Data = args;
 	}
+
+	/**
+	 * @brief Gets the cross product of the two vectors @p a and @p b.
+	 * @returns A new vector that is perpendicular to vectors @P a and @p b.
+	 */
+	static Vector<3, T> Cross(const Vector<3, T>& a, const Vector<3, T>& b)
+	{
+		T rx = a.Y * b.Z - a.Z * b.Y;
+		T ry = a.Z * b.X - a.X * b.Z;
+		T rz = a.X * b.Y - a.Y * b.X;
+
+		return Vector<3, T>(rx, ry, rz);
+	}
 };

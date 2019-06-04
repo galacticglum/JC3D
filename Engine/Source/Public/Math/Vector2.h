@@ -73,4 +73,13 @@ struct Vector<2, T> : VectorBase<T, Vector<2, T>>
 		assert(args.size() <= Dimensions);
 		Data = args;
 	}
+
+	/**
+	 * @brief Gets the vector perpendicular to the specified @p vector.
+	 * @returns A new Vector that is perpendicular to the specified @p vector.
+	 */
+	static Vector<2, T> Perpendicular(const Vector<2, T>& vector)
+	{
+		return Vector<2, T>(-vector.Y, vector.X);
+	}
 };
