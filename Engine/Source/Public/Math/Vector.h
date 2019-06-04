@@ -13,37 +13,143 @@
 #include <cassert>
 #include <array>
 #include <cmath>
+#include <type_traits>
+
+/**
+ * @struct VectorBase Vector.h "Public/Math/Vector.h"
+ * @brief A base generic vector supporting arbitrary element types.
+ * @note Serves a wrapper around derived vector classes.
+ * 
+ * @tparam T the type of the vector elements.
+ * @tparam Derived The type of the derived vector class.
+ *		   @p Derived is assumed to be a @code Vector @endcode type.
+ */
+template<typename T, typename Derived>
+struct VectorBase
+{
+	/**
+	 * @brief Get the derived instance.
+	 */
+	Derived& GetDerived() { return static_cast<Derived&>(*this); }
+
+	/**
+	 * @brief Get the derived instance.
+	 */
+	const Derived& GetDerived() const { return static_cast<const Derived&>(*this); }
+
+	/**
+	 * @brief The size of this Vector.
+	 */
+	std::size_t Size() const
+	{
+		return std::extent<decltype(Derived::Data)>::value;
+	}
+
+	/**
+	 * @brief The number of dimensions of this Vector.
+	 * @note This is the same as @code VectorBase.Size @endcode.
+	 */
+	std::size_t Dimensions() const { return Size(); }
+
+	/**
+	 * @brief Zero out this Vector.
+	 * @note Reinitialize all elements to their default value.
+	 */
+	void Zero()
+	{
+		std::fill(std::begin(GetDerived().Data), std::end(GetDerived().Data), T());
+	}
+
+	using Iterator = T*;
+	using ConstIterator = const T*;
+
+	/**
+	 * @brief An iterator pointing to the beginning of this Vector.
+	 */
+	Iterator Begin() { return &GetDerived().Data[0]; }
+
+	/**
+	 * @brief An iterator pointing to the end of this Vector.
+	 */
+	Iterator End() { return &GetDerived().Data[0] + Size(); }
+
+	/**
+	 * @brief An iterator pointing to the beginning of this Vector.
+	 */
+	ConstIterator Begin() const { return Begin(); }
+
+	/**
+	 * @brief An iterator pointing to the end of this Vector.
+	 */
+	ConstIterator End() const { return End(); }
+
+	/**
+	 * @brief Gets the value of the element in this Vector at the specified @p index.
+	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
+	 */
+	const T& GetAt(const std::size_t index)
+	{
+		assert(index >= 0 && index < Size());
+		return GetDerived().Data[index];
+	}
+
+	/**
+	  * @brief Gets the value of the element in this Vector at the specified @p index.
+	  * @param index The index of the element whose value to retrieve.
+	  * @returns A reference to the value of the element at the specified @p index.
+	  */
+	T& operator[] (const std::size_t index) { return GetAt(index); }
+
+	/**
+	 * @brief Gets the value of the element in this Vector at the specified @p index
+	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
+	 */
+	const T& operator[] (const std::size_t index) const { return GetAt(index); }
+};
+
+/**
+ * @brief Macro definition for the generic vector template typename definition.
+ * @note Restricts to arithmetic types only.
+ */
+#define VECTOR_TYPENAME_TEMPLATE typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
 
 /**
  * @brief Macro definition for the generic vector template definition including typename restriction to only numeric types.
  */
-#define VECTOR_TEMPLATE template <std::size_t n, typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+#define VECTOR_TEMPLATE template <std::size_t n, VECTOR_TYPENAME_TEMPLATE>
 
 /**
- * @class Vector Vector.h "Public/Math/Vector.h"
+ * @struct Vector Vector.h "Public/Math/Vector.h"
  * @brief A generic vector implementation supporting arbitrary element types.
  * 
  * @tparam n The size of the vector (dimensionality).
  * @tparam T The type of the vector elements.
  */
 VECTOR_TEMPLATE
-struct Vector
+struct Vector : VectorBase<T, Vector<n, T>>
 {
-	/**
-	 * @brief The Vector element data.
-	 */
-	std::array<T, n> Data;
+	union
+	{
+		/**
+		 * @brief The Vector element data.
+		 */
+		std::array<T, n> Data;
+	};
 
 	/**
 	 * @brief A default empty constructor that initializes a new Vector: default initializes all vector elements.
 	 */
-	Vector() {}
+	Vector(): Data()
+	{
+	}
 
 	/**
 	 * @brief Initializes a new Vector with a scalar value: all vector elements are initialized to the @p scalar value.
 	 * @param scalar The value of all the elements in this Vector.
 	 */
-	explicit Vector(const T& scalar)
+	explicit Vector(const T& scalar) : Vector()
 	{
 		for (auto& element : Data)
 		{
@@ -154,10 +260,15 @@ struct Vector
 	const T& operator[] (const std::size_t index) const { return GetAt(index); }
 
 	/**
-	 * @brief The number of dimensions that composes the Vector.
-	 * @returns The number of dimensions that composes the Vector.
+	 * @brief Gets the value of the element in this Vector at the specified @p index.
+	 * @param index The index of the element whose value to retrieve.
+	 * @returns A reference to the value of the element at the specified @p index.
 	 */
-	static std::size_t Dimensions() { return n; }
+	const T& GetAt(const std::size_t index)
+	{
+		assert(index >= 0 && index < n);
+		return Data.at(index);
+	}
 
 	/**
 	 * @brief Dot product of two vectors.
@@ -205,17 +316,6 @@ struct Vector
 	static Vector<n, T> Lerp(const Vector<n, T>& a, const Vector<n, T>& b, T t)
 	{
 		return a + (b - a) * t;
-	}
-private:
-	/**
-	 * @brief Gets the value of the element in this Vector at the specified @p index.
-	 * @param index The index of the element whose value to retrieve.
-	 * @returns A reference to the value of the element at the specified @p index.
-	 */
-	const T& GetAt(const std::size_t index)
-	{
-		assert(index >= 0 && index < n);
-		return Data.at(index);
 	}
 };
 
