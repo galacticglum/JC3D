@@ -15,7 +15,7 @@
  /**
   * @struct Vector Vector3.h "Public/Math/Vector3.h"
   * @brief A specialized implementation of a three-dimensional vector
-  *		 supporting arbitrary types.
+  *		   supporting arbitrary types.
   * @tparam T The type of the vector elements.
   */
 template<typename T>
@@ -53,6 +53,17 @@ struct Vector<3, T> : VectorBase<T, Vector<3, T>>
 	explicit Vector(const T& scalar) : Vector()
 	{
 		Data = { scalar, scalar, scalar };
+	}
+
+	/**
+	 * @bref Initializes a new three-dimensional vector from a two-dimensional vector representing the x and y components
+	 *		 of this Vector and a scalar value, @p z, representing the z-component of this Vector.
+	 * @param vector A two-dimensional vector whose x and y components are used for this Vector.
+	 * @param z The z-component of this Vector.
+	 */
+	Vector(const Vector<2, T>& vector, const T& z) : Vector()
+	{
+		Data = { vector.X, vector.Y, z };
 	}
 
 	/**

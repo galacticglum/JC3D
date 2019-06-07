@@ -15,7 +15,7 @@
  /**
   * @struct Vector Vector4.h "Public/Math/Vector4.h"
   * @brief A specialized implementation of a four-dimensional vector
-  *		 supporting arbitrary types.
+  *		   supporting arbitrary types.
   * @tparam T The type of the vector elements.
   */
 template<typename T>
@@ -54,6 +54,17 @@ struct Vector<4, T> : VectorBase<T, Vector<4, T>>
 	explicit Vector(const T& scalar) : Vector()
 	{
 		Data = { scalar, scalar, scalar, scalar };
+	}
+
+	/**
+	 * @bref Initializes a new four-dimensional vector from a three-dimensional vector representing the x, y, and z components
+	 *		 of this Vector and a scalar value, @p w, representing the w-component of this Vector.
+	 * @param vector A three-dimensional vector whose x, y, and z components are used for this Vector.
+	 * @param w The z-component of this Vector.
+	 */
+	Vector(const Vector<3, T>& vector, const T& w) : Vector()
+	{
+		Data = { vector.X, vector.Y, vector.Z, w };
 	}
 
 	/**

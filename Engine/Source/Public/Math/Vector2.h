@@ -15,29 +15,12 @@
 /**
  * @struct Vector Vector2.h "Public/Math/Vector2.h"
  * @brief A specialized implementation of a two-dimensional vector
- *		 supporting arbitrary types. 
+ *		  supporting arbitrary types. 
  * @tparam T The type of the vector elements.
  */
 template<typename T>
 struct Vector<2, T> : VectorBase<T, Vector<2, T>>
 {
-	union
-	{
-		/**
-		 * @brief The Vector element data.
-		 */
-		std::array<T, Dimensions> Data;
-
-		/**
-		 * Components
-		 */
-		struct
-		{
-			T X;
-			T Y;
-		};
-	};
-
 	/**
 	 * @brief A default empty constructor that initializes a new two-dimensional Vector: default initializes all vector elements.
 	 */

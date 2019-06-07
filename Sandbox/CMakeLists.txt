@@ -38,7 +38,7 @@ target_compile_options(Sandbox PUBLIC
 
 # Define the include DIRs
 include_directories(
-	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/*/Public
+	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public
 	${OPENGL_INCLUDE_DIRS}
     # ${GLEW_INCLUDE_DIRS}
     # ${GLFW_INCLUDE_DIRS}

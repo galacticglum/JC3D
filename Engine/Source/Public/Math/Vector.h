@@ -103,24 +103,22 @@ struct VectorBase
 	}
 
 	/**
-	 * @brief Makes this Vector have a magnitude of 1.
+	 * @brief Makes the specified @p vector have a magnitude of 1.
 	 * @note This will change this Vector. If you want to keep the vector unchanged,
 	 *		 use the Vector<n, T>::Normalized method instead.
-	 * @returns A reference to this Vector.
+	 * @returns A reference to @p vector.
 	 */
-	Derived& Normalize()
+	static Derived& Normalize(const Derived& vector)
 	{
-		const Derived& instance = GetDerived();
+		T magnitude = vector.Magnitude();
+		if (magnitude == 0) return vector;
 
-		T magnitude = Magnitude();
-		if (magnitude == 0) return instance;
-
-		for (std::size_t i = 0; i < Size; ++i)
+		for (std::size_t i = 0; i < vector.Size; ++i)
 		{
-			this[i] /= magnitude;
+			vector[i] /= magnitude;
 		}
 
-		return instance;
+		return vector;
 	}
 
 	/**
@@ -306,7 +304,7 @@ Vector<n, T> operator -(const Vector<n, T>& vector)
 }
 
 /**
- * Adds two n-dimensional vectors of type T by component.
+ * @brief Adds two n-dimensional vectors of type T by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator +(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -321,7 +319,7 @@ Vector<n, T> operator +(const Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Subtracts two n-dimensional vectors of type T by component.
+ * @brief Subtracts two n-dimensional vectors of type T by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator -(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -330,7 +328,7 @@ Vector<n, T> operator -(const Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Multiplies two n-dimensional vectors of type T by component.
+ * @brief Multiplies two n-dimensional vectors of type T by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator *(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -345,7 +343,7 @@ Vector<n, T> operator *(const Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Divides two n-dimensional vectors of type T by component.
+ * @brief Divides two n-dimensional vectors of type T by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator /(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -360,7 +358,7 @@ Vector<n, T> operator /(const Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Multiplies an n-dimensional vectors of type T by a scalar value, by component.
+ * @brief Multiplies an n-dimensional vectors of type T by a scalar value, by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator *(const Vector<n, T>& left, T scalar)
@@ -375,7 +373,7 @@ Vector<n, T> operator *(const Vector<n, T>& left, T scalar)
 }
 
 /**
- * Multiplies an n-dimensional vectors of type T by a scalar value, by component.
+ * @brief Multiplies an n-dimensional vectors of type T by a scalar value, by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator *(T scalar, const Vector<n, T>& right)
@@ -384,7 +382,7 @@ Vector<n, T> operator *(T scalar, const Vector<n, T>& right)
 }
 
 /**
- * Divides an n-dimensional vectors of type T by a scalar value, by component.
+ * @brief Divides an n-dimensional vectors of type T by a scalar value, by component.
  */
 VECTOR_TEMPLATE
 Vector<n, T> operator /(const Vector<n, T>& left, T scalar)
@@ -399,7 +397,7 @@ Vector<n, T> operator /(const Vector<n, T>& left, T scalar)
 }
 
 /**
- * Divides a scalar value by an n-dimensional vectors of type T, by component.
+ * @brief Divides a scalar value by an n-dimensional vectors of type T, by component.
  * @note In reality, we are multiplying the reciprocal of the vector by a scalar.
  */
 VECTOR_TEMPLATE
@@ -415,7 +413,7 @@ Vector<n, T> operator /(T scalar, const Vector<n, T>& right)
 }
 
 /**
- * Adds an n-dimensional vector of type T to another same-sized vector of type T.
+ * @brief Adds an n-dimensional vector of type T to another same-sized vector of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator +=(Vector<n, T>& left, const Vector<n, T>& right)
@@ -429,7 +427,7 @@ Vector<n, T>& operator +=(Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Subtracts an n-dimensional vector of type T from another same-sized vector of type T.
+ * @brief Subtracts an n-dimensional vector of type T from another same-sized vector of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator -=(Vector<n, T>& left, const Vector<n, T>& right)
@@ -439,7 +437,7 @@ Vector<n, T>& operator -=(Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Multiplies an n-dimensional vector of type T by another same-sized vector of type T.
+ * @brief Multiplies an n-dimensional vector of type T by another same-sized vector of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator *=(Vector<n, T>& left, const Vector<n, T>& right)
@@ -453,7 +451,7 @@ Vector<n, T>& operator *=(Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Divides an n-dimensional vector of type T by another same-sized vector of type T.
+ * @brief Divides an n-dimensional vector of type T by another same-sized vector of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator /=(Vector<n, T>& left, const Vector<n, T>& right)
@@ -467,7 +465,7 @@ Vector<n, T>& operator /=(Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Multiplies an n-dimensional vector of type T by a scalar value of type T.
+ * @brief Multiplies an n-dimensional vector of type T by a scalar value of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator *=(Vector<n, T>& left, T scalar)
@@ -481,7 +479,7 @@ Vector<n, T>& operator *=(Vector<n, T>& left, T scalar)
 }
 
 /**
- * Divides an n-dimensional vector of type T by a scalar value of type T.
+ * @brief Divides an n-dimensional vector of type T by a scalar value of type T.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator /=(Vector<n, T>& left, T scalar)
@@ -495,7 +493,7 @@ Vector<n, T>& operator /=(Vector<n, T>& left, T scalar)
 }
 
 /**
- * Determines whether two same-sized vectors of the same type are equal.
+ * @brief Determines whether two same-sized vectors of the same type are equal.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator ==(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -509,7 +507,7 @@ Vector<n, T>& operator ==(const Vector<n, T>& left, const Vector<n, T>& right)
 }
 
 /**
- * Determines whether two same-sized vectors of the same type are not equal.
+ * @brief Determines whether two same-sized vectors of the same type are not equal.
  */
 VECTOR_TEMPLATE
 Vector<n, T>& operator !=(const Vector<n, T>& left, const Vector<n, T>& right)
@@ -542,44 +540,44 @@ using Vector4 = Vector<4, T>;
 /**
  * @brief Two-dimensional floating-point precision vector.
  */
-typedef Vector2<float> Vector2f;
+using Vector2f = Vector2<float>;
 
 /**
  * @brief Three-dimensional floating-point precision vector.
  */
-typedef Vector3<float> Vector3f;
+using Vector3f = Vector3<float>;
 
 /**
  * @brief Four-dimensional floating-point precision vector.
  */
-typedef Vector4<float> Vector4f;
+using Vector4f = Vector4<float>;
 
 /**
  * @brief Two-dimensional double-precision vector.
  */
-typedef Vector2<double> Vector2d;
+using Vector2d = Vector2<double>;
 
 /**
  * @brief Three-dimensional double-precision vector.
  */
-typedef Vector3<double> Vector3d;
+using Vector3d = Vector3<double>;
 
 /**
  * @brief Four-dimensional double-precision vector.
  */
-typedef Vector4<double> Vector4d;
+using Vector4d = Vector4<double>;
 
 /**
  * @brief Two-dimensional integer vector.
  */
-typedef Vector2<int> Vector2i;
+using Vector2i = Vector2<int>;
 
 /**
  * @brief Three-dimensional integer vector.
  */
-typedef Vector3<int> Vector3i;
+using Vector3i = Vector3<int>;
 
 /**
  * @brief Four-dimensional integer vector.
  */
-typedef Vector4<int> Vector4i;
+using Vector4i = Vector4<int>;
