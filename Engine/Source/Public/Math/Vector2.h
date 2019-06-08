@@ -3,7 +3,7 @@
  * File Name: Vector2.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/04/19
- * Modified Date: 06/04/19
+ * Modified Date: 06/07/19
  * Description: Specialized implementation of a two-dimensional vector 
  *				supporting arbitrary types.
  */
@@ -55,7 +55,7 @@ struct Vector<2, T> : VectorBase<T, Vector<2, T>>
 	}
 
 	/**
-	 * @brief Initializes a new two-dimensional Vector with a scalar value: all vector elements are initialized to the @p scalar value.
+	 * @brief Initializes a new two-dimensional Vector given the components.
 	 * @param x The x-component of this Vector.
 	 * @param y The y-component of this Vector.
 	 */

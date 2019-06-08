@@ -3,7 +3,7 @@
  * File Name: Vector3.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/04/2019
- * Modified Date: 06/04/2019
+ * Modified Date: 06/07/2019
  * Description: Specialized implementation of a three-dimensional vector
  *				supporting arbitrary types.
  */
@@ -67,7 +67,7 @@ struct Vector<3, T> : VectorBase<T, Vector<3, T>>
 	}
 
 	/**
-	 * @brief Initializes a new three-dimensional Vector with a scalar value: all vector elements are initialized to the @p scalar value.
+	 * @brief Initializes a new three-dimensional Vector given the components.
 	 * @param x The x-component of this Vector.
 	 * @param y The y-component of this Vector.
 	 * @param z The z-component of this Vector.

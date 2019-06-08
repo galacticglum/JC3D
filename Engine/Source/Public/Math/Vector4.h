@@ -68,7 +68,7 @@ struct Vector<4, T> : VectorBase<T, Vector<4, T>>
 	}
 
 	/**
-	 * @brief Initializes a new four-dimensional Vector with a scalar value: all vector elements are initialized to the @p scalar value.
+	 * @brief Initializes a new four-dimensional Vector given the components.
 	 * @param x The x-component of this Vector.
 	 * @param y The y-component of this Vector.
 	 * @param z The z-component of this Vector.

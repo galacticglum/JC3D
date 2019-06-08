@@ -3,7 +3,7 @@
  * File Name: Vector.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/03/2019
- * Modified Date: 06/04/2019
+ * Modified Date: 06/07/2019
  * Description: A generic n-dimensional vector implementation.
  */
 

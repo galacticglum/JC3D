@@ -3,7 +3,7 @@
  * File Name: Matrix4.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/06/19
- * Modified Date: 06/06/19
+ * Modified Date: 06/07/19
  * Description: Specialized implementation of a square matrix
  *				with dimension four.
  */
@@ -16,7 +16,7 @@
 #include <cmath>
 
  /**
-  * @struct Matrix Matrix4.h "Engine/Source/Public/Math/Matrix4.h"
+  * @struct Matrix Matrix4.h
   * @brief A specialized implementation of a square matrix
   *		   with dimension four.
   * @tparam T The type of the vector elements.
@@ -74,7 +74,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 * @param radians A boolean indicating whether the angles are in radians or degrees.
 	 *				  Defaults to false.
 	 */
-	static Matrix<4, 4, T> Rotate(const Vector<3, T>& eulerAngles, bool radians = false)
+	static Matrix<4, 4, T> Rotate(const Vector<3, T>& eulerAngles, const bool radians = false)
 	{
 		Matrix<4, 4, T> rx;
 		Matrix<4, 4, T> ry;
@@ -200,7 +200,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 		frame[2] = Vector<4, T>(-forward, frame[2].W);
 		frame = Matrix<4, 4, T>::Transpose(frame);
 
-		translate[3] = Vector<4, 4, T>(-source, translate[3].W);
+		translate[3] = Vector<4, T>(-source, translate[3].W);
 		return frame * translate;
 	}
 };
