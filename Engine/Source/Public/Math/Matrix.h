@@ -194,14 +194,7 @@ struct MatrixBase
 	Vector<n, T>& GetRow(const std::size_t index) const
 	{
 		assert(index >= 0 && index < m);
-
-		Vector<n, T> result;
-		for(std::size_t i = 0; i < n; ++i)
-		{
-			result[i] = Columns[i][index];
-		}
-
-		return result;
+		return Rows[index];
 	}
 
 	/**
@@ -212,10 +205,7 @@ struct MatrixBase
 	void SetRow(const std::size_t index, const Vector<n, T>& row)
 	{
 		assert(index >= 0 && index < m);
-		for(std::size_t i = 0; i < n; ++i)
-		{
-			Columns[i][index] = row[i];
-		}
+		Rows[index] = row;
 	}
 
 	/**
