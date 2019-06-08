@@ -28,7 +28,7 @@ MATRIX_TEMPLATE
 struct Matrix;
 
  /**
-  * @struct MatrixBase Matrix.h "Public/Math/Matrix.h"
+  * @struct MatrixBase Matrix.h
   * @brief A base generic matrix implementation supporting arbitrary element types.
   * @note Serves a wrapper around derived matrix classes.
   *
@@ -138,19 +138,82 @@ struct MatrixBase
 	}
 
 	/**
+	 * @brief Gets the column Vector at the specified @p index.
+	 * @param index The index of the column whose vector to retrieve.
+	 * @returns A reference to the vector at the specified @p index.
+	 */
+	Vector<m, T>& GetColumn(const std::size_t index) const
+	{
+		assert(index >= 0 && index < n);
+		return const_cast<Vector<m, T>&>(Columns[index]);
+	}
+
+	/**
+	 * @brief Sets the column Vector at the specified @p index.
+	 * @param index The index of the column whose vector to set to the specified @p column value.
+	 * @param column An m-dimensional vector representing the new value of the column at the specified @p index.
+	 */
+	void SetColumn(const std::size_t index, const Vector<m, T>& column)
+	{
+		assert(index >= 0 && index < n);
+		Columns[index] = column;
+	}
+
+	/**
+	 * @brief Gets the row Vector at the specified @p index.
+	 * @param index The index of the row whose vector to retrieve.
+	 * @returns A reference to the vector at the specified @p index.
+	 */
+	Vector<n, T>& GetRow(const std::size_t index) const
+	{
+		assert(index >= 0 && index < m);
+
+		Vector<n, T> result;
+		for(std::size_t i = 0; i < n; ++i)
+		{
+			result[i] = Columns[i][index];
+		}
+
+		return result;
+	}
+
+	/**
+	 * @brief Sets the row Vector at the specified @p index.
+	 * @param index The index of the row whose vector to set to the specified @p row value.
+	 * @param row An n-dimensional vector representing the new value of the row at the specified @p index.
+	 */
+	void SetRow(const std::size_t index, const Vector<n, T>& row)
+	{
+		assert(index >= 0 && index < m);
+		for(std::size_t i = 0; i < n; ++i)
+		{
+			Columns[i][index] = row[i];
+		}
+	}
+
+	/**
 	  * @brief Gets the column Vector at the specified @p index.
-	  * @param columnIndex The index of the column whose vector to retrieve.
+	  * @param index The index of the column whose vector to retrieve.
 	  * @returns A reference to the vector at the specified @p columnIndex.
 	  */
-	Vector<m, T>& operator[](const std::size_t columnIndex)
+	Vector<m, T>& operator[](const std::size_t index)
 	{
-		assert(columnIndex >= 0 && columnIndex < n);
-		return Columns[columnIndex];
+		return GetColumn(index);
+	}
+
+	/**
+	 * @brief Gets the column Vector at the specified @p index.
+	 * @param index The index of the column whose vector to retrieve.
+	 * @returns A reference to the vector at the specified @p columnIndex.
+	 */
+	const Vector<m, T>& operator[](const std::size_t index) const
+	{
+		return GetColumn(index);
 	}
 };
 
 /**
- * @struct Matrix Matrix.h "Public/Math/Matrix.h"
+ * @struct Matrix Matrix.h
  * @brief A generic m by n matrix implementation.
  * @note The matrices are stored in column-major order. The
  *		 transformations also assume column-major order.
@@ -171,7 +234,7 @@ struct Matrix : MatrixBase<m, n, T, Matrix<m, n, T>>
 	 *		  @p scalar value as the diagonal.
 	 * @note Implemented as multiplying the identity matrix by the @p scalar.
 	 */
-	explicit Matrix(const T& scalar) : MatrixBase<T, Matrix<m, n, T>>(scalar)
+	explicit Matrix(const T& scalar) : MatrixBase<m, n, T, Matrix<m, n, T>>(scalar)
 	{
 	}
 
@@ -180,7 +243,7 @@ struct Matrix : MatrixBase<m, n, T, Matrix<m, n, T>>
 	 * @note The elements go from the top-left corner of the Matrix and then go column-to-column for each row.
 	 * @param args The std::initializer_list<T> used to initialize this Matrix's elements.
 	 */
-	Matrix(const std::initializer_list<T> args) : MatrixBase<T, Matrix<m, n, T>>(args)
+	Matrix(const std::initializer_list<T> args) : MatrixBase<m, n, T, Matrix<m, n, T>>(args)
 	{
 	}
 };

@@ -13,7 +13,7 @@
 #include <Math/Vector.h>
 
 /**
- * @struct Vector Vector2.h "Public/Math/Vector2.h"
+ * @struct Vector Vector2.h
  * @brief A specialized implementation of a two-dimensional vector
  *		  supporting arbitrary types. 
  * @tparam T The type of the vector elements.

@@ -13,7 +13,7 @@
 #include <Math/Vector.h>
 
  /**
-  * @struct Vector Vector4.h "Public/Math/Vector4.h"
+  * @struct Vector Vector4.h
   * @brief A specialized implementation of a four-dimensional vector
   *		   supporting arbitrary types.
   * @tparam T The type of the vector elements.

@@ -16,7 +16,7 @@
 #include <cmath>
 
  /**
-  * @struct Matrix Matrix4.h "Public/Math/Matrix4.h"
+  * @struct Matrix Matrix4.h "Engine/Source/Public/Math/Matrix4.h"
   * @brief A specialized implementation of a square matrix
   *		   with dimension four.
   * @tparam T The type of the vector elements.
@@ -36,7 +36,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 *		  @p scalar value as the diagonal.
 	 * @note Implemented as multiplying the identity matrix by the @p scalar.
 	 */
-	explicit Matrix(const T& scalar) : MatrixBase<T, Matrix<4, 4, T>>(scalar)
+	explicit Matrix(const T& scalar) : MatrixBase<4, 4, T, Matrix<4, 4, T>>(scalar)
 	{
 	}
 
@@ -45,7 +45,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 * @note The elements go from the top-left corner of the Matrix and then go column-to-column for each row.
 	 * @param args The std::initializer_list<T> used to initialize this Matrix's elements.
 	 */
-	Matrix(const std::initializer_list<T> args) : MatrixBase<T, Matrix<4, 4, T>>(args)
+	Matrix(const std::initializer_list<T> args) : MatrixBase<4, 4, T, Matrix<4, 4, T>>(args)
 	{
 	}
 

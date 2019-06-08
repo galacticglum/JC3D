@@ -16,7 +16,7 @@
 #include <type_traits>
 
 /**
- * @struct VectorBase Vector.h "Public/Math/Vector.h"
+ * @struct VectorBase Vector.h
  * @brief A base generic vector supporting arbitrary element types.
  * @note Serves a wrapper around derived vector classes.
  * 
@@ -209,15 +209,15 @@ struct VectorBase
 		return a + (b - a) * t;
 	}
 
-	/**
+	/**	
 	 * @brief Gets the value of the element in this Vector at the specified @p index.
 	 * @param index The index of the element whose value to retrieve.
 	 * @returns A reference to the value of the element at the specified @p index.
 	 */
-	const T& GetAt(const std::size_t index)
+	T& GetAt(const std::size_t index) const
 	{
-		assert(index >= 0 && index < Size());
-		return GetDerived().Data[index];
+		assert(index >= 0 && index < Size);
+		return const_cast<T&>(GetDerived().Data[index]);
 	}
 
 	/**
@@ -225,14 +225,20 @@ struct VectorBase
 	  * @param index The index of the element whose value to retrieve.
 	  * @returns A reference to the value of the element at the specified @p index.
 	  */
-	T& operator[] (const std::size_t index) { return GetAt(index); }
+	T& operator[] (const std::size_t index)
+	{
+		return GetAt(index);
+	}
 
 	/**
 	 * @brief Gets the value of the element in this Vector at the specified @p index
 	 * @param index The index of the element whose value to retrieve.
 	 * @returns A reference to the value of the element at the specified @p index.
 	 */
-	const T& operator[] (const std::size_t index) const { return GetAt(index); }
+	const T& operator[] (const std::size_t index) const
+	{
+		return GetAt(index);
+	}
 };
 
 /**
@@ -247,7 +253,7 @@ struct VectorBase
 #define VECTOR_TEMPLATE template <std::size_t n, VECTOR_TYPENAME_TEMPLATE>
 
 /**
- * @struct Vector Vector.h "Public/Math/Vector.h"
+ * @struct Vector Vector.h
  * @brief A generic vector implementation supporting arbitrary element types.
  * 
  * @tparam n The size of the vector (dimensionality).

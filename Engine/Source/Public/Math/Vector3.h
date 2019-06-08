@@ -13,7 +13,7 @@
 #include <Math/Vector.h>
 
  /**
-  * @struct Vector Vector3.h "Public/Math/Vector3.h"
+  * @struct Vector Vector3.h
   * @brief A specialized implementation of a three-dimensional vector
   *		   supporting arbitrary types.
   * @tparam T The type of the vector elements.
