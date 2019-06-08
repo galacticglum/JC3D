@@ -38,7 +38,7 @@ struct Matrix;
   * @tparam m The number of rows.
   * @tparam n The number of columns.
   */
-template<typename T, typename Derived>
+template<std::size_t m, std::size_t n, typename T, typename Derived>
 struct MatrixBase
 {
 	/**
@@ -51,29 +51,19 @@ struct MatrixBase
 	 */
 	const Derived& GetDerived() const { return static_cast<const Derived&>(*this); }
 
-	/**
-	 * @brief The number of columns.
-	 */
-	static constexpr std::size_t N = Derived::N;
-
-	/**
-	 * @brief The number of rows.
-	 */
-	static constexpr std::size_t M = Derived::M;
-
 	union
 	{
 		/**
 		 * @brief The Matrix elements.
 		 */
-		T Data[N][M];
+		T Data[n][m];
 
 		struct
 		{
 			/**
 			 * @brief The columns of this Matrix stored as m-dimensional columns.
 			 */
-			Vector<M, T> Columns[N];
+			Vector<m, T> Columns[n];
 		};
 	};
 
@@ -84,9 +74,9 @@ struct MatrixBase
 	explicit MatrixBase(const T& scalar = 1)
 	{
 		// Initialize as identity matrix.
-		for (std::size_t column = 0; column < N; ++column)
+		for (std::size_t column = 0; column < n; ++column)
 		{
-			for (std::size_t row = 0; row < M; ++row)
+			for (std::size_t row = 0; row < m; ++row)
 			{
 				Data[column][row] = (column == row) ? static_cast<T>(scalar) : static_cast<T>(0);
 			}
@@ -100,14 +90,14 @@ struct MatrixBase
 	 */
 	MatrixBase(const std::initializer_list<T> args)
 	{
-		assert(args.size() <= M * N);
+		assert(args.size() <= m * n);
 		std::size_t columns = 0;
 		std::size_t rows = 0;
 
 		for (auto& it : args)
 		{
 			Data[columns][rows++] = it;
-			if (rows >= M)
+			if (rows >= m)
 			{
 				++columns;
 				rows = 0;
@@ -118,9 +108,9 @@ struct MatrixBase
 	/**
 	 * @brief Converts a @p scale vector to the scale-transformation matrix.
 	 */
-	static Matrix<N, N, T> Scale(const Vector<N, T>& scale)
+	static Matrix<n, n, T> Scale(const Vector<n, T>& scale)
 	{
-		Matrix<N, N, T> result;
+		Matrix<n, n, T> result;
 		for (std::size_t i = 0; i < N; ++i)
 		{
 			result[i][i] = scale[i];
@@ -133,12 +123,12 @@ struct MatrixBase
 	 * @brief Transposes the specified @p matrix.
 	 * @returns A new transposed copy of the @p matrix.
 	 */
-	static Matrix<N, M, T> Transpose(const Matrix<M, N, T>& matrix)
+	static Matrix<n, m, T> Transpose(const Matrix<m, n, T>& matrix)
 	{
-		Matrix<N, M, T> result;
-		for (std::size_t column = 0; column < M; ++column)
+		Matrix<n, m, T> result;
+		for (std::size_t column = 0; column < m; ++column)
 		{
-			for (std::size_t row = 0; row < N; ++row)
+			for (std::size_t row = 0; row < n; ++row)
 			{
 				result[column][row] = matrix[row][column];
 			}
@@ -152,9 +142,9 @@ struct MatrixBase
 	  * @param columnIndex The index of the column whose vector to retrieve.
 	  * @returns A reference to the vector at the specified @p columnIndex.
 	  */
-	Vector<M, T>& operator[](const std::size_t columnIndex)
+	Vector<m, T>& operator[](const std::size_t columnIndex)
 	{
-		assert(columnIndex >= 0 && columnIndex < N);
+		assert(columnIndex >= 0 && columnIndex < n);
 		return Columns[columnIndex];
 	}
 };
@@ -167,14 +157,21 @@ struct MatrixBase
  * 
  */
 MATRIX_TEMPLATE
-struct Matrix : MatrixBase<T, Matrix<m, n, T>>
+struct Matrix : MatrixBase<m, n, T, Matrix<m, n, T>>
 {
+	/**
+	 * @brief A default empty constructor that initializes an identity matrix.
+	 */
+	Matrix() : Matrix(1)
+	{
+	}
+
 	/**
 	 * @brief Initialize this Matrix as an identity matrix with the specified
 	 *		  @p scalar value as the diagonal.
 	 * @note Implemented as multiplying the identity matrix by the @p scalar.
 	 */
-	explicit Matrix(const T& scalar = 1) : MatrixBase<T, Matrix<m, n, T>>(scalar)
+	explicit Matrix(const T& scalar) : MatrixBase<T, Matrix<m, n, T>>(scalar)
 	{
 	}
 
@@ -289,3 +286,26 @@ Vector<m, T> operator*(const Matrix<m, n, T>& left, const Vector<n, T>& right)
 
 	return result;
 }
+
+#include <Math/Matrix4.h>
+
+template <MATRIX_TYPENAME_TEMPLATE>
+/**
+ * @brief A 4x4 matrix with arbitrary element type.
+ */
+using Matrix4 = Matrix<4, 4, T>;
+
+/**
+ * @brief A floating-point precision 4x4 matrix.
+ */
+using Matrix4f = Matrix4<float>;
+
+/**
+ * @brief A double-precision 4x4 matrix.
+ */
+using Matrix4d = Matrix4<double>;
+
+/**
+ * @brief An integer 4x4 matrix.
+ */
+using Matrix4i = Matrix4<int>;

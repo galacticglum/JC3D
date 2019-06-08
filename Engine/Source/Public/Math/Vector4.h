@@ -26,7 +26,7 @@ struct Vector<4, T> : VectorBase<T, Vector<4, T>>
 		/**
 		 * @brief The Vector element data.
 		 */
-		std::array<T, Dimensions> Data;
+		std::array<T, 4> Data;
 
 		/**
 		 * Components

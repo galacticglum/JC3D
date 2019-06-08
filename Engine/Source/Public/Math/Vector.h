@@ -40,13 +40,13 @@ struct VectorBase
 	/**
 	 * @brief The size of this Vector.
 	 */
-	constexpr std::size_t Size = std::extent<decltype(Derived::Data)>::value;
+	const std::size_t Size = std::extent<decltype(GetDerived().Data)>::value;
 
 	/**
 	 * @brief The number of dimensions of this Vector.
 	 * @note This is the same as VectorBase::Size.
 	 */
-	constexpr std::size_t Dimensions = Size;
+	const std::size_t Dimensions = Size;
 
 	/**
 	 * @brief Zero out this Vector.
@@ -68,7 +68,7 @@ struct VectorBase
 	/**
 	 * @brief An iterator pointing to the end of this Vector.
 	 */
-	Iterator End() { return &GetDerived().Data[0] + Size(); }
+	Iterator End() { return &GetDerived().Data[0] + Size; }
 
 	/**
 	 * @brief An iterator pointing to the beginning of this Vector.

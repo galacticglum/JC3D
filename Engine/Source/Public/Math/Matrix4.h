@@ -22,8 +22,15 @@
   * @tparam T The type of the vector elements.
   */
 template<typename T>
-struct Matrix<4, 4, T> : MatrixBase<T, Matrix<4, 4, T>>
+struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 {
+	/**
+	 * @brief A default empty constructor that initializes an identity matrix.
+	 */
+	Matrix() : Matrix(1)
+	{
+	}
+
 	/**
 	 * @brief Initialize this Matrix as an identity matrix with the specified
 	 *		  @p scalar value as the diagonal.
