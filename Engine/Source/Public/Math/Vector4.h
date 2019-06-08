@@ -85,7 +85,7 @@ struct Vector<4, T> : VectorBase<T, Vector<4, T>>
 	 */
 	Vector(const std::initializer_list<T> args)
 	{
-		assert(args.size() <= Dimensions);
+		assert(args.size() <= Size());
 		Data = args;
 	}
 };

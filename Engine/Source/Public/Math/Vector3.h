@@ -83,7 +83,7 @@ struct Vector<3, T> : VectorBase<T, Vector<3, T>>
 	 */
 	Vector(const std::initializer_list<T> args)
 	{
-		assert(args.size() <= Dimensions);
+		assert(args.size() <= Size());
 		Data = args;
 	}
 

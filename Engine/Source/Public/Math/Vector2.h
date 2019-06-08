@@ -21,6 +21,23 @@
 template<typename T>
 struct Vector<2, T> : VectorBase<T, Vector<2, T>>
 {
+	union
+	{
+		/**
+		 * @brief The Vector element data.
+		 */
+		std::array<T, 2> Data;
+
+		/**
+		 * Components
+		 */
+		struct
+		{
+			T X;
+			T Y;
+		};
+	};
+
 	/**
 	 * @brief A default empty constructor that initializes a new two-dimensional Vector: default initializes all vector elements.
 	 */
@@ -53,7 +70,7 @@ struct Vector<2, T> : VectorBase<T, Vector<2, T>>
 	 */
 	Vector(const std::initializer_list<T> args)
 	{
-		assert(args.size() <= Dimensions);
+		assert(args.size() <= Size());
 		Data = args;
 	}
 

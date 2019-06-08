@@ -51,6 +51,22 @@ struct MatrixBase
 	 */
 	const Derived& GetDerived() const { return static_cast<const Derived&>(*this); }
 
+	/**
+	 * The number of columns (n).
+	 */
+	const std::size_t Width = n;
+
+	/**
+	 * The number of rows (m).
+	 */
+	const std::size_t Height = m;
+
+	/**
+	 * @brief The size of this Matrix as a two-dimensional vector where the x-component
+	 *		  represents the width and the y-component represents the height.
+	 */
+	const Vector2<std::size_t> Size = Vector2<std::size_t>(Width, Height);
+
 	union
 	{
 		/**

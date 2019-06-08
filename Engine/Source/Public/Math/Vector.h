@@ -40,13 +40,10 @@ struct VectorBase
 	/**
 	 * @brief The size of this Vector.
 	 */
-	const std::size_t Size = std::extent<decltype(GetDerived().Data)>::value;
-
-	/**
-	 * @brief The number of dimensions of this Vector.
-	 * @note This is the same as VectorBase::Size.
-	 */
-	const std::size_t Dimensions = Size;
+	std::size_t Size() const
+	{
+		return GetDerived().Data.size();
+	}
 
 	/**
 	 * @brief Zero out this Vector.
@@ -68,7 +65,7 @@ struct VectorBase
 	/**
 	 * @brief An iterator pointing to the end of this Vector.
 	 */
-	Iterator End() { return &GetDerived().Data[0] + Size; }
+	Iterator End() { return &GetDerived().Data[0] + Size(); }
 
 	/**
 	 * @brief An iterator pointing to the beginning of this Vector.
@@ -113,7 +110,7 @@ struct VectorBase
 		T magnitude = vector.Magnitude();
 		if (magnitude == 0) return vector;
 
-		for (std::size_t i = 0; i < vector.Size; ++i)
+		for (std::size_t i = 0; i < vector.Size(); ++i)
 		{
 			vector[i] /= magnitude;
 		}
@@ -138,7 +135,7 @@ struct VectorBase
 	 */
 	void Foreach(void(*operation)(std::size_t index, const T& element)) const
 	{
-		for (std::size_t i = 0; i < Size; ++i)
+		for (std::size_t i = 0; i < Size(); ++i)
 		{
 			operation(i, this[i]);
 		}
@@ -169,7 +166,7 @@ struct VectorBase
 	{
 		T result;
 
-		const std::size_t size = a.Size;
+		const std::size_t size = a.Size();
 		for (std::size_t i = 0; i < size; ++i)
 		{
 			result += a[i] * b[i];
@@ -216,7 +213,7 @@ struct VectorBase
 	 */
 	T& GetAt(const std::size_t index) const
 	{
-		assert(index >= 0 && index < Size);
+		assert(index >= 0 && index < Size());
 		return const_cast<T&>(GetDerived().Data[index]);
 	}
 
