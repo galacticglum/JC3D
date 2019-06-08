@@ -11,6 +11,9 @@
 
 #include <cassert>
 #include <initializer_list>
+#include <string>
+#include <sstream>
+
 #include <Math/Vector.h>
 
  /**
@@ -77,9 +80,17 @@ struct MatrixBase
 		struct
 		{
 			/**
-			 * @brief The columns of this Matrix stored as m-dimensional columns.
+			 * @brief The columns of this Matrix stored as m-dimensional vectors.
 			 */
 			Vector<m, T> Columns[n];
+		};
+
+		struct
+		{
+			/**
+			 * @brief The rows of this Matrix stored as n-dimensional vectors.
+			 */
+			Vector<n, T> Rows[m];
 		};
 	};
 
@@ -226,6 +237,20 @@ struct MatrixBase
 	{
 		return GetColumn(index);
 	}
+
+	/**
+	 * @brief Converts this Matrix to a std::string.
+	 */
+	std::string ToString() const
+	{
+		std::stringstream result;
+		for (std::size_t row = 0; row < n; ++row)
+		{
+			result << Rows[row] << (row < n - 1 ? "\n" : "");
+		}
+
+		return result.str();
+	}
 };
 
 /**
@@ -364,6 +389,15 @@ Vector<m, T> operator*(const Matrix<m, n, T>& left, const Vector<n, T>& right)
 	}
 
 	return result;
+}
+
+/**
+ * @brief Matrix string stream operator.
+ */
+MATRIX_TEMPLATE
+std::ostream& operator<<(std::ostream& stream, const Matrix<m, n, T>& matrix)
+{
+	return (stream << matrix.ToString());
 }
 
 #include <Math/Matrix4.h>

@@ -14,6 +14,8 @@
 #include <array>
 #include <cmath>
 #include <type_traits>
+#include <string>
+#include <sstream>
 
 /**
  * @struct VectorBase Vector.h
@@ -204,6 +206,25 @@ struct VectorBase
 	static Derived Lerp(const Derived& a, const Derived& b, T t)
 	{
 		return a + (b - a) * t;
+	}
+
+	/**
+	 * @brief Converts this Vector to a std::string.
+	 */
+	std::string ToString() const
+	{
+		std::stringstream result;
+		result << "(";
+
+		const std::size_t size = Size();
+		for (std::size_t i = 0; i < size; ++i)
+		{
+			result << GetAt(i) << (i < size - 1 ? ", " : "");
+		}
+
+		result << ")";
+
+		return result.str();
 	}
 
 	/**	
@@ -516,6 +537,15 @@ VECTOR_TEMPLATE
 Vector<n, T>& operator !=(const Vector<n, T>& left, const Vector<n, T>& right)
 {
 	return !(left == right);
+}
+
+/**
+ * @brief Vector string stream operator.
+ */
+VECTOR_TEMPLATE
+std::ostream& operator<<(std::ostream& stream, const Vector<n, T>& vector)
+{
+	return (stream << vector.ToString());
 }
 
 #include <Math/Vector2.h>
