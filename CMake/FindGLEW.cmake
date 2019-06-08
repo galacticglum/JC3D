@@ -1,7 +1,7 @@
 SET(_PF86 "PROGRAMFILES(X86)")
 SET( GLEW_SEARCH_PATHS
 	${GLEW_ROOT_DIR}					# GLEW!
-	${JesusChristIn3D_SOURCE_DIR}/Engine/Dependencies/glew
+	${JesusChristIn3D_Engine_DEPEND_DIR}/glew
 	$ENV{PROGRAMFILES}/GLEW				# WINDOWS
 	"$ENV{_PF86}/GLEW"		            # WINDOWS
 	~/Library/Frameworks				# MAC
@@ -14,18 +14,19 @@ SET( GLEW_SEARCH_PATHS
 	/opt/csw							# Blastwave
 )
 
-FIND_PATH( GLEW_INCLUDE_DIRS
-	NAMES
-		glew.h
-	PATHS
-		${GLEW_SEARCH_PATHS}
-	PATH_SUFFIXES
-		include
-	DOC
-		"The directory where glew.h resides"
-)
+# FIND_PATH( GLEW_INCLUDE_DIRS
+# 	NAMES
+# 		glew.h
+# 	PATHS
+# 		${GLEW_SEARCH_PATHS}
+# 	PATH_SUFFIXES
+# 		include
+# 	DOC
+# 		"The directory where glew.h resides"
+# )
 
-set(GLEW_LIBRARIES "${JesusChristIn3D_DEPEND_DIR}/glew/lib/${_config}/x64/glew32s.lib")
+set(GLEW_INCLUDE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/glew/include")
+set(GLEW_LIBRARIES "${JesusChristIn3D_Engine_DEPEND_DIR}/glew/lib/${_config}/x64/glew32s.lib")
 
 # Check if we found it!
 IF ( GLEW_INCLUDE_DIRS AND GLEW_LIBRARIES )

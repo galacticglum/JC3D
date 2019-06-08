@@ -48,24 +48,24 @@ target_compile_options(Engine PUBLIC
 find_package(OpenGL REQUIRED)
 
 # GLEW
-# INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
 
 # GLFW
-# INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
 
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source
 	${OPENGL_INCLUDE_DIRS}
-    # ${GLEW_INCLUDE_DIRS}
-    # ${GLFW_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIRS}
 )
 
 # Define the link libraries
 target_link_libraries( Engine
 	${OPENGL_LIBRARIES}
-    # ${GLEW_LIBRARIES}
-    # ${GLFW_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${GLFW_LIBRARIES}
 )
 
 if(WIN32)

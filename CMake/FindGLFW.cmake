@@ -1,7 +1,7 @@
 SET(_PF86 "PROGRAMFILES(X86)")
 SET( GLFW_SEARCH_PATHS
 	${GLFW_ROOT_DIR}					# GLFW!
-	${CMAKE_SOURCE_DIR}/Engine/Dependencies/glfw
+	${JesusChristIn3D_Engine_DEPEND_DIR}/glfw
 	$ENV{PROGRAMFILES}/GLFW				# WINDOWS
 	"$ENV{_PF86}/GLFW"		# WINDOWS
 	~/Library/Frameworks				# MAC
@@ -14,19 +14,22 @@ SET( GLFW_SEARCH_PATHS
 	/opt/csw							# Blastwave
 )
 
-FIND_PATH( GLFW_INCLUDE_DIRS
-	NAMES
-        glfw3.h
-        glfw3native.h
-	PATHS
-		${GLFW_SEARCH_PATHS}
-	PATH_SUFFIXES
-		include
-	DOC
-		"The directory where glfw3.h and glfw3native.h resides"
-)
+# FIND_PATH( GLFW_INCLUDE_DIRS
+# 	NAMES
+#         glfw3.h
+#         glfw3native.h
+# 	PATHS
+# 		${GLFW_SEARCH_PATHS}
+# 	PATH_SUFFIXES
+# 		include
+# 	DOC
+# 		"The directory where glfw3.h and glfw3native.h resides"
+# )
 
-set(GLFW_LIBRARIES "${JesusChristIn3D_DEPEND_DIR}/glfw/lib/${_config}/x64/$<$<CONFIG:Debug>:glfw3-debug.lib>$<$<CONFIG:Release>:glfw3.lib>")
+set(GLFW_INCLUDE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/glfw/include")
+
+# set(GLFW_LIBRARIES "${JesusChristIn3D_DEPEND_DIR}/glfw/lib/${_config}/x64/$<$<CONFIG:Debug>:glfw3-debug.lib>$<$<CONFIG:Release>:glfw3.lib>")
+set(GLFW_LIBRARIES "${JesusChristIn3D_Engine_DEPEND_DIR}/glfw/lib/${_config}/x64/glfw3.lib")
 
 # Check if we found it!
 IF ( GLFW_INCLUDE_DIRS AND GLFW_LIBRARIES )

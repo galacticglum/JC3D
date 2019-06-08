@@ -17,7 +17,7 @@ option(BUILD_SANDBOX "Generate sandbox project" ON)
 
 # We need a CMAKE_DIR with some code to find external dependencies
 SET(JesusChristIn3D_CMAKE_DIR "${JesusChristIn3D_SOURCE_DIR}/CMake")
-SET(JesusChristIn3D_DEPEND_DIR "${JesusChristIn3D_SOURCE_DIR}/Engine/Dependencies")
+SET(JesusChristIn3D_Engine_DEPEND_DIR "${JesusChristIn3D_SOURCE_DIR}/Engine/Dependencies")
 
 if(BUILD_ENGINE)
     add_subdirectory(${CMAKE_SOURCE_DIR}/Engine)

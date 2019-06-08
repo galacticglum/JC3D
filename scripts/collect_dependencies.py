@@ -123,6 +123,57 @@ class Dependency(object):
     
     """
 
+    DEPENDENCY_SCHEMA = {
+        'type': 'object',
+        'properties': {
+            'sub_dependencies': {
+                'type': 'object',
+            },
+            'url': {
+                'type': 'string',
+                'format': 'uri'
+            },
+            'url_type': {
+                'type': 'string',
+                'enum': DependencySourceType.get_names_for_schema()
+            },
+            'libraries': {
+                'type': 'array',
+                'items': {
+                    'type': 'object'
+                }
+            },
+            'include_dirs': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            }
+        },
+    }
+
+    BINARY_JSON_SCHEMA = {
+        'type': 'object',
+        'properties': {
+            'filepath': {
+                'type': 'string'
+            },
+            'platforms': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            },
+            'configs': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
+            }
+        },
+        'required': ['filepath', 'platforms', 'configs']
+    }
+
     def __init__(self, name, source_url, source_url_type, args, container_directory):
         self.name = name
         self.source_url = source_url
@@ -132,6 +183,13 @@ class Dependency(object):
         self.colourized_name = colourize_string(self.name, colorama.Fore.LIGHTWHITE_EX)
         self.container_directory = container_directory
         self.destination_path = Path(container_directory) / self.name
+
+        # sub dependencies should be saved in the same directory as their parent.
+        # To do this, the containing directory is the sub dependency parent directory.
+        sub_dependency_container_directory = self.destination_path
+
+        # load the sub dependencies
+        self.sub_dependencies = Dependency.get_dependencies(args.get('sub_dependencies', dict()), sub_dependency_container_directory)
 
     def _get_lock_filepath(self):
         """
@@ -179,24 +237,11 @@ class Dependency(object):
         if lock_filepath.is_file():
             lock_filepath.unlink()
 
-    def process(self):
+    def _get(self):
         """
-        Processes the dependency.
-
+        Retrieve and extract the dependency.
         """
-        
-        if self.destination_path.is_dir():
-            if self.is_locked():
-                logger.info(f'{self.colourized_name} - Skipped: dependency already installed')
-                return
-            
-            _rmtree(self.destination_path)
 
-        # Create the destination directory if it does not exist
-        self.destination_path.mkdir(parents=True, exist_ok=True)
-        self.unlock()
-
-        # Get the source
         if self.source_url_type == DependencySourceType.Git:
             # TODO: Implement git dependencies.
             raise UnsupportedSourceTypeError(DependencySourceType.Git)
@@ -224,7 +269,7 @@ class Dependency(object):
                     raise zipfile.BadZipFile()
             except:
                 logger.exception(f'Invalid archive file provided for \'{self.name}\' dependency.')
-                return
+                return False
 
             logger.info(f'{self.colourized_name} - Extracting archive')
             with zipfile.ZipFile(tmp_file_handle.name) as zip_file:
@@ -270,12 +315,111 @@ class Dependency(object):
                     for name in bar:
                         zip_file.extract(name, self.destination_path)
 
-        self.lock()
+            # Delete temporary file
+            tmp_file_path = Path(tmp_file_handle.name)
+            if tmp_file_path.is_file():
+                tmp_file_path.unlink()
+            
+        return True
 
-        # Delete temporary file
-        tmp_file_path = Path(tmp_file_handle.name)
-        if tmp_file_path.is_file():
-            tmp_file_path.unlink()
+    def _collect_libraries(self):
+        libraries = self.args.get('libraries', list())
+        root_library_path = self.destination_path / 'lib'
+
+        count = 0
+        for library in libraries:
+            try:
+                validate_json(instance=library, schema=Dependency.BINARY_JSON_SCHEMA)
+            except:
+                logger.exception(f'{self.colourized_name} - Invalid library entry for dependency of name \'{self.name}\'.')
+                continue
+
+            # filepaths in the json are given relative to the dependency destination directory ("<containing_directory>/<dependency_name>")
+            absolute_filepath = self.destination_path / library['filepath']
+
+            for config in library['configs']:
+                for platform in library['platforms']:
+                    library_path = root_library_path / config / platform
+                    
+                    # create the library file destination tree
+                    library_path.mkdir(exist_ok=True, parents=True)
+                    shutil.copy(absolute_filepath,  library_path / absolute_filepath.name)
+
+            count += 1
+        
+        logger.info(f'{self.colourized_name} - Finished library collection. Collected {count} libraries.')
+
+    def _collect_includes(self):
+        include_dirs = self.args.get('include_dirs', list())
+        root_include_path = self.destination_path / 'include'
+
+        count = 0
+        for include_dir in include_dirs:
+            include_path = self.destination_path / include_dir
+            if not include_path.is_dir():
+                logger.error(f'{self.colourized_name} - Invalid include directory (\'{include_dir}\') provided for dependency of name \'{self.name}\'.')
+                continue
+
+            shutil.copytree(include_path, root_include_path)
+            count += 1
+
+        logger.info(f'{self.colourized_name} - Finished include directory collection. Collected {count} include directories.')
+
+    def _collect_binaries(self):
+        binaries = self.args.get('binaries', list())
+        root_binary_path = self.destination_path / 'bin'
+
+        count = 0
+        for binary in binaries:
+            try:
+                validate_json(instance=binary, schema=Dependency.BINARY_JSON_SCHEMA)
+            except:
+                logger.exception(f'{self.colourized_name} - Invalid binary entry for dependency of name \'{self.name}\'.')
+                continue
+
+            # filepaths in the json are given relative to the dependency destination directory ("<containing_directory>/<dependency_name>")
+            absolute_filepath = self.destination_path / binary['filepath']
+
+            for config in binary['configs']:
+                for platform in binary['platforms']:
+                    binary_path = root_binary_path / config / platform
+                    
+                    # create the binary file destination tree
+                    binary_path.mkdir(exist_ok=True, parents=True)
+                    shutil.copy(absolute_filepath,  binary_path / absolute_filepath.name)
+
+            count += 1
+        
+        logger.info(f'{self.colourized_name} - Finished binary collection. Collected {count} binaries.')
+
+    def process(self):
+        """
+        Processes the dependency.
+
+        """
+    
+        if self.destination_path.is_dir():
+            if self.is_locked():
+                logger.info(f'{self.colourized_name} - Skipped: dependency already installed')
+                return
+            
+            _rmtree(self.destination_path)
+
+        # Process the sub dependencies. We have to load the sub dependencies first since
+        # they are dependencies of this dependency!
+        for sub_dependency in self.sub_dependencies.values():
+            sub_dependency.process()
+
+        # Create the destination directory if it does not exist
+        self.destination_path.mkdir(parents=True, exist_ok=True)
+
+        self.unlock()
+        if not self._get(): return
+        self.lock()
+        
+        self._collect_libraries()
+        self._collect_binaries()
+        self._collect_includes()
 
     def get_hash(self):
         return hashlib.md5(json.dumps({
@@ -285,7 +429,30 @@ class Dependency(object):
         }, sort_keys=True).encode('utf-8')).hexdigest()
 
     def __str__(self): return str((self.name, str(self.source_url_type), self.source_url))
-    def __repr__(self): return self.__str__()   
+    def __repr__(self): return self.__str__()
+
+    @staticmethod
+    def get_dependencies(dependencies_json, container_directory, onerror=None):
+        result = {}
+        for dependency_name in dependencies_json:
+            try:
+                validate_json(instance=dependencies_json[dependency_name], schema=Dependency.DEPENDENCY_SCHEMA)
+
+                source_url = dependencies_json[dependency_name].get('url')
+                source_url_type = dependencies_json[dependency_name].get('url_type')
+                if source_url_type is not None:
+                    source_url_type = DependencySourceType.from_snake_case_name(source_url_type)
+
+                dependency = Dependency(dependency_name, source_url, source_url_type, 
+                    dependencies_json[dependency_name], container_directory)
+                
+                result[dependency_name] = dependency
+            except:
+                if onerror is not None:
+                    onerror(dependency_name)
+                continue
+
+        return result
 
 class DependencyDirectory(object):
     """
@@ -311,47 +478,22 @@ class DependencyDirectory(object):
         }
     }
 
-    DEPENDENCY_SCHEMA = {
-        'type': 'object',
-        'properties': {
-            'url': {
-                'type': 'string',
-                'format': 'uri'
-            },
-            'url_type': {
-                'type': 'string',
-                'enum': DependencySourceType.get_names_for_schema()
-            }
-        },
-        'required': ['url', 'url_type']
-    }
-
     def __init__(self, directory):
         self.directory = directory
+        self.config_path = DependencyDirectory._get_dependencies_config_path(directory)
         self.json_data = DependencyDirectory._get_dependencies_config(directory)
 
         self.is_valid = self.json_data is not None 
         if self.json_data is None: return
 
-        self.dependencies = {}
         self.container_directory = get_container_directory(directory, self.json_data.get('container_directory_name'))
 
-        # Load the valid dependencies
-        dependencies = self.json_data.get('dependencies', dict())
-        for dependency_name in dependencies:
-            try:
-                validate_json(instance=dependencies[dependency_name], schema=DependencyDirectory.DEPENDENCY_SCHEMA)
+        # Handle an error with getting a dependency
+        def _dependency_onerror(dependency_name):
+            logger.exception(f'Invalid dependency in \'{self.config_path.absolute()}\' with name \'{dependency_name}\'')
 
-                source_url = dependencies[dependency_name]['url']
-                source_url_type = DependencySourceType.from_snake_case_name(dependencies[dependency_name]['url_type'])
-                dependency = Dependency(dependency_name, source_url, source_url_type, 
-                    dependencies[dependency_name], self.container_directory)
-                
-                self.dependencies[dependency_name] = dependency
-            except:
-                logger.exception(f'Invalid dependency in \'{dependencies_config.absolute()}\' with name \'{dependency_name}\'')
-                continue
-        
+        self.dependencies = Dependency.get_dependencies(self.json_data.get('dependencies', dict()), self.container_directory, onerror=_dependency_onerror)
+
         # Load the subdirectories
         self.subdirectories = []
         subdirectory_paths = self.json_data.get('subdirectories', list())
@@ -387,6 +529,10 @@ class DependencyDirectory(object):
             subdirectory.clean()
 
     @staticmethod
+    def _get_dependencies_config_path(directory):
+        return Path(directory, 'dependencies').with_suffix('.json')
+
+    @staticmethod
     def _get_dependencies_config(directory):
         """
         Retrieves the dependencies.json data in the specified directory.
@@ -399,7 +545,7 @@ class DependencyDirectory(object):
 
         """
 
-        dependencies_config = Path(directory, 'dependencies').with_suffix('.json')
+        dependencies_config = DependencyDirectory._get_dependencies_config_path(directory)
         if dependencies_config is None:
             logger.error(f'Could not find \'dependencies.json\' file in {directory}.')
             return None
