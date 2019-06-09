@@ -26,7 +26,7 @@ std::string File::Read(const std::string& filepath)
 	return contents;
 }
 
-bool File::Write(const std::string& filepath, const std::string& content, bool overwrite)
+bool File::Write(const std::string& filepath, const std::string& content, const bool overwrite)
 {
 	std::ofstream file;
 	file.open(filepath);

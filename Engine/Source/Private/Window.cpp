@@ -1,8 +1,6 @@
 #include <Window.h>
 #include <utility>
 
-#include <GL/glew.h>
-
 /**
  * @brief Raised when the window is resized.
  * @param window The window context.
