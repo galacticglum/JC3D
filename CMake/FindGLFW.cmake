@@ -14,18 +14,6 @@ SET( GLFW_SEARCH_PATHS
 	/opt/csw							# Blastwave
 )
 
-# FIND_PATH( GLFW_INCLUDE_DIRS
-# 	NAMES
-#         glfw3.h
-#         glfw3native.h
-# 	PATHS
-# 		${GLFW_SEARCH_PATHS}
-# 	PATH_SUFFIXES
-# 		include
-# 	DOC
-# 		"The directory where glfw3.h and glfw3native.h resides"
-# )
-
 set(GLFW_INCLUDE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/glfw/include")
 
 # set(GLFW_LIBRARIES "${JesusChristIn3D_DEPEND_DIR}/glfw/lib/${_config}/x64/$<$<CONFIG:Debug>:glfw3-debug.lib>$<$<CONFIG:Release>:glfw3.lib>")

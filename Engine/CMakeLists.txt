@@ -12,6 +12,7 @@ endif()
 
 add_definitions( -D_CRT_SECURE_NO_WARNINGS )
 add_definitions( -DGLEW_STATIC )
+add_definitions( -DFMT_HEADER_ONLY )
 
 # Lets load up our headers for the engine project
 file(GLOB_RECURSE ENGINE_HDRS
@@ -53,13 +54,19 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
 # GLFW
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
 
+# FMT
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindFMT.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source
 	${OPENGL_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
+	${GLFW_INCLUDE_DIRS}
+	${FMT_INCLUDE_DIRS}
 )
+
+message(${FMT_INCLUDE_DIRS})
 
 # Define the link libraries
 target_link_libraries( Engine
