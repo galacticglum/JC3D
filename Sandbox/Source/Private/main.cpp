@@ -1,16 +1,35 @@
-#include <iostream>
+/**
+ * Author: Shon Verch
+ * File Name: main.cpp
+ * Project Name: JesusChristIn3D
+ * Creation Date: 06/09/2019
+ * Modified Date: 06/09/2019
+ * Description: Entry point for the sandbox application.
+ */
+
 #include <Logger.h>
-#include <Window.h>
+#include <Application.h>
 
-int main(int argc, char* argv[])
+class Sandbox : public Application
 {
-	const Window window("Window", 800, 600);
-
-	while (!window.IsCloseRequested())
+public:
+	Sandbox()
 	{
-		Window::Clear();
-		window.Update();
+		
 	}
 
-    return 0;
+	~Sandbox()
+	{
+		
+	}
+};
+
+/**
+ * Entry point for the sandbox application.
+ */
+int main(int argc, char** argv)
+{
+	Sandbox* sandbox = new Sandbox();
+	sandbox->Run();
+	delete sandbox;
 }
