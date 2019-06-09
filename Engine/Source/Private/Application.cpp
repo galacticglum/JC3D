@@ -1,9 +1,16 @@
 #include <Application.h>
 
-Application::Application() = default;
+Application::Application()
+{
+	m_Window = std::unique_ptr<Window>(Window::Create());
+}
+
 Application::~Application() = default;
 
 void Application::Run()
 {
-	while (true);
+	while (m_IsRunning)
+	{
+		m_Window->OnUpdate();
+	}
 }

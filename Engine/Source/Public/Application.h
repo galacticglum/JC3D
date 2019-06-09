@@ -7,6 +7,11 @@
  * Description: Main application class.
  */
 
+#pragma once
+
+#include <memory>
+#include <Window.h>
+
 /**
  * @class Application Application.h
  */
@@ -16,4 +21,7 @@ public:
 	Application();
 	virtual ~Application();
 	void Run();
+private:
+	std::unique_ptr<Window> m_Window;
+	bool m_IsRunning = true;
 };
