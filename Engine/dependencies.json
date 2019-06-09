@@ -4,8 +4,6 @@
         "glew": {
             "url": "https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0-win32.zip/download",
             "url_type": "archive",
-            "build_actions": [],
-            "binaries": [],
             "libraries": [
                 {
                     "filepath": "glew-2.1.0/lib/Release/x64/glew32s.lib",
@@ -43,7 +41,6 @@
                     "url_type": "archive"
                 }
             },
-            "build_actions": [],
             "binaries": [
                 {
                     "filepath": "glfw_x64/glfw-3.3.bin.WIN64/lib-vc2017/glfw3.dll",
@@ -90,6 +87,13 @@
             ],
             "include_dirs": [
                 "glfw_win32/glfw-3.3.bin.WIN32/include"
+            ]
+        },
+        "fmt": {
+            "url": "https://github.com/fmtlib/fmt/releases/download/5.3.0/fmt-5.3.0.zip",
+            "url_type": "archive",
+            "include_dirs": [
+                "fmt-5.3.0/include"
             ]
         }
     }
