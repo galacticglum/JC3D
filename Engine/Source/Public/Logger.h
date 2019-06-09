@@ -95,3 +95,6 @@ private:
 	static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> s_Loggers;
 	static bool s_IsInitialized;
 };
+
+#define LOG_CATEGORY_ASSERT(x, category, ...) { if (!(x)) { Logger::Log(category, LoggerVerbosity::Error, "Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } } 
+#define LOG_ASSERT(x, ...) LOG_CATEGORY_ASSERT(x, GLOBAL_LOGGER_IDENTIFIER, __VA_ARGS__)
