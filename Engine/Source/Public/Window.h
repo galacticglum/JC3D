@@ -4,88 +4,102 @@
  * Project Name: JesusChristIn3D
  * Creation Date: 06/08/2019
  * Modified Date: 06/08/2019
- * Description: Manages the application window.
+ * Description: A platform-independent window interface.
  */
 #pragma once
 
+#include <Events/Event.h>
 #include <string>
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include <functional>
+#include <utility>
 
 /**
- * @class Window Window.H
- * @brief Manages the application window.
+ * @struct WindowProperties Window.h
+ * @brief Generic window properties.
+ */
+struct WindowProperties
+{
+	/**
+	 * @brief The window title.
+	 */
+	std::string Title;
+
+	/**
+	 * @brief The width of the window.
+	 */
+	uint32_t Width;
+
+	/**
+	 * @brief The height of the window.
+	 */
+	uint32_t Height;
+
+	/**
+	 * @brief Initializes the WindowsProperties with default values
+	 *		  (title = "Window Title", width = 1280, height = 720).
+	 */
+	WindowProperties() : WindowProperties("Window Title", 1280, 720)
+	{
+	}
+
+	/**
+	 * @brief Initializes the WindowsProperties given a title, width, and height.
+	 */
+	WindowProperties(std::string title, const uint32_t width, const uint32_t height) :
+		Title(std::move(title)), Width(width), Height(height)
+	{
+	}
+};
+
+/**
+ * @class Window Window.h
+ * @brief A platform-independent window interface.
  */
 class Window
 {
 public:
 	/**
-	 * @brief Initialize this Window with the specified @p title and dimensions (@p width and @p height).
-	 * @param title The title of the window.
-	 * @param width The width of the window, in pixels.
-	 * @param height The height of the window, in pixels.
+	 * @brief Window event handler type.
 	 */
-	Window(std::string title, int width, int height);
+	using EventHandler = std::function<void(Event&)>;
 
 	/**
 	 * @brief Dispose of this Window.
 	 */
-	~Window();
-
-	/**
-	 * @brief Clear this Window.
-	 */
-	static void Clear();
+	virtual ~Window() = default;
 
 	/**
 	 * @brief Update this Window.
 	 */
-	void Update() const;
-
-	/**
-	 * @brief Make this Window the current GLFW window context.
-	 */
-	void MakeContextCurrent() const
-	{
-		glfwMakeContextCurrent(m_Window);
-	}
-
-	/**
-	 * @brief Gets whether this window should close.
-	 */
-	bool IsCloseRequested() const
-	{
-		return glfwWindowShouldClose(m_Window) == 1;
-	}
+	virtual void OnUpdate() const = 0;
 
 	/**
 	 * @brief Get the width of this Window, in pixels.
 	 */
-	int GetWidth() const { return m_Width; }
+	virtual uint32_t GetWidth() const = 0;
 
 	/**
 	 * @brief Get the height of this Window, in pixels.
 	 */
-	int GetHeight() const { return m_Height; }
+	virtual uint32_t GetHeight() const = 0;
 
 	/**
-	 * @brief Get the title of this Window.
+	 * @brief Set the event handler.
 	 */
-	std::string GetTitle() const { return m_Title; }
+	virtual void SetEventCallback(const EventHandler& handler) = 0;
 
 	/**
-	 * @brief Set the title of this Window to the specified @p title.
+	 * @brief Toggle VSync.
 	 */
-	void SetTitle(const std::string& title);
-private:
-	GLFWwindow* m_Window;
-	std::string m_Title;
-	int m_Width;
-	int m_Height;
+	virtual void ToggleVSync(bool enabled) = 0;
 
 	/**
-	 * Initialize this Window.
+	 * @brief Indicates whether VSync is enabled.
 	 */
-	bool Initialize();
+	virtual bool IsVSyncEnabled() const = 0;
+
+	/**
+	 * @brief Creates a Window.
+	 */
+	static Window* Create(const WindowProperties& props = WindowProperties());
 };
