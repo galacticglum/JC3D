@@ -14,6 +14,7 @@
 #include <unordered_map>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/ostr.h>
 
 #define GLOBAL_LOGGER_IDENTIFIER "Global"
 
