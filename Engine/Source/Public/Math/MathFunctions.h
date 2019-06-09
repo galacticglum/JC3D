@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <type_traits>
+#include <Logger.h>
 
 /**
  * @brief Macro definition for the generic matrix template typename definition.
@@ -49,8 +50,7 @@ struct MathFunctions
 	{
 		if (n < 0)
 		{
-			// TODO: Logging system
-			std::cerr << "MathFunctions::NextPowerOfTwo: 'n' must be positive!\n";
+			Logger::Log("Engine", LoggerVerbosity::Warning, "MathFunctions::NextPowerOfTwo: 'n' must be positive!");
 			exit(1);
 		}
 

@@ -36,12 +36,22 @@ target_compile_options(Sandbox PUBLIC
 	"$<$<CONFIG:Debug>:-W4>"
 )
 
+# GLEW
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
+
+# GLFW
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
+
+# spdlog
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public
 	${OPENGL_INCLUDE_DIRS}
-    # ${GLEW_INCLUDE_DIRS}
-    # ${GLFW_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+	${GLFW_INCLUDE_DIRS}
+	${SPDLOG_INCLUDE_DIRS}
 )
 
 target_link_libraries( Sandbox Engine )

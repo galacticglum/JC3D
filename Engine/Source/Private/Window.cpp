@@ -1,4 +1,5 @@
 #include <Window.h>
+#include <Logger.h>
 #include <utility>
 
 /**
@@ -32,12 +33,14 @@ bool Window::Initialize()
 {
 	if(!glfwInit())
 	{
+		Logger::Log("Graphics", LoggerVerbosity::Error, "Window::Initialize: Failed to initialize GLFW!");
 		return false;
 	}
 
 	m_Window = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
-	if (m_Window)
+	if (!m_Window)
 	{
+		Logger::Log("Graphics", LoggerVerbosity::Error, "Window::Initialize: Failed to create window!");
 		return false;
 	}
 
@@ -46,9 +49,11 @@ bool Window::Initialize()
 
 	if (glewInit() != GLEW_OK)
 	{
+		Logger::Log("Graphics", LoggerVerbosity::Error, "Window::Initialize: Failed to initialize GLEW!");
 		return false;
 	}
 
+	Logger::Log("Graphics", LoggerVerbosity::Info, "OpenGL {}", glGetString(GL_VERSION));
 	return true;
 }
 

@@ -54,8 +54,8 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
 # GLFW
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
 
-# FMT
-INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindFMT.cmake)
+# spdlog
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 
 # Define the include DIRs
 include_directories(
@@ -63,10 +63,8 @@ include_directories(
 	${OPENGL_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
 	${GLFW_INCLUDE_DIRS}
-	${FMT_INCLUDE_DIRS}
+	${SPDLOG_INCLUDE_DIRS}
 )
-
-message(${FMT_INCLUDE_DIRS})
 
 # Define the link libraries
 target_link_libraries( Engine

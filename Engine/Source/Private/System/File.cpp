@@ -1,5 +1,5 @@
 #include <System/File.h>
-#include <Utilities/Logger.h>
+#include <Logger.h>
 
 #include <fstream>
 #include <cstdio>
@@ -21,8 +21,8 @@ std::string File::Read(const std::string& filepath)
 
 		return contents;
 	}
-	
-	// TODO: Log error; "Could not open file: " + filepath + "!\n"
+
+	Logger::Log("Engine", LoggerVerbosity::Info, "Could not open file: {}", filepath);
 	return contents;
 }
 
@@ -41,8 +41,8 @@ bool File::Write(const std::string& filepath, const std::string& content, const 
 		file << content;
 		return true;
 	}
-	
-	// TODO: Log error; "Could not open file: " + filepath+ "!\n"
+
+	Logger::Log("Engine", LoggerVerbosity::Info, "Could not open file: {}", filepath);
 	return false;
 }
 
@@ -58,6 +58,7 @@ bool File::Delete(const std::basic_string<char>& filepath)
 {
 	if (!Exists(filepath)) return false;
 	std::remove(filepath.c_str());
+	return true;
 }
 
 

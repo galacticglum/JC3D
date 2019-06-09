@@ -1,11 +1,16 @@
 #include <iostream>
-#include <Utilities/Logger.h>
+#include <Logger.h>
+#include <Window.h>
 
 int main(int argc, char* argv[])
 {
-	Logger::Initialize();
-	Logger::Log("", "test");
+	const Window window("Window", 800, 600);
 
-    std::cout << "Hello World!" << std::endl;
+	while (!window.IsCloseRequested())
+	{
+		Window::Clear();
+		window.Update();
+	}
+
     return 0;
 }
