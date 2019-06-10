@@ -143,13 +143,19 @@ class Dependency(object):
                     'type': 'object'
                 }
             },
-            'include_dirs': {
+            'include_path': {
+                'type': 'string'
+            },
+            'source_path': {
+                'type': 'string'
+            },
+            'includes': {
                 'type': 'array',
                 'items': {
                     'type': 'string'
                 }
             },
-            'source_dirs': {
+            'sources': {
                 'type': 'array',
                 'items': {
                     'type': 'string'
@@ -356,17 +362,23 @@ class Dependency(object):
         logger.info(f'{self.colourized_name} - Finished library collection. Collected {count} libraries.')
 
     def _collect_includes(self):
-        include_dirs = self.args.get('include_dirs', list())
-        root_include_path = self.destination_path / 'include'
+        includes = self.args.get('includes', list())
+        root_include_path = self.destination_path / self.args.get('include_path', 'include')
 
         count = 0
-        for include_dir in include_dirs:
-            include_path = self.destination_path / include_dir
+        for include in includes:
+            include_path = self.destination_path / include
             if not include_path.is_dir():
-                logger.error(f'{self.colourized_name} - Invalid include directory (\'{include_dir}\') provided for dependency of name \'{self.name}\'.')
-                continue
+                if not include_path.is_file():
+                    logger.error(f'{self.colourized_name} - Invalid include (\'{include}\') provided for dependency of name \'{self.name}\'.')
+                    continue
+                
+                # the include specified is a file...
+                root_include_path.mkdir(exist_ok=True, parents=True)
+                shutil.copy(include_path, root_include_path)
+            else:
+                shutil.copytree(include_path, root_include_path)
 
-            shutil.copytree(include_path, root_include_path)
             count += 1
 
         logger.info(f'{self.colourized_name} - Finished include directory collection. Collected {count} include directories.')
@@ -398,18 +410,23 @@ class Dependency(object):
         
         logger.info(f'{self.colourized_name} - Finished binary collection. Collected {count} binaries.')
 
-    def _collect_source_dirs(self):
-        source_dirs = self.args.get('source_dirs', list())
-        root_source_path = self.destination_path / 'src'
+    def _collect_sources(self):
+        sources = self.args.get('sources', list())
+        root_source_path = self.destination_path / self.args.get('source_path', 'src')
 
         count = 0
-        for source_dir in source_dirs:
-            source_path = self.destination_path / source_dir
+        for source in sources:
+            source_path = self.destination_path / source
             if not source_path.is_dir():
-                logger.error(f'{self.colourized_name} - Invalid source directory (\'{source_dir}\') provided for dependency of name \'{self.name}\'.')
-                continue
+                if not source_path.is_file():
+                    logger.error(f'{self.colourized_name} - Invalid source (\'{source}\') provided for dependency of name \'{self.name}\'.')
+                    continue
+                    
+                root_source_path.mkdir(exist_ok=True, parents=True)
+                shutil.copy(source_path, root_source_path)
+            else:
+                shutil.copytree(source_path, root_source_path)
 
-            shutil.copytree(source_path, root_source_path)
             count += 1
 
         logger.info(f'{self.colourized_name} - Finished source directory collection. Collected {count} source directories.')
@@ -442,7 +459,7 @@ class Dependency(object):
         self._collect_libraries()
         self._collect_binaries()
         self._collect_includes()
-        self._collect_source_dirs()
+        self._collect_sources()
 
     def get_hash(self):
         return hashlib.md5(json.dumps({

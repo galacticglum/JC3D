@@ -60,15 +60,33 @@
                     ]
                 }
             ],
-            "include_dirs": [
+            "includes": [
                 "glfw_win32/glfw-3.3.bin.WIN32/include"
             ]
         },
         "spdlog": {
             "url": "https://github.com/gabime/spdlog/archive/v1.3.1.zip",
             "url_type": "archive",
-            "include_dirs": [
+            "includes": [
                 "spdlog-1.3.1/include"
+            ]
+        },
+        "imgui": {
+            "url": "https://github.com/ocornut/imgui/archive/v1.70.zip",
+            "url_type": "archive",
+            "includes": [
+                "imgui-1.70/imconfig.h",
+                "imgui-1.70/imgui.h",
+                "imgui-1.70/imgui_internal.h",
+                "imgui-1.70/imstb_rectpack.h",
+                "imgui-1.70/imstb_truetype.h",
+                "imgui-1.70/imstb_textedit.h"
+            ],
+            "sources": [
+                "imgui-1.70/imgui.cpp",
+                "imgui-1.70/imgui_draw.cpp",
+                "imgui-1.70/imgui_widgets.cpp",
+                "imgui-1.70/imgui_demo.cpp"
             ]
         }
     }

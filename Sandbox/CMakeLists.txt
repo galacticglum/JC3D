@@ -44,6 +44,9 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
 # spdlog
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 
+# imgui
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindImGui.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public
@@ -51,6 +54,7 @@ include_directories(
 	${GLFW_INCLUDE_DIRS}
 	${GLAD_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
+	${ImGui_INCLUDE_DIRS}
 )
 
 target_link_libraries( Sandbox Engine )

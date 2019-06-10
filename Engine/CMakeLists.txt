@@ -57,6 +57,9 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
 # spdlog
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 
+# imgui
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindImGui.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source
@@ -64,6 +67,7 @@ include_directories(
     ${GLAD_INCLUDE_DIRS}
 	${GLFW_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
+	${ImGui_INCLUDE_DIRS}
 )
 
 # Define the link libraries
@@ -116,3 +120,18 @@ target_compile_options(Glad PUBLIC
 )
 
 target_link_libraries( Engine Glad )
+
+# Make ImGui project
+add_library(ImGui STATIC ${ImGui_HDRS} ${ImGui_SRCS})
+set_target_properties(ImGui PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_definitions(ImGui PUBLIC 
+	"$<$<CONFIG:Release>:O2>" 
+	"$<$<CONFIG:Release>:NDEBUG>"
+)
+
+target_compile_options(ImGui PUBLIC
+	"$<$<CONFIG:Release>:-w>"
+	"$<$<CONFIG:Debug>:-W4>"
+)
+
+target_link_libraries( Engine ImGui )
