@@ -59,7 +59,7 @@ private:
 	bool OnMouseMovedEvent(MouseMovedEvent& event) const;
 	bool OnMouseScrolledEvent(MouseScrolledEvent& event) const;
 	bool OnKeyPressedEvent(KeyPressedEvent& event) const;
-	bool OnKeyTypedEvent(KeyTypedEvent& event);
+	bool OnKeyTypedEvent(KeyTypedEvent& event) const;
 	bool OnKeyReleasedEvent(KeyReleasedEvent& event) const;
 	bool OnWindowResizedEvent(WindowResizeEvent& event) const;
 
