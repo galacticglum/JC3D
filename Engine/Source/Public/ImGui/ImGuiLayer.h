@@ -12,6 +12,9 @@
 #include <imgui.h>
 
 #include <Events/Event.h>
+#include <Events/ApplicationEvent.h>
+#include <Events/MouseEvent.h>
+#include <Events/KeyEvent.h>
 #include <Layer.h>
 
 /**
@@ -49,7 +52,16 @@ public:
 	/**
 	 * @brief Handle an Event on this ImGuiLayer.,
 	 */
-	void OnEvent(const Event& event) override;
+	void OnEvent(Event& event) override;
 private:
-	float m_DeltaTime;
+	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event) const;
+	bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event) const;
+	bool OnMouseMovedEvent(MouseMovedEvent& event) const;
+	bool OnMouseScrolledEvent(MouseScrolledEvent& event) const;
+	bool OnKeyPressedEvent(KeyPressedEvent& event) const;
+	bool OnKeyTypedEvent(KeyTypedEvent& event);
+	bool OnKeyReleasedEvent(KeyReleasedEvent& event) const;
+	bool OnWindowResizedEvent(WindowResizeEvent& event) const;
+
+	float m_DeltaTime = 0;
 };

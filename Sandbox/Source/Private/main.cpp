@@ -24,7 +24,7 @@ public:
 		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnUpdate");
 	}
 
-	void OnEvent(const Event& event) override
+	void OnEvent(Event& event) override
 	{
 		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnEvent: {0}", event);
 	}

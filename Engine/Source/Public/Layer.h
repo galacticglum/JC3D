@@ -46,7 +46,7 @@ public:
 	/**
 	 * @brief Called whenever this Layer receives an Event.
 	 */
-	virtual void OnEvent(const Event& event) {}
+	virtual void OnEvent(Event& event) {}
 
 	/**
 	 * @brief Retrieves the name of this Layer.
