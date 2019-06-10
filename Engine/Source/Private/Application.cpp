@@ -30,7 +30,6 @@ void Application::OnEvent(Event& event)
 	EventDispather dispatcher(event);
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT(Application::OnWindowClose));
 
-	Logger::Log(LoggerVerbosity::Trace, event);
 	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 	{
 		(*--it)->OnEvent(event);
