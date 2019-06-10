@@ -1,3 +1,5 @@
+include(${JesusChristIn3D_CMAKE_DIR}/utils.cmake)
+
 set(ImGui_INCLUDE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/imgui/include")
 set(ImGui_SOURCE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/imgui/src")
 
@@ -16,6 +18,10 @@ file(GLOB_RECURSE ImGui_SRCS
 # Check if we found it!
 IF ( ImGui_INCLUDE_DIRS AND ImGui_SOURCE_DIRS )
 	SET( ImGui_FOUND TRUE )
+
+	# Remove any example files from the srcs
+	filter_items(ImGui_SRCS ".*examples.*")
+
 	MESSAGE( STATUS "Looking for ImGui - found" )
 ELSE ( ImGui_INCLUDE_DIRS AND ImGui_SOURCE_DIRS )
 	SET( ImGui_FOUND FAlSE )
