@@ -63,6 +63,7 @@ void ImGuiLayer::OnUpdate()
 	Application& application = Application::Get();
 	io.DisplaySize = ImVec2(application.GetWindow().GetWidth(), application.GetWindow().GetHeight());
 
+	// Track the delta time
 	const float deltaTime = static_cast<float>(glfwGetTime());
 	io.DeltaTime = m_DeltaTime > 0 ? (deltaTime - m_DeltaTime) : 1 / 60.0f;
 	m_DeltaTime = deltaTime;
@@ -82,6 +83,9 @@ void ImGuiLayer::OnEvent(Event& event)
 {
 	EventDispather dispatcher(event);
 
+	// Bind our event handlers to the the dispatcher.
+	// The dispatcher will invoke the event handler
+	// if the current event matches the type of the handler.
 	dispatcher.Dispatch<MouseButtonPressedEvent>(BIND_EVENT(ImGuiLayer::OnMouseButtonPressedEvent));
 	dispatcher.Dispatch<MouseButtonReleasedEvent>(BIND_EVENT(ImGuiLayer::OnMouseButtonReleasedEvent));
 	dispatcher.Dispatch<MouseMovedEvent>(BIND_EVENT(ImGuiLayer::OnMouseMovedEvent));

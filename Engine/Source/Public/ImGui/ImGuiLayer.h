@@ -21,7 +21,7 @@
  * @class ImGuiLayer ImGuiLayer.h
  * @brief Application Layer for handling ImGui.
  */
-class ImGuiLayer : public Layer
+class ImGuiLayer final : public Layer
 {
 public:
 	/**
@@ -54,14 +54,48 @@ public:
 	 */
 	void OnEvent(Event& event) override;
 private:
+	/**
+	 * @brief Handles the MouseButtonPressedEvent/
+	 */
 	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event) const;
+
+	/**
+	 * @brief Handles the MouseButtonReleasedEvent.
+	 */
 	bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event) const;
+
+	/**
+	 * @brief Handles the MouseMovedEvent.
+	 */
 	bool OnMouseMovedEvent(MouseMovedEvent& event) const;
+
+	/**
+	 * @brief Handles the MouseScrolledEvent.
+	 */
 	bool OnMouseScrolledEvent(MouseScrolledEvent& event) const;
+
+	/**
+	 * @brief Handles the KeyPressedEvent.
+	 */
 	bool OnKeyPressedEvent(KeyPressedEvent& event) const;
+
+	/**
+	 * @brief Handles the KeyTypedEvent.
+	 */
 	bool OnKeyTypedEvent(KeyTypedEvent& event) const;
+
+	/**
+	 * @brief Handles the KeyReleasedEvent.
+	 */
 	bool OnKeyReleasedEvent(KeyReleasedEvent& event) const;
+
+	/**
+	 * @brief Handles the WindowResizeEvent.
+	 */
 	bool OnWindowResizedEvent(WindowResizeEvent& event) const;
 
+	/**
+	 * @brief The elapsed time, in seconds, between two consecutive frames.
+	 */
 	float m_DeltaTime = 0;
 };
