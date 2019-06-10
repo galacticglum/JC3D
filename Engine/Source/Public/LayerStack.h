@@ -37,24 +37,24 @@ public:
 	~LayerStack();
 
 	/**
-	 * @brief Pushes a Layer onto this LayerStack.
+	 * @brief Pushes the specified @p layer onto this LayerStack.
 	 * @note Layers get pushed onto the first half of the stack.
 	 */
 	void PushLayer(Layer* layer);
 
 	/**
-	 * @brief Pushes an overlay Layer onto this LayerStack.
+	 * @brief Pushes the specified overlay @p layer onto this LayerStack.
 	 * @note Overlay layers get pushed onto the second half of the stack.
 	 */
 	void PushOverlay(Layer* layer);
 
 	/**
-	 * @brief Pops a Layer from this LayerStack.
+	 * @brief Pops the specified @p layer from this LayerStack.
 	 */
 	void PopLayer(Layer* layer);
 
 	/**
-	 * @brief Pops an overlay Layer from this LayerStack.
+	 * @brief Pops the specified overlay @p layer from this LayerStack.
 	 */
 	void PopOverlay(Layer* layer);
 
