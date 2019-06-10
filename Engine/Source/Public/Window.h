@@ -101,6 +101,8 @@ public:
 
 	/**
 	 * @brief Gets the native window context.
+	 * @note The native window context refers to the
+	 *		 backend window implementation.
 	 */
 	virtual void* GetNativeWindowContext() const = 0;
 
