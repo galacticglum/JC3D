@@ -24,7 +24,6 @@
  */
 class LayerStack
 {
-	using LayerStackVector = std::vector<Layer*>;
 public:
 	/**
 	 * @brief Default LayerStack constructor.
@@ -63,7 +62,17 @@ public:
 	 * @note Lowercase method name is used to stay consistent with STL and to support
 	 *		 foreach loops.
 	 */
-	LayerStackVector::iterator begin()
+	std::vector<Layer*>::iterator begin()
+	{
+		return m_Layers.begin();
+	}
+
+	/**
+	 * @brief Gets an iterator pointing to the beginning of this LayerStack.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
+	 */
+	std::vector<Layer*>::const_iterator begin() const
 	{
 		return m_Layers.begin();
 	}
@@ -73,7 +82,17 @@ public:
 	 * @note Lowercase method name is used to stay consistent with STL and to support
 	 *		 foreach loops.
 	 */
-	LayerStackVector::iterator end()
+	std::vector<Layer*>::iterator end()
+	{
+		return m_Layers.end();
+	}
+
+	/**
+	 * @brief Gets an iterator pointing to the end of this LayerStack.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
+	 */
+	std::vector<Layer*>::const_iterator end() const
 	{
 		return m_Layers.end();
 	}
@@ -81,10 +100,10 @@ private:
 	/**
 	 * @brief A std::vector of Layers.
 	 */
-	LayerStackVector m_Layers;
+	std::vector<Layer*> m_Layers;
 
 	/**
 	 * @brief An iterator pointing to the top of the LayerStack.
 	 */
-	LayerStackVector::iterator m_LayersTop;
+	std::vector<Layer*>::iterator m_LayersTop;
 };
