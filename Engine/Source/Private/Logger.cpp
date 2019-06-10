@@ -22,13 +22,13 @@ void Logger::Initialize(const bool force)
 	spdlog::set_pattern("%^[%T] %n: %v%$");
 
 	// Create a global logger.
-	s_Loggers[GLOBAL_LOGGER_IDENTIFIER] = spdlog::stdout_color_mt("GLOBAL");
-	s_Loggers[GLOBAL_LOGGER_IDENTIFIER]->set_level(spdlog::level::trace);
+	RegisterCategory(GLOBAL_LOGGER_IDENTIFIER, spdlog::stdout_color_mt("GLOBAL"));
 }
 
 void Logger::RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger)
 {
 	s_Loggers[name] = logger;
+	s_Loggers[name]->set_level(spdlog::level::trace);
 }
 
 const std::shared_ptr<spdlog::logger>& Logger::GetLogger()
