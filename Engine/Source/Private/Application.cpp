@@ -10,9 +10,11 @@ Application* Application::s_Instance = nullptr;
 
 Application::Application()
 {
+	// Ensure that there is only application instance
 	LOG_CATEGORY_ASSERT(!s_Instance, "Engine", "Application already exists!");
 	s_Instance = this;
 
+	// Create and initialize the window
 	m_Window = std::unique_ptr<Window>(Window::Create());
 	m_Window->SetEventCallback(BIND_EVENT(Application::OnEvent));
 }
@@ -32,6 +34,7 @@ void Application::Run() const
 			layer->OnUpdate();
 		}
 
+		// Update the window
 		m_Window->OnUpdate();
 	}
 }
@@ -39,11 +42,17 @@ void Application::Run() const
 void Application::OnEvent(Event& event)
 {
 	EventDispather dispatcher(event);
+
+	// Bind the WindowCloseEvent handler
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT(Application::OnWindowClose));
 
+	// Dispatch events on our layers
 	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
 	{
 		(*--it)->OnEvent(event);
+
+		// If our layer handles an event, lets break out of this loop
+		// since we don't want any layers below to also receive the event.
 		if (event.Handled) break;
 	}
 }
