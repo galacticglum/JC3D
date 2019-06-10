@@ -1,9 +1,9 @@
 #include <Application.h>
 
-#include <Core.h>
-#include <Events/Event.h>
-#include <Input.h>
+#include <Common.h>
+#include <Engine.h>
 
+#include <Events/Event.h>
 #include <glad/glad.h>
 
 Application* Application::s_Instance = nullptr;
@@ -33,9 +33,6 @@ void Application::Run() const
 		}
 
 		m_Window->OnUpdate();
-
-		Vector2f mousePosition = Input::GetMousePosition();
-		Logger::Log(LoggerVerbosity::Trace, "{0} {1}", mousePosition.X, mousePosition.Y);
 	}
 }
 

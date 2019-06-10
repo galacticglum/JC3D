@@ -9,7 +9,8 @@
 	
 #pragma once
 
-#include <Core.h>
+#include <Common.h>
+
 #include <string>
 #include <functional>
 

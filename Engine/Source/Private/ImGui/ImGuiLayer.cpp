@@ -6,7 +6,7 @@
 
 #include <Platform/OpenGL/ImGuiOpenGLRenderer.h>
 #include <Application.h>
-#include <Core.h>
+#include <Engine.h>
 
 ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
 {
