@@ -3,11 +3,14 @@ set(GLAD_SOURCE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/glad/src")
 
 file(GLOB_RECURSE GLAD_HDRS
 	${GLAD_INCLUDE_DIRS}/*.h
+	${GLAD_INCLUDE_DIRS}/*.hpp
 )
 
 file(GLOB_RECURSE GLAD_SRCS
-	${GLAD_INCLUDE_DIRS}*.cpp
+	${GLAD_INCLUDE_DIRS}/*.c
+	${GLAD_INCLUDE_DIRS}/*.cpp
 	${GLAD_SOURCE_DIRS}/*.c
+	${GLAD_SOURCE_DIRS}/*.cpp
 )
 
 # Check if we found it!
