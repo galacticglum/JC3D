@@ -1,5 +1,5 @@
 /**
- * Author: AUTHOR
+ * Author: Shon Verch
  * File Name: Vector3.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/04/2019
