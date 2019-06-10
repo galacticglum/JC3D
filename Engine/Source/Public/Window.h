@@ -6,6 +6,7 @@
  * Modified Date: 06/08/2019
  * Description: A platform-independent window interface.
  */
+
 #pragma once
 
 #include <Events/Event.h>
@@ -97,6 +98,11 @@ public:
 	 * @brief Indicates whether VSync is enabled.
 	 */
 	virtual bool IsVSyncEnabled() const = 0;
+
+	/**
+	 * @brief Gets the native window context.
+	 */
+	virtual void* GetNativeWindowContext() const = 0;
 
 	/**
 	 * @brief Creates a Window.

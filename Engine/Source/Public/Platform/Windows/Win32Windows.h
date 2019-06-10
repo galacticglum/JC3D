@@ -42,6 +42,11 @@ public:
 		return m_Data.IsVSyncEnabled;
 	}
 
+	void* GetNativeWindowContext() const override
+	{
+		return m_Window;
+	}
+
 private:
 	virtual void Initialize(const WindowProperties& props);
 	virtual void Shutdown();
