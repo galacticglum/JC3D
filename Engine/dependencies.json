@@ -72,21 +72,21 @@
             ]
         },
         "imgui": {
-            "url": "https://github.com/ocornut/imgui/archive/v1.70.zip",
+            "url": "https://github.com/ocornut/imgui/archive/docking.zip",
             "url_type": "archive",
             "includes": [
-                "imgui-1.70/imconfig.h",
-                "imgui-1.70/imgui.h",
-                "imgui-1.70/imgui_internal.h",
-                "imgui-1.70/imstb_rectpack.h",
-                "imgui-1.70/imstb_truetype.h",
-                "imgui-1.70/imstb_textedit.h"
+                "imgui-docking/imconfig.h",
+                "imgui-docking/imgui.h",
+                "imgui-docking/imgui_internal.h",
+                "imgui-docking/imstb_rectpack.h",
+                "imgui-docking/imstb_truetype.h",
+                "imgui-docking/imstb_textedit.h"
             ],
             "sources": [
-                "imgui-1.70/imgui.cpp",
-                "imgui-1.70/imgui_draw.cpp",
-                "imgui-1.70/imgui_widgets.cpp",
-                "imgui-1.70/imgui_demo.cpp"
+                "imgui-docking/imgui.cpp",
+                "imgui-docking/imgui_draw.cpp",
+                "imgui-docking/imgui_widgets.cpp",
+                "imgui-docking/imgui_demo.cpp"
             ]
         }
     }
