@@ -2,6 +2,7 @@
 
 #include <Core.h>
 #include <Events/Event.h>
+#include <glad/glad.h>
 
 Application* Application::s_Instance = nullptr;
 
@@ -20,13 +21,16 @@ void Application::Run() const
 {
 	while (m_IsRunning)
 	{
-		m_Window->OnUpdate();
+		glClearColor(0.1f, 0.1f, 0.1f, 1);
+		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Update the layers.
 		for (Layer* layer : m_LayerStack)
 		{
 			layer->OnUpdate();
 		}
+
+		m_Window->OnUpdate();
 	}
 }
 
