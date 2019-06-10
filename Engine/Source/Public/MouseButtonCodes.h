@@ -5,6 +5,7 @@
  * Creation Date: 06/10/19
  * Modified Date: 06/10/19
  * Description: Mouse button codes.
+ * Source: Keycodes from glfw3.h
  */
 
 #pragma once
