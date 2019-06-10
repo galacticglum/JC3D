@@ -10,6 +10,7 @@
 #include <Logger.h>
 #include <Layer.h>
 #include <Application.h>
+#include <ImGui/ImGuiLayer.h>
 
 class TestLayer : public Layer
 {
@@ -35,6 +36,7 @@ public:
 	Sandbox()
 	{
 		PushLayer(new TestLayer());
+		PushOverlay(new ImGuiLayer());
 	}
 
 	~Sandbox()
