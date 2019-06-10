@@ -7,8 +7,9 @@
 #include <Events/KeyEvent.h>
 #include <Events/MouseEvent.h>
 
-static bool s_IsGLFWInitialized = false;
+#include <glad/glad.h>
 
+static bool s_IsGLFWInitialized = false;
 static void GLFWErrorCallback(const int error, const char* description)
 {
 	Logger::Log("Engine", LoggerVerbosity::Error, "GLFW Error ({0}): {1}", error, description);
@@ -19,9 +20,9 @@ Window* Window::Create(const WindowProperties& props)
 	return new Win32Windows(props);
 }
 
-Win32Windows::Win32Windows(const WindowProperties& props)
+Win32Windows::Win32Windows(const WindowProperties& props) : m_Window(nullptr)
 {
-	Initialize(props);
+	Win32Windows::Initialize(props);
 }
 
 Win32Windows::~Win32Windows()
@@ -58,6 +59,10 @@ void Win32Windows::Initialize(const WindowProperties& props)
 
 	m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
 	glfwMakeContextCurrent(m_Window);
+
+	const int gladStatus = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+	LOG_CATEGORY_ASSERT(gladStatus, "Engine", "Failed to initialize Glad!")
+
 	glfwSetWindowUserPointer(m_Window, &m_Data);
 	ToggleVSync(true);
 

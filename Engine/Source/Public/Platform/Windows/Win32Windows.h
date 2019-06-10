@@ -12,7 +12,6 @@
 #include <string>
 #include <Window.h>
 
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 class Win32Windows : public Window
