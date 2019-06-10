@@ -14,7 +14,7 @@
 
 /**
  * @class WindowResizeEvent ApplicationEvent.h
- * @brief Raised whenever the window is resized.
+ * @brief Raised whenever a window is resized.
  */
 class WindowResizeEvent : public Event
 {
@@ -49,13 +49,27 @@ public:
 	EVENT_CLASS_TYPE(WindowResize)
 	EVENT_CLASS_CATEGORY(EventCategoryApplication)
 private:
+	/**
+	 * @brief The width of the window.
+	 */
 	uint32_t m_Width;
+
+	/*
+	 * @brief The height of the window.
+	 */
 	uint32_t m_Height;
 };
 
+/**
+ * @class WindowCloseEvent ApplicationEvent.h
+ * @brief Raised whenever a window is closed.
+ */
 class WindowCloseEvent : public Event
 {
 public:
+	/**
+	 * Initialize a new WindowCloseEvent.
+	 */
 	WindowCloseEvent() = default;
 
 	EVENT_CLASS_TYPE(WindowClose)
