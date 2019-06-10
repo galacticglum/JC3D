@@ -1,4 +1,4 @@
-#include <Platform/Windows/Win32Windows.h>
+#include <Platform/Windows/Win32Window.h>
 #include <Window.h>
 #include <Logger.h>
 #include <Math/Vector.h>
@@ -10,6 +10,10 @@
 #include <glad/glad.h>
 
 static bool s_IsGLFWInitialized = false;
+
+/**
+ * @brief Handle any GLFW error.
+ */
 static void GLFWErrorCallback(const int error, const char* description)
 {
 	Logger::Log("Engine", LoggerVerbosity::Error, "GLFW Error ({0}): {1}", error, description);
@@ -17,32 +21,32 @@ static void GLFWErrorCallback(const int error, const char* description)
 
 Window* Window::Create(const WindowProperties& props)
 {
-	return new Win32Windows(props);
+	return new Win32Window(props);
 }
 
-Win32Windows::Win32Windows(const WindowProperties& props) : m_Window(nullptr)
+Win32Window::Win32Window(const WindowProperties& props) : m_Window(nullptr)
 {
-	Win32Windows::Initialize(props);
+	Win32Window::Initialize(props);
 }
 
-Win32Windows::~Win32Windows()
+Win32Window::~Win32Window()
 {
-	Win32Windows::Shutdown();
+	Win32Window::Shutdown();
 }
 
-void Win32Windows::OnUpdate() const
+void Win32Window::OnUpdate() const
 {
 	glfwPollEvents();
 	glfwSwapBuffers(m_Window);
 }
 
-void Win32Windows::ToggleVSync(const bool enabled)
+void Win32Window::ToggleVSync(const bool enabled)
 {
 	glfwSwapInterval(enabled ? 1 : 0);
 	m_Data.IsVSyncEnabled = enabled;
 }
 
-void Win32Windows::Initialize(const WindowProperties& props)
+void Win32Window::Initialize(const WindowProperties& props)
 {
 	m_Data.Title = props.Title;
 	m_Data.Width = props.Width;
@@ -66,7 +70,12 @@ void Win32Windows::Initialize(const WindowProperties& props)
 	glfwSetWindowUserPointer(m_Window, &m_Data);
 	ToggleVSync(true);
 
-	// Initialize events
+	InitializeEvents();
+}
+
+
+void Win32Window::InitializeEvents() const
+{
 	glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, const int width, const int height)
 	{
 		WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
@@ -92,24 +101,24 @@ void Win32Windows::Initialize(const WindowProperties& props)
 		WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 		switch (action)
 		{
-			case GLFW_PRESS:
-			{
-				KeyPressedEvent keyPressedEvent(key, 0);
-				data.Handler(keyPressedEvent);
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				KeyReleasedEvent keyReleasedEvent(key);
-				data.Handler(keyReleasedEvent);
-				break;
-			}
-			case GLFW_REPEAT:
-			{
-				KeyPressedEvent keyPressedEvent(key, 1);
-				data.Handler(keyPressedEvent);
-				break;
-			}
+		case GLFW_PRESS:
+		{
+			KeyPressedEvent keyPressedEvent(key, 0);
+			data.Handler(keyPressedEvent);
+			break;
+		}
+		case GLFW_RELEASE:
+		{
+			KeyReleasedEvent keyReleasedEvent(key);
+			data.Handler(keyReleasedEvent);
+			break;
+		}
+		case GLFW_REPEAT:
+		{
+			KeyPressedEvent keyPressedEvent(key, 1);
+			data.Handler(keyPressedEvent);
+			break;
+		}
 		}
 	});
 
@@ -125,17 +134,17 @@ void Win32Windows::Initialize(const WindowProperties& props)
 		WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 		switch (action)
 		{
-			case GLFW_PRESS:
-			{
-				MouseButtonPressedEvent mouseButtonPressedEvent(button);
-				data.Handler(mouseButtonPressedEvent);
-				break;
-			}
-			case GLFW_RELEASE:
-			{
-				MouseButtonReleasedEvent mouseButtonReleasedEvent(button);
-				data.Handler(mouseButtonReleasedEvent);
-			}
+		case GLFW_PRESS:
+		{
+			MouseButtonPressedEvent mouseButtonPressedEvent(button);
+			data.Handler(mouseButtonPressedEvent);
+			break;
+		}
+		case GLFW_RELEASE:
+		{
+			MouseButtonReleasedEvent mouseButtonReleasedEvent(button);
+			data.Handler(mouseButtonReleasedEvent);
+		}
 		}
 	});
 
@@ -154,7 +163,7 @@ void Win32Windows::Initialize(const WindowProperties& props)
 	});
 }
 
-void Win32Windows::Shutdown()
+void Win32Window::Shutdown()
 {
 	glfwDestroyWindow(m_Window);
 }
