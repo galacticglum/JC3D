@@ -16,6 +16,12 @@ void Application::Run() const
 	while (m_IsRunning)
 	{
 		m_Window->OnUpdate();
+
+		// Update the layers.
+		for (Layer* layer : m_LayerStack)
+		{
+			layer->OnUpdate();
+		}
 	}
 }
 
@@ -25,6 +31,11 @@ void Application::OnEvent(Event& event)
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT(Application::OnWindowClose));
 
 	Logger::Log(LoggerVerbosity::Trace, event);
+	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+	{
+		(*--it)->OnEvent(event);
+		if (event.Handled) break;
+	}
 }
 
 void Application::PushLayer(Layer* layer)
