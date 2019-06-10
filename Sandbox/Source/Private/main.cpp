@@ -8,14 +8,33 @@
  */
 
 #include <Logger.h>
+#include <Layer.h>
 #include <Application.h>
+
+class TestLayer : public Layer
+{
+public:
+	TestLayer() : Layer("Test")
+	{	
+	}
+
+	void OnUpdate() override
+	{
+		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnUpdate");
+	}
+
+	void OnEvent(const Event& event) override
+	{
+		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnEvent: {0}", event);
+	}
+};
 
 class Sandbox : public Application
 {
 public:
 	Sandbox()
 	{
-		
+		PushLayer(new TestLayer());
 	}
 
 	~Sandbox()
