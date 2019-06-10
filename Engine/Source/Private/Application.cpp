@@ -27,6 +27,16 @@ void Application::OnEvent(Event& event)
 	Logger::Log(LoggerVerbosity::Trace, event);
 }
 
+void Application::PushLayer(Layer* layer)
+{
+	m_LayerStack.PushLayer(layer);
+}
+
+void Application::PushOverlay(Layer* layer)
+{
+	m_LayerStack.PushOverlay(layer);
+}
+
 bool Application::OnWindowClose(WindowCloseEvent& event)
 {
 	m_IsRunning = false;

@@ -14,6 +14,8 @@
 #include <Window.h>
 
 #include <Events/ApplicationEvent.h>
+#include <Layer.h>
+#include <LayerStack.h>
 
 /**
  * @class Application Application.h
@@ -26,9 +28,14 @@ public:
 	void Run() const;
 
 	void OnEvent(Event& event);
+
+	void PushLayer(Layer* layer);
+	void PushOverlay(Layer* layer);
 private:
 	bool OnWindowClose(WindowCloseEvent& event);
 
 	std::unique_ptr<Window> m_Window;
 	bool m_IsRunning = true;
+
+	LayerStack m_LayerStack;
 };
