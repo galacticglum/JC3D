@@ -29,6 +29,8 @@ include_directories(${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public)
 
 # Define the executable
 add_library(Engine STATIC ${ENGINE_HDRS} ${ENGINE_SRCS})
+set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
+set_property(TARGET Engine PROPERTY CXX_STANDARD_REQUIRED ON)
 set_target_properties(Engine PROPERTIES LINKER_LANGUAGE CXX)
 
 target_compile_definitions(Engine PUBLIC 
@@ -108,6 +110,7 @@ endif()
 
 # Make GLAD project
 add_library(Glad STATIC ${GLAD_HDRS} ${GLAD_SRCS})
+
 set_target_properties(Glad PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_definitions(Glad PUBLIC 
 	"$<$<CONFIG:Release>:O2>" 
@@ -123,6 +126,7 @@ target_link_libraries( Engine Glad )
 
 # Make ImGui project
 add_library(ImGui STATIC ${ImGui_HDRS} ${ImGui_SRCS})
+
 set_target_properties(ImGui PROPERTIES LINKER_LANGUAGE CXX)
 target_compile_definitions(ImGui PUBLIC 
 	"$<$<CONFIG:Release>:O2>" 

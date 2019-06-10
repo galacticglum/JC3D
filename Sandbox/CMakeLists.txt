@@ -59,6 +59,8 @@ include_directories(
 
 target_link_libraries( Sandbox Engine )
 set_target_properties( Sandbox PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Content")
+set_property(TARGET Sandbox PROPERTY CXX_STANDARD 17)
+set_property(TARGET Sandbox PROPERTY CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
 	string(REPLACE "/" "\\" source_path_windows "${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content")
