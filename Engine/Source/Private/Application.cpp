@@ -3,8 +3,13 @@
 #include <Core.h>
 #include <Events/Event.h>
 
+Application* Application::s_Instance = nullptr;
+
 Application::Application()
 {
+	LOG_CATEGORY_ASSERT(!s_Instance, "Engine", "Application already exists!");
+	s_Instance = this;
+
 	m_Window = std::unique_ptr<Window>(Window::Create());
 	m_Window->SetEventCallback(BIND_EVENT(Application::OnEvent));
 }
@@ -39,11 +44,13 @@ void Application::OnEvent(Event& event)
 
 void Application::PushLayer(Layer* layer)
 {
+	layer->OnAttach();
 	m_LayerStack.PushLayer(layer);
 }
 
 void Application::PushOverlay(Layer* layer)
 {
+	layer->OnAttach();
 	m_LayerStack.PushOverlay(layer);
 }
 
