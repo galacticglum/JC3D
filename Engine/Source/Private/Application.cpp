@@ -17,6 +17,10 @@ Application::Application()
 	// Create and initialize the window
 	m_Window = std::unique_ptr<Window>(Window::Create());
 	m_Window->SetEventCallback(BIND_EVENT(Application::OnEvent));
+
+	// Initialize the ImGuiLayer instance
+	m_ImGuiLayer = new ImGuiLayer();
+	PushOverlay(m_ImGuiLayer);
 }
 
 Application::~Application() = default;
@@ -33,6 +37,15 @@ void Application::Run() const
 		{
 			layer->OnUpdate();
 		}
+
+		// Render ImGui
+		m_ImGuiLayer->Begin();
+		for (Layer* layer : m_LayerStack)
+		{
+			layer->OnImGuiRender();
+		}
+
+		m_ImGuiLayer->End();
 
 		// Update the window
 		m_Window->OnUpdate();

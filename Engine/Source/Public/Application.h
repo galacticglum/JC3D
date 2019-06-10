@@ -16,6 +16,7 @@
 #include <Events/ApplicationEvent.h>
 #include <Layer.h>
 #include <LayerStack.h>
+#include <ImGui/ImGuiLayer.h>
 
 /**
  * @class Application Application.h
@@ -82,6 +83,11 @@ private:
 	 * @brief The Window instance.
 	 */
 	std::unique_ptr<Window> m_Window;
+
+	/**
+	 * @brief The ImGuiLayer instance.
+	 */
+	ImGuiLayer* m_ImGuiLayer;
 
 	/**
 	 * @brief A boolean indicating whether this Application is running.

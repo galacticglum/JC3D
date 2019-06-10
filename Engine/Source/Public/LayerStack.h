@@ -103,7 +103,7 @@ private:
 	std::vector<Layer*> m_Layers;
 
 	/**
-	 * @brief An iterator pointing to the top of the LayerStack.
+	 * @brief The index pointing to where Layers should be inserted in this LayerStack.
 	 */
-	std::vector<Layer*>::iterator m_LayersTop;
+	std::size_t m_LayerInsertIndex;
 };

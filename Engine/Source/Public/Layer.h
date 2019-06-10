@@ -45,6 +45,12 @@ public:
 	virtual void OnUpdate() {}
 
 	/**
+	 * @brief Renders ImGui.
+	 * @note All ImGui rendering should be in this method.
+	 */
+	virtual void OnImGuiRender() {}
+
+	/**
 	 * @brief Called whenever this Layer receives an Event.
 	 */
 	virtual void OnEvent(Event& event) {}

@@ -13,6 +13,8 @@
 #include <ImGui/ImGuiLayer.h>
 #include <Input.h>
 
+#include <imgui.h>
+
 class TestLayer : public Layer
 {
 public:
@@ -41,13 +43,9 @@ public:
 	Sandbox()
 	{
 		PushLayer(new TestLayer());
-		PushOverlay(new ImGuiLayer());
 	}
 
-	~Sandbox()
-	{
-		
-	}
+	~Sandbox() = default;
 };
 
 /**

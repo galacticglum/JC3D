@@ -1,8 +1,7 @@
 #include <LayerStack.h>
 
-LayerStack::LayerStack()
+LayerStack::LayerStack(): m_LayerInsertIndex(0)
 {
-	m_LayersTop = m_Layers.begin();
 }
 
 LayerStack::~LayerStack()
@@ -16,7 +15,8 @@ LayerStack::~LayerStack()
 
 void LayerStack::PushLayer(Layer* layer)
 {
-	m_LayersTop = m_Layers.emplace(m_LayersTop, layer);
+	m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
+	m_LayerInsertIndex++;
 }
 
 void LayerStack::PushOverlay(Layer* layer)
@@ -34,7 +34,7 @@ void LayerStack::PopLayer(Layer* layer)
 	if (it != m_Layers.end())
 	{
 		m_Layers.erase(it);
-		--m_LayersTop;
+		--m_LayerInsertIndex;
 	}
 }
 

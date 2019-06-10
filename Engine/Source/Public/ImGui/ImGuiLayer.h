@@ -3,7 +3,7 @@
  * File Name: ImGuiLayer.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/09/2019
- * Modified Date: 06/09/2019
+ * Modified Date: 06/10/2019
  * Description: Application Layer for handling ImGui.
  */
 
@@ -38,62 +38,22 @@ public:
 	void OnAttach() override;
 
 	/**
-	 * @Brief Called when this ImGuiLayer is detached.
+	 * @brief Called when this ImGuiLayer is detached.
 	 */
 	void OnDetach() override;
 
 	/**
-	 * @brief Update this ImGuiLayer.
+	 * @brief Render ImGui.
 	 */
-	void OnUpdate() override;
+	void OnImGuiRender() override;
 
 	/**
-	 * @brief Handle an Event on this ImGuiLayer.,
+	 * @brief Begin ImGui rendering.
 	 */
-	void OnEvent(Event& event) override;
-private:
-	/**
-	 * @brief Handles the MouseButtonPressedEvent/
-	 */
-	bool OnMouseButtonPressedEvent(MouseButtonPressedEvent& event) const;
+	void Begin() const;
 
 	/**
-	 * @brief Handles the MouseButtonReleasedEvent.
+	 * @brief End ImGui rendering.
 	 */
-	bool OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event) const;
-
-	/**
-	 * @brief Handles the MouseMovedEvent.
-	 */
-	bool OnMouseMovedEvent(MouseMovedEvent& event) const;
-
-	/**
-	 * @brief Handles the MouseScrolledEvent.
-	 */
-	bool OnMouseScrolledEvent(MouseScrolledEvent& event) const;
-
-	/**
-	 * @brief Handles the KeyPressedEvent.
-	 */
-	bool OnKeyPressedEvent(KeyPressedEvent& event) const;
-
-	/**
-	 * @brief Handles the KeyTypedEvent.
-	 */
-	bool OnKeyTypedEvent(KeyTypedEvent& event) const;
-
-	/**
-	 * @brief Handles the KeyReleasedEvent.
-	 */
-	bool OnKeyReleasedEvent(KeyReleasedEvent& event) const;
-
-	/**
-	 * @brief Handles the WindowResizeEvent.
-	 */
-	bool OnWindowResizedEvent(WindowResizeEvent& event) const;
-
-	/**
-	 * @brief The elapsed time, in seconds, between two consecutive frames.
-	 */
-	float m_DeltaTime = 0;
+	void End() const;
 };
