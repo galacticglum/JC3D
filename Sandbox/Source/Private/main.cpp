@@ -21,12 +21,12 @@ public:
 
 	void OnUpdate() override
 	{
-		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnUpdate");
+		//Logger::Log(LoggerVerbosity::Info, "TestLayer::OnUpdate");
 	}
 
 	void OnEvent(Event& event) override
 	{
-		Logger::Log(LoggerVerbosity::Info, "TestLayer::OnEvent: {0}", event);
+		//Logger::Log(LoggerVerbosity::Info, "TestLayer::OnEvent: {0}", event);
 	}
 };
 
