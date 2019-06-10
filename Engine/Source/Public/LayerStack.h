@@ -60,16 +60,20 @@ public:
 
 	/**
 	 * @brief Gets an iterator pointing to the beginning of this LayerStack.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
 	 */
-	LayerStackVector::iterator Begin()
+	LayerStackVector::iterator begin()
 	{
 		return m_Layers.begin();
 	}
 
 	/**
 	 * @brief Gets an iterator pointing to the end of this LayerStack.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
 	 */
-	LayerStackVector::iterator End()
+	LayerStackVector::iterator end()
 	{
 		return m_Layers.end();
 	}
