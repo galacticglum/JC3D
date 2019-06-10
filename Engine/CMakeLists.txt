@@ -11,8 +11,8 @@ else()
 endif()
 
 add_definitions( -D_CRT_SECURE_NO_WARNINGS )
-add_definitions( -DGLEW_STATIC )
 add_definitions( -DFMT_HEADER_ONLY )
+add_definitions( -DGLFW_INCLUDE_NONE )
 
 # Lets load up our headers for the engine project
 file(GLOB_RECURSE ENGINE_HDRS
@@ -48,8 +48,8 @@ target_compile_options(Engine PUBLIC
 # OpenGL
 find_package(OpenGL REQUIRED)
 
-# GLEW
-INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
+# GLAD
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLAD.cmake)
 
 # GLFW
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
@@ -61,7 +61,7 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source
 	${OPENGL_INCLUDE_DIRS}
-    ${GLEW_INCLUDE_DIRS}
+    ${GLAD_INCLUDE_DIRS}
 	${GLFW_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
 )
@@ -69,7 +69,6 @@ include_directories(
 # Define the link libraries
 target_link_libraries( Engine
 	${OPENGL_LIBRARIES}
-    ${GLEW_LIBRARIES}
     ${GLFW_LIBRARIES}
 )
 
@@ -102,3 +101,18 @@ if(MSVC_IDE)
 		source_group("${actual_source_path_msvc}" FILES "${source}")
 	endforeach()
 endif()
+
+# Make GLAD project
+add_library(Glad STATIC ${GLAD_HDRS} ${GLAD_SRCS})
+set_target_properties(Glad PROPERTIES LINKER_LANGUAGE CXX)
+target_compile_definitions(Glad PUBLIC 
+	"$<$<CONFIG:Release>:O2>" 
+	"$<$<CONFIG:Release>:NDEBUG>"
+)
+
+target_compile_options(Glad PUBLIC
+	"$<$<CONFIG:Release>:-w>"
+	"$<$<CONFIG:Debug>:-W4>"
+)
+
+target_link_libraries( Engine Glad )

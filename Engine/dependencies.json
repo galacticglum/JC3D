@@ -1,34 +1,9 @@
 {
     "container_directory_name": "Dependencies",
     "dependencies": {
-        "glew": {
-            "url": "https://sourceforge.net/projects/glew/files/glew/2.1.0/glew-2.1.0-win32.zip/download",
-            "url_type": "archive",
-            "libraries": [
-                {
-                    "filepath": "glew-2.1.0/lib/Release/x64/glew32s.lib",
-                    "platforms": [
-                        "x64"
-                    ],
-                    "configs": [
-                        "Release",
-                        "Debug"
-                    ]
-                },
-                {
-                    "filepath": "glew-2.1.0/lib/Release/Win32/glew32s.lib",
-                    "platforms": [
-                        "Win32"
-                    ],
-                    "configs": [
-                        "Release",
-                        "Debug"
-                    ]
-                }
-            ],
-            "include_dirs": [
-                "glew-2.1.0/include"
-            ]
+        "glad": {
+            "url": "https://drive.google.com/uc?export=download&id=1WLE6Lh-3ab1Lls7dqdtXnEKqCcg62TNP",
+            "url_type": "archive"
         },
         "glfw": {
             "sub_dependencies": {

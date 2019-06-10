@@ -11,7 +11,6 @@ else()
 endif()
 
 add_definitions( -D_CRT_SECURE_NO_WARNINGS )
-# add_definitions( -DGLEW_STATIC )
 
 file(GLOB_RECURSE SANDBOX_HDRS
 	${JesusChristIn3D_SOURCE_DIR}/Sandbox/Source/*.h
@@ -36,8 +35,8 @@ target_compile_options(Sandbox PUBLIC
 	"$<$<CONFIG:Debug>:-W4>"
 )
 
-# GLEW
-INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLEW.cmake)
+# GLAD
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLAD.cmake)
 
 # GLFW
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindGLFW.cmake)
@@ -49,8 +48,8 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public
 	${OPENGL_INCLUDE_DIRS}
-    ${GLEW_INCLUDE_DIRS}
 	${GLFW_INCLUDE_DIRS}
+	${GLAD_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
 )
 

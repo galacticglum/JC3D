@@ -1,19 +1,3 @@
-SET(_PF86 "PROGRAMFILES(X86)")
-SET( GLFW_SEARCH_PATHS
-	${GLFW_ROOT_DIR}					# GLFW!
-	${JesusChristIn3D_Engine_DEPEND_DIR}/glfw
-	$ENV{PROGRAMFILES}/GLFW				# WINDOWS
-	"$ENV{_PF86}/GLFW"		# WINDOWS
-	~/Library/Frameworks				# MAC
-	/Library/Frameworks					# MAC
-	/usr/local							# LINUX/MAC/UNIX
-	/usr								# LINUX/MAC/UNIX
-	/opt								# LINUX/MAC/UNIX
-	/sw									# Fink
-	/opt/local							# DarwinPorts
-	/opt/csw							# Blastwave
-)
-
 set(GLFW_INCLUDE_DIRS "${JesusChristIn3D_Engine_DEPEND_DIR}/glfw/include")
 
 # set(GLFW_LIBRARIES "${JesusChristIn3D_DEPEND_DIR}/glfw/lib/${_config}/x64/$<$<CONFIG:Debug>:glfw3-debug.lib>$<$<CONFIG:Release>:glfw3.lib>")

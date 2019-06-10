@@ -148,6 +148,12 @@ class Dependency(object):
                 'items': {
                     'type': 'string'
                 }
+            },
+            'source_dirs': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                }
             }
         },
     }
@@ -392,6 +398,22 @@ class Dependency(object):
         
         logger.info(f'{self.colourized_name} - Finished binary collection. Collected {count} binaries.')
 
+    def _collect_source_dirs(self):
+        source_dirs = self.args.get('source_dirs', list())
+        root_source_path = self.destination_path / 'src'
+
+        count = 0
+        for source_dir in source_dirs:
+            source_path = self.destination_path / source_dir
+            if not source_path.is_dir():
+                logger.error(f'{self.colourized_name} - Invalid source directory (\'{source_dir}\') provided for dependency of name \'{self.name}\'.')
+                continue
+
+            shutil.copytree(source_path, root_source_path)
+            count += 1
+
+        logger.info(f'{self.colourized_name} - Finished source directory collection. Collected {count} source directories.')
+
     def process(self):
         """
         Processes the dependency.
@@ -420,6 +442,7 @@ class Dependency(object):
         self._collect_libraries()
         self._collect_binaries()
         self._collect_includes()
+        self._collect_source_dirs()
 
     def get_hash(self):
         return hashlib.md5(json.dumps({
