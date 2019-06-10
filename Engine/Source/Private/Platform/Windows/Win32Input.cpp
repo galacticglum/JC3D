@@ -4,7 +4,6 @@
 #include <GLFW/glfw3.h>
 
 Input* Input::s_Instance = new Win32Input();
-
 bool Win32Input::IsKeyPressed_Impl(const int keycode)
 {
 	GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindowContext());
