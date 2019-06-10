@@ -103,19 +103,19 @@ void Win32Window::InitializeEvents() const
 		{
 		case GLFW_PRESS:
 		{
-			KeyPressedEvent keyPressedEvent(key, 0);
+			KeyPressedEvent keyPressedEvent(static_cast<KeyCode>(key), 0);
 			data.Handler(keyPressedEvent);
 			break;
 		}
 		case GLFW_RELEASE:
 		{
-			KeyReleasedEvent keyReleasedEvent(key);
+			KeyReleasedEvent keyReleasedEvent(static_cast<KeyCode>(key));
 			data.Handler(keyReleasedEvent);
 			break;
 		}
 		case GLFW_REPEAT:
 		{
-			KeyPressedEvent keyPressedEvent(key, 1);
+			KeyPressedEvent keyPressedEvent(static_cast<KeyCode>(key), 1);
 			data.Handler(keyPressedEvent);
 			break;
 		}
@@ -125,7 +125,7 @@ void Win32Window::InitializeEvents() const
 	glfwSetCharCallback(m_Window, [](GLFWwindow* window, const unsigned int keycode)
 	{
 		WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
-		KeyTypedEvent keyTypedEvent(keycode);
+		KeyTypedEvent keyTypedEvent(static_cast<KeyCode>(keycode));
 		data.Handler(keyTypedEvent);
 	});
 
@@ -136,13 +136,13 @@ void Win32Window::InitializeEvents() const
 		{
 		case GLFW_PRESS:
 		{
-			MouseButtonPressedEvent mouseButtonPressedEvent(button);
+			MouseButtonPressedEvent mouseButtonPressedEvent(static_cast<MouseButton>(button));
 			data.Handler(mouseButtonPressedEvent);
 			break;
 		}
 		case GLFW_RELEASE:
 		{
-			MouseButtonReleasedEvent mouseButtonReleasedEvent(button);
+			MouseButtonReleasedEvent mouseButtonReleasedEvent(static_cast<MouseButton>(button));
 			data.Handler(mouseButtonReleasedEvent);
 		}
 		}

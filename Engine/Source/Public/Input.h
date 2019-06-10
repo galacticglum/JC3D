@@ -10,6 +10,8 @@
 #pragma once
 
 #include <Math/Vector.h>
+#include <KeyCodes.h>
+#include <MouseButtonCodes.h>
 
 /**
  * @class Input Input.h
@@ -23,7 +25,7 @@ public:
 	/**
 	 * @brief Indicates whether the key with the specified @p keycode is pressed.
 	 */
-	static bool IsKeyPressed(const int keycode)
+	static bool IsKeyPressed(const KeyCode keycode)
 	{
 		return s_Instance->IsKeyPressed_Impl(keycode);
 	}
@@ -31,7 +33,7 @@ public:
 	/**
 	 * @brief Indicates whether the mouse button with the specified @p button code is pressed.
 	 */
-	static bool IsMouseButtonPressed(const int button)
+	static bool IsMouseButtonPressed(const MouseButton button)
 	{
 		return s_Instance->IsMouseButtonPressed_Impl(button);
 	}
@@ -47,12 +49,12 @@ protected:
 	/**
 	 * @brief Platform specific implementation of Input::IsKeyPressed.
 	 */
-	virtual bool IsKeyPressed_Impl(int keycode) = 0;
+	virtual bool IsKeyPressed_Impl(KeyCode keycode) = 0;
 
 	/**
 	 * @brief Platform specific implementation of Input::IsMouseButtonPressed.
 	 */
-	virtual bool IsMouseButtonPressed_Impl(int button) = 0;
+	virtual bool IsMouseButtonPressed_Impl(MouseButton button) = 0;
 
 	/**
 	 * @brief Platform specific implementation of Input::GetMousePosition.

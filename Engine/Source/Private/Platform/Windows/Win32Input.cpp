@@ -4,18 +4,22 @@
 #include <GLFW/glfw3.h>
 
 Input* Input::s_Instance = new Win32Input();
-bool Win32Input::IsKeyPressed_Impl(const int keycode)
+bool Win32Input::IsKeyPressed_Impl(const KeyCode keycode)
 {
 	GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindowContext());
-	const int state = glfwGetKey(window, keycode);
+	
+	const int glfwKey = static_cast<int>(keycode);
+	const int state = glfwGetKey(window, glfwKey);
 
-	return state == GLFW_PRESS || GLFW_REPEAT;
+	return state == GLFW_PRESS || state == GLFW_REPEAT;
 }
 
-bool Win32Input::IsMouseButtonPressed_Impl(const int button)
+bool Win32Input::IsMouseButtonPressed_Impl(const MouseButton button)
 {
 	GLFWwindow* window = static_cast<GLFWwindow*>(Application::Get().GetWindow().GetNativeWindowContext());
-	const int state = glfwGetMouseButton(window, button);
+	
+	const int glfwButton = static_cast<int>(button);
+	const int state = glfwGetMouseButton(window, glfwButton);
 
 	return state == GLFW_PRESS;
 }

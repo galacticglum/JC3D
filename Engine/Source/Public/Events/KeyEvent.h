@@ -11,6 +11,7 @@
 
 #include <sstream>
 #include <Events/Event.h>
+#include <Input.h>
 
 /**
  *@class KeyEvent KeyEvent.h
@@ -22,7 +23,7 @@ public:
 	/**
 	 * @brief Get the keycode pertaining to this KeyEvent.
 	 */
-	int GetKeyCode() const
+	KeyCode GetKeyCode() const
 	{
 		return m_KeyCode;
 	}
@@ -32,14 +33,14 @@ protected:
 	/**
 	 * @brief Initialize a new KeyEvent given a @p keycode.
 	 */
-	explicit KeyEvent(const int keycode) : m_KeyCode(keycode)
+	explicit KeyEvent(const KeyCode keycode) : m_KeyCode(keycode)
 	{
 	}
 
 	/**
 	 * @brief The keycode pertaining to this KeyEvent.
 	 */
-	int m_KeyCode;
+	KeyCode m_KeyCode;
 };
 
 /**
@@ -54,7 +55,7 @@ public:
 	 * @param keycode The code of the key that was pressed.
 	 * @param repeatCount The number of times the key was repeated.
 	 */
-	KeyPressedEvent(const int keycode, const int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount)
+	KeyPressedEvent(const KeyCode keycode, const int repeatCount) : KeyEvent(keycode), m_RepeatCount(repeatCount)
 	{
 	}
 
@@ -72,7 +73,7 @@ public:
 	std::string ToString() const override
 	{
 		std::stringstream stream;
-		stream << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+		stream << "KeyPressedEvent: " << static_cast<int>(m_KeyCode) << " (" << m_RepeatCount << " repeats)";
 		return stream.str();
 	}
 
@@ -94,7 +95,7 @@ public:
 	/**
 	 * @brief Initialize a new KeyReleasedEvent given the @p keycode.
 	 */
-	explicit KeyReleasedEvent(const int keycode) : KeyEvent(keycode)
+	explicit KeyReleasedEvent(const KeyCode keycode) : KeyEvent(keycode)
 	{
 	}
 
@@ -104,7 +105,7 @@ public:
 	std::string ToString() const override
 	{
 		std::stringstream stream;
-		stream << "KeyReleasedEvent: " << m_KeyCode;
+		stream << "KeyReleasedEvent: " << static_cast<int>(m_KeyCode);
 		return stream.str();
 	}
 
@@ -128,7 +129,7 @@ public:
 	/**
 	 * @brief Initialize a new KeyTypedEvent given the @p keycode.
 	 */
-	explicit KeyTypedEvent(const int keycode) : KeyEvent(keycode)
+	explicit KeyTypedEvent(const KeyCode keycode) : KeyEvent(keycode)
 	{
 	}
 
@@ -138,7 +139,7 @@ public:
 	std::string ToString() const override
 	{
 		std::stringstream stream;
-		stream << "KeyTypedEvent: " << m_KeyCode;
+		stream << "KeyTypedEvent: " << static_cast<int>(m_KeyCode);
 		return stream.str();
 	}
 

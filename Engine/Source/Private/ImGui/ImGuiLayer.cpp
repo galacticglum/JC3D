@@ -99,7 +99,7 @@ void ImGuiLayer::OnEvent(Event& event)
 bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event) const
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.MouseDown[event.GetMouseButton()] = true;
+	io.MouseDown[static_cast<int>(event.GetMouseButton())] = true;
 
 	return false;
 }
@@ -107,7 +107,7 @@ bool ImGuiLayer::OnMouseButtonPressedEvent(MouseButtonPressedEvent& event) const
 bool ImGuiLayer::OnMouseButtonReleasedEvent(MouseButtonReleasedEvent& event) const
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.MouseDown[event.GetMouseButton()] = false;
+	io.MouseDown[static_cast<int>(event.GetMouseButton())] = false;
 
 	return false;
 }
@@ -133,7 +133,7 @@ bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& event) const
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	io.KeysDown[event.GetKeyCode()] = true;
+	io.KeysDown[static_cast<int>(event.GetKeyCode())] = true;
 	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
 	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
@@ -145,7 +145,7 @@ bool ImGuiLayer::OnKeyPressedEvent(KeyPressedEvent& event) const
 bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& event) const
 {
 	ImGuiIO& io = ImGui::GetIO();
-	const int keycode = event.GetKeyCode();
+	const int keycode = static_cast<int>(event.GetKeyCode());
 	if (keycode > 0 && keycode < 0x10000)
 	{
 		io.AddInputCharacter(static_cast<unsigned short>(keycode));
@@ -157,7 +157,7 @@ bool ImGuiLayer::OnKeyTypedEvent(KeyTypedEvent& event) const
 bool ImGuiLayer::OnKeyReleasedEvent(KeyReleasedEvent& event) const
 {
 	ImGuiIO& io = ImGui::GetIO();
-	io.KeysDown[event.GetKeyCode()] = false;
+	io.KeysDown[static_cast<int>(event.GetKeyCode())] = false;
 
 	return false;
 }

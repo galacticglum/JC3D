@@ -9,9 +9,11 @@
 
 #pragma once
 
+#include <sstream>
+
 #include <Events/Event.h>
 #include <Math/Vector.h>
-#include <sstream>
+#include <Input.h>
 
 /**
  * @class MouseMovedEvent MouseEvent.h
@@ -89,7 +91,7 @@ public:
 	/**
 	 * @brief Gets the mouse button pertaining to this MouseButtonEvent.
 	 */
-	int GetMouseButton() const
+	MouseButton GetMouseButton() const
 	{
 		return m_Button;
 	}
@@ -99,14 +101,14 @@ protected:
 	/**
 	 * @brief Initialize a new MouseButtonEvent given the @p button.
 	 */
-	explicit MouseButtonEvent(const int button) : m_Button(button)
+	explicit MouseButtonEvent(const MouseButton button) : m_Button(button)
 	{
 	}
 
 	/**
 	 * @brief The mouse button pertaining to this MouseButtonEvent.
 	 */
-	int m_Button;
+	MouseButton m_Button;
 };
 
 /**
@@ -119,7 +121,7 @@ public:
 	/**
 	 * @brief Initialize a new MouseButtonPressedEvent given the @p button.
 	 */
-	explicit MouseButtonPressedEvent(const int button) : MouseButtonEvent(button)
+	explicit MouseButtonPressedEvent(const MouseButton button) : MouseButtonEvent(button)
 	{
 	}
 
@@ -129,7 +131,7 @@ public:
 	std::string ToString() const override
 	{
 		std::stringstream stream;
-		stream << "MouseButtonPressedEvent: " << m_Button;
+		stream << "MouseButtonPressedEvent: " << static_cast<int>(m_Button);
 		return stream.str();
 	}
 
@@ -146,7 +148,7 @@ public:
 	/**
 	 * @brief Initialize a new MouseButtonReleasedEvent given the @p button.
 	 */
-	explicit MouseButtonReleasedEvent(const int button) : MouseButtonEvent(button)
+	explicit MouseButtonReleasedEvent(const MouseButton button) : MouseButtonEvent(button)
 	{
 	}
 
@@ -156,7 +158,7 @@ public:
 	std::string ToString() const override
 	{
 		std::stringstream ss;
-		ss << "MouseButtonReleasedEvent: " << m_Button;
+		ss << "MouseButtonReleasedEvent: " << static_cast<int>(m_Button);
 		return ss.str();
 	}
 

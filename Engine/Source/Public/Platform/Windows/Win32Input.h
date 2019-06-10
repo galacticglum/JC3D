@@ -21,12 +21,12 @@ protected:
 	/**
 	 * @brief The Win32 specific implementation of Input::IsKeyPressed.
 	 */
-	bool IsKeyPressed_Impl(int keycode) override;
+	bool IsKeyPressed_Impl(KeyCode keycode) override;
 
 	/**
 	 * @brief The Win32 specific implementation of Input::IsMouseButtonPressed.
 	 */
-	bool IsMouseButtonPressed_Impl(int button) override;
+	bool IsMouseButtonPressed_Impl(MouseButton button) override;
 
 	/**
 	 * @brief The Win32 specific implementation of Input::GetMousePosition.

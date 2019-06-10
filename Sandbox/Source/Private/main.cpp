@@ -11,6 +11,7 @@
 #include <Layer.h>
 #include <Application.h>
 #include <ImGui/ImGuiLayer.h>
+#include <Input.h>
 
 class TestLayer : public Layer
 {
@@ -22,6 +23,10 @@ public:
 	void OnUpdate() override
 	{
 		//Logger::Log(LoggerVerbosity::Info, "TestLayer::OnUpdate");
+		if (Input::IsKeyPressed(KeyCode::Tab))
+		{
+			Logger::Log(LoggerVerbosity::Trace, "Tab key pressed.");
+		}
 	}
 
 	void OnEvent(Event& event) override
