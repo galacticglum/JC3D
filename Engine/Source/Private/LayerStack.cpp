@@ -19,7 +19,7 @@ void LayerStack::PushLayer(Layer* layer)
 	m_LayersTop = m_Layers.emplace(m_LayersTop, layer);
 }
 
-void LayerStack::PushOverlay(class Layer* layer)
+void LayerStack::PushOverlay(Layer* layer)
 {
 	m_Layers.emplace_back(layer);
 }
