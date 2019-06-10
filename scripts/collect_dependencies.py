@@ -11,6 +11,7 @@ import time
 import datetime
 import requests
 import zipfile
+import distutils.dir_util
 
 from enum import IntEnum
 from pathlib import Path
@@ -152,7 +153,10 @@ class Dependency(object):
             'includes': {
                 'type': 'array',
                 'items': {
-                    'type': 'string'
+                    'oneOf': [
+                        {'type': 'string'},
+                        {'type': 'object'}
+                    ]
                 }
             },
             'sources': {
@@ -362,22 +366,48 @@ class Dependency(object):
         logger.info(f'{self.colourized_name} - Finished library collection. Collected {count} libraries.')
 
     def _collect_includes(self):
+        INCLUDE_ENTRY_JSON_SCHEMA = {
+            'type': 'object',
+            'properties': {
+                'source': {
+                    'type': 'string'
+                },
+                'destination': {
+                    'type': 'string'
+                }
+            },
+            'required': ['source', 'destination']
+        }
+
         includes = self.args.get('includes', list())
         root_include_path = self.destination_path / self.args.get('include_path', 'include')
 
         count = 0
         for include in includes:
-            include_path = self.destination_path / include
+            destination_path = root_include_path
+            if not isinstance(include, str):
+                # validate the include object
+                try:
+                    validate_json(instance=include, schema=INCLUDE_ENTRY_JSON_SCHEMA)
+                except:
+                    logger.exception(f'{self.colourized_name} - Invalid include entry for dependency of name \'{self.name}\'.')
+                    continue
+
+                include_path = self.destination_path / include['source']
+                destination_path = (root_include_path / include['destination']).resolve()
+            else:
+                include_path = self.destination_path / include
+
             if not include_path.is_dir():
                 if not include_path.is_file():
                     logger.error(f'{self.colourized_name} - Invalid include (\'{include}\') provided for dependency of name \'{self.name}\'.')
                     continue
                 
                 # the include specified is a file...
-                root_include_path.mkdir(exist_ok=True, parents=True)
-                shutil.copy(include_path, root_include_path)
+                destination_path.mkdir(exist_ok=True, parents=True)
+                shutil.copy(include_path, destination_path)
             else:
-                shutil.copytree(include_path, root_include_path)
+                distutils.dir_util.copy_tree(str(include_path.resolve()), str(destination_path.resolve()))
 
             count += 1
 
@@ -425,7 +455,7 @@ class Dependency(object):
                 root_source_path.mkdir(exist_ok=True, parents=True)
                 shutil.copy(source_path, root_source_path)
             else:
-                shutil.copytree(source_path, root_source_path)
+                distutils.dir_util.copy_tree(str(source_path.resolve()), str(root_source_path.resolve()))
 
             count += 1
 

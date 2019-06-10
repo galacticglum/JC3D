@@ -80,7 +80,11 @@
                 "imgui-docking/imgui_internal.h",
                 "imgui-docking/imstb_rectpack.h",
                 "imgui-docking/imstb_truetype.h",
-                "imgui-docking/imstb_textedit.h"
+                "imgui-docking/imstb_textedit.h",
+                {
+                    "source": "imgui-docking/examples",
+                    "destination": "examples"
+                }
             ],
             "sources": [
                 "imgui-docking/imgui.cpp",
