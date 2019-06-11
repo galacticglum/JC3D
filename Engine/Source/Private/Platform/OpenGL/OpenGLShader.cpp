@@ -136,23 +136,22 @@ void OpenGLShader::SetUniform(const std::string& uniformName, const bool value) 
 
 void OpenGLShader::SetUniform(const std::string& uniformName, const Vector2f& value) const
 {
-	INTERNAL_SET_UNIFORM(glUniform2f, uniformName, value.X, value.Y);
+	INTERNAL_SET_UNIFORM(glUniform2fv, uniformName, 1, &value.Data[0]);
 }
 
 void OpenGLShader::SetUniform(const std::string& uniformName, const Vector3f& value) const
 {
-	INTERNAL_SET_UNIFORM(glUniform3f, uniformName, value.X, value.Y, value.Z);
+	INTERNAL_SET_UNIFORM(glUniform3fv, uniformName, 1, &value.Data[0]);
 }
 
 void OpenGLShader::SetUniform(const std::string& uniformName, const Vector4f& value) const
 {
-	INTERNAL_SET_UNIFORM(glUniform4f, uniformName, value.X, value.Y, value.Z, value.W);
+	INTERNAL_SET_UNIFORM(glUniform4fv, uniformName, 1, &value.Data[0]);
 }
 
 void OpenGLShader::SetUniform(const std::string& uniformName, const Matrix4f& value) const
 {
-	VERIFY_UNIFORM(uniformName);
-	glUniformMatrix4fv(m_Uniforms.at(uniformName), 1, GL_FALSE, &(value.Data[0][0]));
+	INTERNAL_SET_UNIFORM(glUniformMatrix4fv, uniformName, 1, GL_FALSE, &value.Data[0][0]);
 }
 
 GLuint OpenGLShader::ProcessShader(const std::string& filePath, const GLenum shaderType)
