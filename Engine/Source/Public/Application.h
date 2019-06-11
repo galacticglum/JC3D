@@ -17,6 +17,8 @@
 #include <Layer.h>
 #include <LayerStack.h>
 #include <ImGui/ImGuiLayer.h>
+
+#include <Renderer/Shader.h>
 #include <glad/glad.h>
 
 /**
@@ -108,4 +110,5 @@ private:
 	static Application* s_Instance;
 
 	GLuint m_VertexArray, m_VertexBuffer, m_IndexBuffer;
+	std::unique_ptr<Shader> m_Shader;
 };
