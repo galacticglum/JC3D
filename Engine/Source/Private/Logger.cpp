@@ -14,20 +14,21 @@ const std::unordered_map<LoggerVerbosity, std::string> Logger::s_VerbosityNames 
 
 std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> Logger::s_Loggers;
 bool Logger::s_IsInitialized = false;
+std::string Logger::m_DefaultMessageFormat;
 
 void Logger::Initialize(const std::string& defaultMessageFormat, const bool force)
 {
 	if (s_IsInitialized && !force) return;
 
 	m_DefaultMessageFormat = defaultMessageFormat;
-
-	// Create a global logger.
-	RegisterCategory(GLOBAL_LOGGER_IDENTIFIER, spdlog::stdout_color_mt("GLOBAL"));
 }
 
 void Logger::RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger,
 	const std::string& messageFormat)
 {
+	// Return if this category is already registered.
+	if (s_Loggers.find(name) != s_Loggers.end()) return;
+
 	s_Loggers[name] = logger;
 	s_Loggers[name]->set_level(spdlog::level::trace);
 	s_Loggers[name]->set_pattern(messageFormat);
@@ -35,12 +36,12 @@ void Logger::RegisterCategory(const std::string& name, const std::shared_ptr<spd
 
 const std::shared_ptr<spdlog::logger>& Logger::GetLogger()
 {
-	Initialize();
 	return GetLogger(GLOBAL_LOGGER_IDENTIFIER);
 }
 
 const std::shared_ptr<spdlog::logger>& Logger::GetLogger(const std::string& category)
 {
+	Initialize();
 	if (s_Loggers.find(category) == s_Loggers.end())
 	{
 		const auto logger = spdlog::stdout_color_mt(category);
