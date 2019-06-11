@@ -31,6 +31,13 @@ public:
 		}
 	}
 
+	void OnImGuiRender() override
+	{
+		ImGui::Begin("Test");
+		ImGui::Text("Hello World");
+		ImGui::End();
+	}
+
 	void OnEvent(Event& event) override
 	{
 		//Logger::Log(LoggerVerbosity::Info, "TestLayer::OnEvent: {0}", event);
@@ -51,7 +58,7 @@ public:
 /**
  * Entry point for the sandbox application.
  */
-int main(int argc, char** argv)
+int main()
 {
 	Sandbox* sandbox = new Sandbox();
 	sandbox->Run();
