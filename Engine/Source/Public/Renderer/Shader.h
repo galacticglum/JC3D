@@ -19,24 +19,43 @@ class Shader
 {
 public:
 	/**
-	 * @brief Initialize a new Shader given its vertex and fragment source.
-	 */
-	Shader(const std::string& vertexSource, const std::string& fragmentSource);
-
-	/**
 	 * @brief Destroy this Shader.
 	 */
-	~Shader();
+	virtual ~Shader() = default;
 
 	/**
 	 * @brief Bind this Shader.
 	 */
-	void Bind() const;
+	virtual void Bind() const = 0;
 
 	/**
 	 * @brief Unbind this Shader.
 	 */
-	void Unbind() const;
-private:
-	uint32_t m_ShaderProgramId;
+	virtual void Unbind() const = 0;
+
+	/**
+	 * @brief Gets the path to the vertex shader source file.
+	 */
+	virtual const std::string& GetVertexPath() const = 0;
+
+	/**
+	 * @brief Gets the path to the fragment shader source file.
+	 */
+	virtual const std::string& GetFragmentPath() const = 0;
+
+	/**
+	 * @brief Gets the path to the geometry shader source file.
+	 * @note This method will return null if there is no geometry shader. 
+	 */
+	virtual const std::string& GetGeometryPath() const = 0;
+
+	/**
+	 * @brief Create a new Shader.
+	 * @param vertexPath The path to the vertex shader.
+	 * @param fragmentPath The path to the fragment shader.
+	 * @param geometryPath The path to the geometry shader. This is an optional parameter.
+	 *					   If it is null or empty, it is assumed that there is no geometry shader.
+	 */
+	static Shader* Create(const std::string& vertexPath, const std::string& fragmentPath, 
+		const std::string& geometryPath = "");
 };
