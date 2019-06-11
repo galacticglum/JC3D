@@ -4,6 +4,31 @@
 #include <Engine.h>
 
 #include <Events/Event.h>
+#include <Renderer/BufferLayout.h>
+
+/**
+ * @briefs Converts a ShaderDataType to an OpenGL data type.
+ */
+static GLenum ShaderDataTypeToGLType(ShaderDataType type)
+{
+	switch (type)
+	{
+		case ShaderDataType::Float: return GL_FLOAT;
+		case ShaderDataType::Int: return GL_INT;
+		case ShaderDataType::Bool: return GL_BOOL;
+		case ShaderDataType::Vector2f: return GL_FLOAT;
+		case ShaderDataType::Vector3f: return GL_FLOAT;
+		case ShaderDataType::Vector4f: return GL_FLOAT;
+		case ShaderDataType::Vector2i: return GL_INT;
+		case ShaderDataType::Vector3i: return GL_INT;
+		case ShaderDataType::Vector4i: return GL_INT;
+		case ShaderDataType::Matrix3f: return GL_FLOAT;
+		case ShaderDataType::Matrix4f: return GL_FLOAT;
+	}
+
+	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown ShaderDataType!");
+	return 0;
+}
 
 Application* Application::s_Instance = nullptr;
 
@@ -24,16 +49,32 @@ Application::Application()
 	glGenVertexArrays(1, &m_VertexArray);
 	glBindVertexArray(m_VertexArray);
 
-	float vertices[9] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f
+	float vertices[3 * 7] = {
+		-0.5f, -0.5f, 0.0f, 0.23f, 0.24f, 0, 1.0f,
+		0.5f, -0.5f, 0.0f, 0.2f, 1, 0, 1.0f,
+		0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
 	};
 
 	m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-	
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+	{
+		const BufferLayout layout = {
+			{ ShaderDataType::Vector3f, "a_Position" },
+			{ ShaderDataType::Vector4f, "a_Colour" }
+		};
+
+		m_VertexBuffer->SetLayout(layout);
+	}
+
+	uint32_t index = 0;
+	const BufferLayout& layout = m_VertexBuffer->GetLayout();
+	for (const BufferElement& element : layout)
+	{
+		glEnableVertexAttribArray(index);
+		glVertexAttribPointer(index, element.GetComponentCount(), ShaderDataTypeToGLType(element.Type), 
+			element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(), reinterpret_cast<const void*>(element.Offset));
+
+		index++;
+	}
 
 	uint32_t indices[3] = {
 		0, 1, 2
@@ -45,12 +86,16 @@ Application::Application()
 		#version 330 core
 		
 		layout (location = 0) in vec3 a_Position;
+		layout (location = 1) in vec4 a_Colour;
+
 		out vec3 v_Position;
+		out vec4 v_Colour;
 		
 		void main()
 		{
 			gl_Position = vec4(a_Position, 1);
 			v_Position = a_Position;
+			v_Colour = a_Colour;
 		}
 	)";
 
@@ -59,10 +104,12 @@ Application::Application()
 
 		layout (location = 0) out vec4 colour;
 		in vec3 v_Position;
+		in vec4 v_Colour;
 
 		void main()
 		{
-			colour = vec4(v_Position * 0.5 + 0.5, 1);
+			//colour = vec4(v_Position * 0.5 + 0.5, 1);
+			colour = v_Colour;
 		}
 	)";
 
