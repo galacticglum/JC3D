@@ -15,20 +15,22 @@ const std::unordered_map<LoggerVerbosity, std::string> Logger::s_VerbosityNames 
 std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> Logger::s_Loggers;
 bool Logger::s_IsInitialized = false;
 
-void Logger::Initialize(const bool force)
+void Logger::Initialize(const std::string& defaultMessageFormat, const bool force)
 {
 	if (s_IsInitialized && !force) return;
 
-	spdlog::set_pattern("%^[%T] %n: %v%$");
+	m_DefaultMessageFormat = defaultMessageFormat;
 
 	// Create a global logger.
 	RegisterCategory(GLOBAL_LOGGER_IDENTIFIER, spdlog::stdout_color_mt("GLOBAL"));
 }
 
-void Logger::RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger)
+void Logger::RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger,
+	const std::string& messageFormat)
 {
 	s_Loggers[name] = logger;
 	s_Loggers[name]->set_level(spdlog::level::trace);
+	s_Loggers[name]->set_pattern(messageFormat);
 }
 
 const std::shared_ptr<spdlog::logger>& Logger::GetLogger()

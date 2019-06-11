@@ -44,11 +44,12 @@ public:
 	 * @note This method is automatically called by the Logger before
 	 *		 any logging operations; however, the Logger can also be
 	 *		 manually initialized.
+	 *	@param defaultMessageFormat The default message format.
 	 *	@param force A boolean value indicating whether or not the Logger
 	 *			     should be initialized even if it has already been initialized.
 	 *			     This is useful when Logger settings need to be changed during runtime.
 	 */
-	static void Initialize(bool force = false);
+	static void Initialize(const std::string& defaultMessageFormat = "%^[%T] %n: %v%$", bool force = false);
 
 	/**
 	 * @brief Log in the specified @p category.
@@ -71,7 +72,15 @@ public:
 	/**
 	 * @brief Adds a category with the specified logger.
 	 */
-	static void RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger);
+	static void RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger)
+	{
+		RegisterCategory(name, logger, m_DefaultMessageFormat);
+	}
+
+	/**
+	 * @brief Adds a category with the specified logger.
+	 */
+	static void RegisterCategory(const std::string& name, const std::shared_ptr<spdlog::logger>& logger, const std::string& messageFormat);
 
 	/**
 	 * @brief Gets the global logger instance.
@@ -95,6 +104,8 @@ private:
 	static const std::unordered_map<LoggerVerbosity, std::string> s_VerbosityNames;
 	static std::unordered_map<std::string, std::shared_ptr<spdlog::logger>> s_Loggers;
 	static bool s_IsInitialized;
+
+	static std::string& m_DefaultMessageFormat;
 };
 
 #define LOG_CATEGORY_ASSERT(x, category, ...) { if (!(x)) { Logger::Log(category, LoggerVerbosity::Error, "Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } } 
