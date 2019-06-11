@@ -13,6 +13,7 @@
 #include <Window.h>
 
 #include <GLFW/glfw3.h>
+#include <Rendering/RenderContext.h>
 
 /**
  * @class Win32Window Win32Window.h
@@ -103,13 +104,18 @@ private:
 	/**
 	 * @brief Shutdown this Win32Window.
 	 */
-	void Shutdown();
+	void Shutdown() const;
 
 	/**
 	 * @brief The GLFW window.
 	 * @note The native window context.
 	 */
 	GLFWwindow* m_Window;
+
+	/**
+	 * @brief The RenderContext instance for this Window.
+	 */
+	RenderContext* m_RenderContext{};
 
 	/**
 	 * @brief The data of this window.
