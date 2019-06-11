@@ -8,7 +8,6 @@
 #include <Engine.h>
 
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 
 ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer")
 {

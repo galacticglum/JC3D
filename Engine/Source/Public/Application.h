@@ -17,6 +17,7 @@
 #include <Layer.h>
 #include <LayerStack.h>
 #include <ImGui/ImGuiLayer.h>
+#include <glad/glad.h>
 
 /**
  * @class Application Application.h
@@ -105,4 +106,6 @@ private:
 	 * @brief The singleton Application instance.
 	 */
 	static Application* s_Instance;
+
+	GLuint m_VertexArray, m_VertexBuffer, m_IndexBuffer;
 };
