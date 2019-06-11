@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstddef>
+#include <Renderer/BufferLayout.h>
 
 /**
  * @class VertexBuffer VertexBuffer.h
@@ -35,6 +36,16 @@ public:
 	 * @brief Unbind this VertexBuffer.
 	 */
 	virtual void Unbind() const = 0;
+
+	/**
+	 * @brief Get the BufferLayout of this VertexBuffer.
+	 */
+	virtual const BufferLayout& GetLayout() const = 0;
+
+	/**
+	 * @brief Set the BufferLayout of this VertexBuffer.
+	 */
+	virtual void SetLayout(const BufferLayout& layout) = 0;
 
 	/**
 	 * @brief Create a new VertexBuffer.
