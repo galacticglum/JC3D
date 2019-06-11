@@ -21,7 +21,7 @@
 #include <Renderer/Shader.h>
 #include <Renderer/VertexBuffer.h>
 #include <Renderer/IndexBuffer.h>
-#include <glad/glad.h>
+#include <Renderer/VertexArray.h>
 
 /**
  * @class Application Application.h
@@ -111,9 +111,6 @@ private:
 	 */
 	static Application* s_Instance;
 
-	GLuint m_VertexArray;
 	std::unique_ptr<Shader> m_Shader;
-
-	std::unique_ptr<IndexBuffer> m_IndexBuffer;
-	std::unique_ptr<VertexBuffer> m_VertexBuffer;
+	std::shared_ptr<VertexArray> m_VertexArray;
 };
