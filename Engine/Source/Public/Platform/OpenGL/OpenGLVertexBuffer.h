@@ -38,6 +38,23 @@ public:
 	 * @brief Unbind this OpenGLVertexBuffer.
 	 */
 	void Unbind() const override;
+
+	/**
+	 * @Brief Get the BufferLayout of this OpenGLVertexBuffer.
+	 */
+	const BufferLayout& GetLayout() const override
+	{
+		return m_Layout;
+	}
+
+	/**
+	 * @brief Set the BufferLayout of this OpenGLVertexBuffer.
+	 */
+	void SetLayout(const BufferLayout& layout) override
+	{
+		m_Layout = layout;
+	}
 private:
 	uint32_t m_VertexBufferId{};
+	BufferLayout m_Layout;
 };
