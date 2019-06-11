@@ -411,7 +411,7 @@ class Dependency(object):
 
             count += 1
 
-        logger.info(f'{self.colourized_name} - Finished include directory collection. Collected {count} include directories.')
+        logger.info(f'{self.colourized_name} - Finished include directory collection. Collected {count} includes.')
 
     def _collect_binaries(self):
         binaries = self.args.get('binaries', list())
@@ -459,7 +459,7 @@ class Dependency(object):
 
             count += 1
 
-        logger.info(f'{self.colourized_name} - Finished source directory collection. Collected {count} source directories.')
+        logger.info(f'{self.colourized_name} - Finished source directory collection. Collected {count} sources.')
 
     def process(self):
         """
