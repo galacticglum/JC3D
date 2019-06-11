@@ -32,7 +32,7 @@ void Application::Run() const
 	while (m_IsRunning)
 	{
 		glClearColor(0.1f, 0.1f, 0.1f, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Update the layers.
 		for (Layer* layer : m_LayerStack)
