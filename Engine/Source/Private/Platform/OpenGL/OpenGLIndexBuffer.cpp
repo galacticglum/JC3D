@@ -1,10 +1,12 @@
 #include <Platform/OpenGL/OpenGLIndexBuffer.h>
 #include <glad/glad.h>
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, const std::size_t size)
+OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t* indices, const std::size_t count) : m_Count(count)
 {
 	glCreateBuffers(1, &m_IndexBufferId);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, indices, GL_STATIC_DRAW);
+	OpenGLIndexBuffer::Bind();
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(uint32_t), indices, GL_STATIC_DRAW);
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()

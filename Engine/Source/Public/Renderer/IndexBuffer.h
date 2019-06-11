@@ -37,6 +37,11 @@ public:
 	virtual void Unbind() const = 0;
 
 	/**
+	 * @brief Gets the number of indices in this IndexBuffer.
+	 */
+	virtual uint32_t GetCount() const = 0;
+
+	/**
 	 * @brief Create a new IndexBuffer.
 	 */
 	static IndexBuffer* Create(uint32_t* indices, std::size_t size);

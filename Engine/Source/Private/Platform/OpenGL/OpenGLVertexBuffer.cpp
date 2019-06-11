@@ -4,6 +4,8 @@
 OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, const std::size_t size)
 {
 	glCreateBuffers(1, &m_VertexBufferId);
+	OpenGLVertexBuffer::Bind();
+
 	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
 }
 
