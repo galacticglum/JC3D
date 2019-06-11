@@ -22,9 +22,15 @@ class BufferLayout
 {
 public:
 	/**
+	 * @brief Default constructor for BufferLayout.
+	 */
+	BufferLayout() = default;
+
+	/**
 	 * @brief Initialize a new BufferLayout from a std::initializer_list<BufferElement>
 	 */
-	BufferLayout(const std::initializer_list<BufferElement>& elements) : m_Elements(elements)
+	BufferLayout(const std::initializer_list<BufferElement>& elements) : 
+		m_Elements(elements), m_Stride(0)
 	{
 		CalculateLayout();
 	}
@@ -35,6 +41,54 @@ public:
 	const std::vector<BufferElement>& GetElements() const
 	{
 		return m_Elements;
+	}
+
+	/**
+	 * @brief Get the stride.
+	 */
+	uint32_t GetStride() const
+	{
+		return m_Stride;
+	}
+
+	/**
+ * @brief Gets an iterator pointing to the beginning of this BufferLayout.
+ * @note Lowercase method name is used to stay consistent with STL and to support
+ *		 foreach loops.
+ */
+	std::vector<BufferElement>::iterator begin()
+	{
+		return m_Elements.begin();
+	}
+
+	/**
+	 * @brief Gets an iterator pointing to the beginning of this BufferLayout.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
+	 */
+	std::vector<BufferElement>::const_iterator begin() const
+	{
+		return m_Elements.begin();
+	}
+
+	/**
+	 * @brief Gets an iterator pointing to the end of this BufferLayout.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
+	 */
+	std::vector<BufferElement>::iterator end()
+	{
+		return m_Elements.end();
+	}
+
+	/**
+	 * @brief Gets an iterator pointing to the end of this BufferLayout.
+	 * @note Lowercase method name is used to stay consistent with STL and to support
+	 *		 foreach loops.
+	 */
+	std::vector<BufferElement>::const_iterator end() const
+	{
+		return m_Elements.end();
 	}
 private:
 	/**
