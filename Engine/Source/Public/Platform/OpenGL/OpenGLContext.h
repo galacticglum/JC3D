@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <Rendering/RenderContext.h>
+#include <Renderer/RenderContext.h>
 
 struct GLFWwindow;
 

@@ -13,7 +13,7 @@
 #include <Window.h>
 
 #include <GLFW/glfw3.h>
-#include <Rendering/RenderContext.h>
+#include <Renderer/RenderContext.h>
 
 /**
  * @class Win32Window Win32Window.h
