@@ -18,11 +18,6 @@
 #include <LayerStack.h>
 #include <ImGui/ImGuiLayer.h>
 
-#include <Renderer/Shader.h>
-#include <Renderer/VertexBuffer.h>
-#include <Renderer/IndexBuffer.h>
-#include <Renderer/VertexArray.h>
-
 /**
  * @class Application Application.h
  * @brief Main application class.
@@ -110,7 +105,4 @@ private:
 	 * @brief The singleton Application instance.
 	 */
 	static Application* s_Instance;
-
-	std::unique_ptr<Shader> m_Shader;
-	std::shared_ptr<VertexArray> m_VertexArray;
 };

@@ -23,62 +23,6 @@ Application::Application()
 	// Initialize the ImGuiLayer instance
 	m_ImGuiLayer = new ImGuiLayer();
 	PushOverlay(m_ImGuiLayer);
-
-	float vertices[3 * 7] = {
-		-0.5f, -0.5f, 0.0f, 0.23f, 0.24f, 0, 1.0f,
-		0.5f, -0.5f, 0.0f, 0.2f, 1, 0, 1.0f,
-		0.0f,  0.5f, 0.0f, 0.8f, 0.8f, 0.2f, 1.0f
-	};
-
-	std::shared_ptr<VertexBuffer> vertexBuffer(VertexBuffer::Create(vertices, sizeof(vertices)));
-	
-	vertexBuffer->SetLayout({
-		{ ShaderDataType::Vector3f, "a_Position" },
-		{ ShaderDataType::Vector4f, "a_Colour" }
-	});
-
-	m_VertexArray.reset(VertexArray::Create());
-	m_VertexArray->AddVertexBuffer(vertexBuffer);
-	
-	uint32_t indices[3] = {
-		0, 1, 2
-	};
-
-	const std::shared_ptr<IndexBuffer> indexBuffer(IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
-	m_VertexArray->SetIndexBuffer(indexBuffer);
-
-	const std::string vertexSource = R"(
-		#version 330 core
-		
-		layout (location = 0) in vec3 a_Position;
-		layout (location = 1) in vec4 a_Colour;
-
-		out vec3 v_Position;
-		out vec4 v_Colour;
-		
-		void main()
-		{
-			gl_Position = vec4(a_Position, 1);
-			v_Position = a_Position;
-			v_Colour = a_Colour;
-		}
-	)";
-
-	const std::string fragmentSource = R"(
-		#version 330 core
-
-		layout (location = 0) out vec4 colour;
-		in vec3 v_Position;
-		in vec4 v_Colour;
-
-		void main()
-		{
-			//colour = vec4(v_Position * 0.5 + 0.5, 1);
-			colour = v_Colour;
-		}
-	)";
-
-	m_Shader.reset(new Shader(vertexSource, fragmentSource));
 }
 
 Application::~Application() = default;
@@ -89,10 +33,6 @@ void Application::Run() const
 	{
 		glClearColor(0.1f, 0.1f, 0.1f, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
-
-		m_Shader->Bind();
-		m_VertexArray->Bind();
-		glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffer()->GetCount(), GL_UNSIGNED_INT, nullptr);
 
 		// Update the layers.
 		for (Layer* layer : m_LayerStack)
