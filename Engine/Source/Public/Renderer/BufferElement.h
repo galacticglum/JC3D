@@ -87,10 +87,45 @@ struct BufferElement
 	ShaderDataType Type;
 
 	/**
+	 * @brief Indicates whether this BufferElement ia normalized.
+	 */
+	bool Normalized;
+	bool m_Normalized;
+
+	/**
+	 * @brief Default constructor for BufferElement.
+	 */
+	BufferElement() = default;
+
+	/**
 	 * @brief Initialize a new BufferElement.
 	 */
-	BufferElement(const ShaderDataType type, std::string name) : 
-		Name(std::move(name)), Offset(0), Size(ShaderDataTypeSize(type)), Type(type)
+	BufferElement(const ShaderDataType type, std::string name, const bool normalized = false) :
+		Name(std::move(name)), Offset(0), Size(ShaderDataTypeSize(type)), Type(type), Normalized(normalized), m_Normalized(normalized)
 	{
+	}
+
+	/**
+	 * @brief Get the number of components making up this BufferElement.
+	 */
+	uint32_t GetComponentCount() const
+	{
+		switch (Type)
+		{
+			case ShaderDataType::Float: return 1;
+			case ShaderDataType::Int: return 1;
+			case ShaderDataType::Bool: return 1;
+			case ShaderDataType::Vector2f: return 2;
+			case ShaderDataType::Vector3f: return 3;
+			case ShaderDataType::Vector4f: return 4;
+			case ShaderDataType::Vector2i: return 2;
+			case ShaderDataType::Vector3i: return 3;
+			case ShaderDataType::Vector4i: return 4;
+			case ShaderDataType::Matrix3f: return 3 * 3;
+			case ShaderDataType::Matrix4f: return 4 * 4;
+		}
+
+		LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown ShaderDataType!");
+		return 0;
 	}
 };
