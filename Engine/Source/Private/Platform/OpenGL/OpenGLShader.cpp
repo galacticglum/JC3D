@@ -6,6 +6,17 @@
 #include <vector>
 #include <utility>
 
+/**
+ * @brief Macro to verify that a uniform with the specified name exists.
+ */
+#define VERIFY_UNIFORM(x) if (m_Uniforms.find(x) == m_Uniforms.end()) { \
+	Logger::Log("Renderer", LoggerVerbosity::Warning, "No uniform with name \"{0}\" exists!", x); return; }
+
+/**
+ * @brief Internal macro to set the value of a uniform.
+ */
+#define INTERNAL_SET_UNIFORM(func, name, ...) { VERIFY_UNIFORM(name); func(m_Uniforms.at(name), __VA_ARGS__); }
+
 OpenGLShader::OpenGLShader(std::string vertexPath, std::string fragmentPath, std::string geometryPath) : 
 	m_VertexPath(std::move(vertexPath)), m_FragmentPath(std::move(fragmentPath)), m_GeometryPath(std::move(geometryPath))
 {
@@ -96,6 +107,52 @@ void OpenGLShader::Bind() const
 void OpenGLShader::Unbind() const
 {
 	glUseProgram(0);
+}
+
+void OpenGLShader::AddUniform(const std::string& uniformName)
+{
+	const GLint uniformLocation = glGetUniformLocation(m_ShaderProgramId, uniformName.c_str());
+	LOG_CATEGORY_ASSERT(uniformLocation != -1, "Renderer", "Could not find location of uniform with name \"{0}\". (vertex: \"{1}\", fragment: \"{2}\")",
+		uniformName, m_VertexPath, m_FragmentPath);
+
+	if (m_Uniforms.find(uniformName) != m_Uniforms.end()) return;
+	m_Uniforms[uniformName] = uniformLocation;
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const int value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform1i, uniformName, value);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const float value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform1f, uniformName, value);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const bool value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform1i, uniformName, value ? 1 : 0);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const Vector2f& value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform2f, uniformName, value.X, value.Y);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const Vector3f& value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform3f, uniformName, value.X, value.Y, value.Z);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const Vector4f& value) const
+{
+	INTERNAL_SET_UNIFORM(glUniform4f, uniformName, value.X, value.Y, value.Z, value.W);
+}
+
+void OpenGLShader::SetUniform(const std::string& uniformName, const Matrix4f& value) const
+{
+	VERIFY_UNIFORM(uniformName);
+	glUniformMatrix4fv(m_Uniforms.at(uniformName), 1, GL_FALSE, &(value.Data[0][0]));
 }
 
 GLuint OpenGLShader::ProcessShader(const std::string& filePath, const GLenum shaderType)

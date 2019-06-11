@@ -11,7 +11,9 @@
 
 #include <string>
 #include <Renderer/Shader.h>
+
 #include <glad/glad.h>
+#include <unordered_map>
 
 /**
  * @class OpenGLShader OpenGLShader.h
@@ -68,11 +70,53 @@ public:
 	{
 		return m_GeometryPath;
 	}
+
+	/**
+	 * @brief Add a uniform with the specified @p uniformName.
+	 */
+	void AddUniform(const std::string& uniformName) override;
+
+	/**
+	 * @brief Set the value of the integer uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, int value) const override;
+
+	/**
+	 * @brief Set the value of the float uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, float value) const override;
+
+	/**
+	 * @brief Set the value of the boolean uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, bool value) const override;
+
+	/**
+	 * @brief Set the value of the Vector2f uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, const Vector2f& value) const override;
+
+	/**
+	 * @brief Set the value of the Vector3f uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, const Vector3f& value) const override;
+
+	/**
+	 * @brief Set the value of the Vector4f uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, const Vector4f& value) const override;
+
+	/**
+	 * @brief Set the value of the Matrix4f uniform with the specified @p uniformName.
+	 */
+	void SetUniform(const std::string& uniformName, const Matrix4f& value) const override;
 private:
 	std::string m_VertexPath;
 	std::string m_FragmentPath;
 	std::string m_GeometryPath;
 	uint32_t m_ShaderProgramId;
+
+	std::unordered_map<std::string, GLuint> m_Uniforms;
 
 	/**
 	 * @brief Process a shader source file.
