@@ -16,10 +16,10 @@ struct Image
 	/**
 	 * @brief Loads an image at the specified @p filepath.
 	 */
-	static unsigned char* Load(const char* filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false) const;
+	static unsigned char* Load(const char* filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false);
 
 	/**
 	 * @brief Loads an image at the specified @p filepath.
 	 */
-	static unsigned char* Load(const std::string& filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false) const;
+	static unsigned char* Load(const std::string& filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false);
 };

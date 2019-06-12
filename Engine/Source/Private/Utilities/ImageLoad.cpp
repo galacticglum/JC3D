@@ -4,7 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 
-unsigned char* Image::Load(const char* filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY) const
+unsigned char* Image::Load(const char* filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY)
 {
 	int x, y, channels;
 
@@ -20,7 +20,7 @@ unsigned char* Image::Load(const char* filepath, uint32_t* width, uint32_t* heig
 	return data;
 }
 
-unsigned char* Image::Load(const std::string& filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY) const
+unsigned char* Image::Load(const std::string& filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY)
 {
 	return Load(filepath.c_str(), width, height, components, flipY);
 }
