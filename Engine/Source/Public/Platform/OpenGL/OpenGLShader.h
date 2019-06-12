@@ -116,7 +116,7 @@ private:
 	std::string m_GeometryPath;
 	uint32_t m_ShaderProgramId;
 
-	std::unordered_map<std::string, GLuint> m_Uniforms;
+	std::unordered_map<std::string, int> m_Uniforms;
 
 	/**
 	 * @brief Process a shader source file.
