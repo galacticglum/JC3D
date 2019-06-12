@@ -25,11 +25,6 @@ public:
 	virtual void SetData(const void* pixels) = 0;
 
 	/**
-	 * @brief Sets the data of this Texture2D to the specified @p colour.
-	 */
-	virtual void SetData(uint32_t colour) = 0;
-
-	/**
 	 * @brief Gets the width of this Texture2D.
 	 */
 	virtual uint32_t GetWidth() const = 0;
@@ -53,14 +48,4 @@ public:
 	 * @brief Create a new Texture2D from a file.
 	 */
 	static Texture2D* Create(const std::string& filepath, TextureLoadOptions loadOptions);
-
-	/**
-	 * @brief Create a new Texture2D from a file.
-	 */
-	static Texture2D* Create(const std::string& name, const std::string& filepath, TextureParameters parameters = TextureParameters(), TextureLoadOptions loadOptions = TextureLoadOptions());
-
-	/**
-	 * @brief Create a new Texture2D from a file.
-	 */
-	static Texture2D* Create(const std::string& name, const std::string& filepath, TextureLoadOptions loadOptions);
 };
