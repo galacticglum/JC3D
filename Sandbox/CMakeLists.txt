@@ -58,29 +58,33 @@ include_directories(
 )
 
 target_link_libraries( Sandbox Engine )
-# set_target_properties( Sandbox PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Content")
+
+# Set the output directory for sandbox to make managing directories easier
+set (SANDBOX_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/bin")
+set_target_properties( Sandbox PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${SANDBOX_OUT_DIR})
+
 set_property(TARGET Sandbox PROPERTY CXX_STANDARD 17)
 set_property(TARGET Sandbox PROPERTY CXX_STANDARD_REQUIRED ON)
 
-if(WIN32)
-	string(REPLACE "/" "\\" source_path_windows "${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content")
-	string(REPLACE "/" "\\" build_path_windows "${JesusChristIn3D_BINARY_DIR}/Sandbox/Content")
-	execute_process(COMMAND cmd.exe /c mklink /J "${build_path_windows}" "${source_path_windows}" RESULT_VARIABLE exitcode)
-else()
-	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content ${JesusChristIn3D_BINARY_DIR}/Sandbox/Content RESULT_VARIABLE exitcode)
-endif()
+# Copy content to output directory
+add_custom_command(TARGET Sandbox PRE_BUILD
+				   COMMAND ${CMAKE_COMMAND} -E copy_directory
+				   ${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content $<TARGET_FILE_DIR:Sandbox>/Content)
 
-if(NOT ${exitcode} EQUAL 0)
-	MESSAGE("SYMLINKING FAILED: ${exitcode}")
-	MESSAGE("FALLING BACK TO COPYING")
-endif()
-
-# Copy file if the build resource folder contains an older version. 
-# This is ignored when the symlink was succesful because the files are already the newest version.
-file(GLOB_RECURSE RES RELATIVE ${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content/ ${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content/*.*)
-foreach(file IN LISTS RES)
-	configure_file(${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content/${file} ${JesusChristIn3D_BINARY_DIR}/Sandbox/Content/${file} COPYONLY)
-endforeach()
+# Set the working directory
+file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/Sandbox.vcxproj.user" 
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>     \
+    <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
+    <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">
+        <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+        <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    </PropertyGroup>
+    <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
+        <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+        <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    </PropertyGroup>
+	</Project>"
+)
 
 # Create virtual folders to make it look nicer in VS
 if(MSVC_IDE)

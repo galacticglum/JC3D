@@ -33,6 +33,12 @@ set_property(TARGET Engine PROPERTY CXX_STANDARD 17)
 set_property(TARGET Engine PROPERTY CXX_STANDARD_REQUIRED ON)
 set_target_properties(Engine PROPERTIES LINKER_LANGUAGE CXX)
 
+# Set the output directory for engine to make managing directories easier
+set_target_properties( Engine PROPERTIES 
+	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/bin"
+	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib"
+	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/lib") 
+
 target_compile_definitions(Engine PUBLIC 
 	"$<$<CONFIG:Release>:O2>" 
 	"$<$<CONFIG:Release>:NDEBUG>"
@@ -81,25 +87,6 @@ target_link_libraries( Engine
 	${OPENGL_LIBRARIES}
     ${GLFW_LIBRARIES}
 )
-
-if(WIN32)
-	string(REPLACE "/" "\\" source_path_windows "${JesusChristIn3D_SOURCE_DIR}/Engine/Content")
-	string(REPLACE "/" "\\" build_path_windows "${JesusChristIn3D_BINARY_DIR}/Engine/Content")
-	execute_process(COMMAND cmd.exe /c mklink /J "${build_path_windows}" "${source_path_windows}" RESULT_VARIABLE exitcode)
-else()
-	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${JesusChristIn3D_SOURCE_DIR}/Engine/Content ${JesusChristIn3D_BINARY_DIR}/Engine/Content RESULT_VARIABLE exitcode)
-endif()
-
-if(NOT ${exitcode} EQUAL 0)
-	MESSAGE("SYMLINKING FAILED: ${exitcode}")
-	MESSAGE("FALLING BACK TO COPYING")
-endif()
-
-# Copy file if the build resource folder contains an older version. This is ignored when the symlink was succesful because the files are already the newest version.
-file(GLOB_RECURSE RES RELATIVE ${JesusChristIn3D_SOURCE_DIR}/Engine/Content/ ${JesusChristIn3D_SOURCE_DIR}/Engine/Content/*.*)
-foreach(file IN LISTS RES)
-	configure_file(${JesusChristIn3D_SOURCE_DIR}/Engine/Content/${file} ${JesusChristIn3D_BINARY_DIR}/Engine/Content/${file} COPYONLY)
-endforeach()
 
 # Create virtual folders to make it look nicer in VS
 if(MSVC_IDE)
