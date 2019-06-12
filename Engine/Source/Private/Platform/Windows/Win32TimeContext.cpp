@@ -5,7 +5,7 @@
 
 double Win32TimeContext::GetTime()
 {
-	LOG_CATEGORY_ASSERT(!GLFW_NOT_INITIALIZED, "Engine", "GLFW is not initialized!");
+	LOG_CATEGORY_ASSERT(GLFW_NOT_INITIALIZED, "Engine", "GLFW is not initialized!");
 	return glfwGetTime();
 }
 
