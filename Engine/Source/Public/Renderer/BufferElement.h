@@ -12,7 +12,6 @@
 #include <utility>
 
 #include <Renderer/ShaderDataType.h>
-#include <Logger.h>
 
  /**
   * @struct BufferElement BufferElement.h
@@ -55,7 +54,7 @@ struct BufferElement
 	 * @brief Initialize a new BufferElement.
 	 */
 	BufferElement(const ShaderDataType type, std::string name, const bool normalized = false) :
-		Name(std::move(name)), Offset(0), Size(ShaderDataTypeSize(type)), Type(type), Normalized(normalized), m_Normalized(normalized)
+		Name(std::move(name)), Offset(0), Size(ShaderDataTypeHelper::GetSize(type)), Type(type), Normalized(normalized), m_Normalized(normalized)
 	{
 	}
 
@@ -64,6 +63,6 @@ struct BufferElement
 	 */
 	uint32_t GetComponentCount() const
 	{
-		return GetShaderDataTypeComponentCount(Type);
+		return ShaderDataTypeHelper::GetComponentCount(Type);
 	}
 };
