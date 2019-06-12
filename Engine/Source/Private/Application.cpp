@@ -23,14 +23,22 @@ Application::Application()
 	// Initialize the ImGuiLayer instance
 	m_ImGuiLayer = new ImGuiLayer();
 	PushOverlay(m_ImGuiLayer);
+
+	// Initialize the time
+	m_Time = std::unique_ptr<Time>(Time::Create());
 }
 
 Application::~Application() = default;
 
-void Application::Run() const
+void Application::Run()
 {
+	float lastFrame = 0;
 	while (m_IsRunning)
 	{
+		const float currentFrame = static_cast<float>(m_Time->GetTime());
+		m_DeltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		glClearColor(0.1f, 0.1f, 0.1f, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

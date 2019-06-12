@@ -3,7 +3,7 @@
  * File Name: Application.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/09/2019
- * Modified Date: 06/09/2019
+ * Modified Date: 06/12/2019
  * Description: Main application class.
  */
 
@@ -12,6 +12,7 @@
 #include <memory>
 #include <Events/Event.h>
 #include <Window.h>
+#include <Time.h>
 
 #include <Events/ApplicationEvent.h>
 #include <Layer.h>
@@ -39,7 +40,7 @@ public:
 	 * @brief Run this application.
 	 * @note Application::Run contains the main render loop.
 	 */
-	void Run() const;
+	void Run();
 
 	/**
 	 * @brief Called when an Event is dispatched.
@@ -73,6 +74,13 @@ public:
 		return *m_Window;
 	}
 
+	/**
+	 * @brief Get the time, in seconds, between consecutive frames.
+	 */
+	float GetDeltaTime() const
+	{
+		return m_DeltaTime;
+	}
 private:
 	/**
 	 * @brief Handle the WindowCloseEvent.
@@ -95,6 +103,16 @@ private:
 	 *		 should terminate.
 	 */
 	bool m_IsRunning = true;
+
+	/**
+	 * @brief The time, in seconds, between consecutive frames.
+	 */
+	float m_DeltaTime;
+
+	/**
+	 * @brief The time context.
+	 */
+	std::unique_ptr<Time> m_Time;
 
 	/**
 	 * @brief The LayerStack of this Application.
