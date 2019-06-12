@@ -62,6 +62,9 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 # imgui
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindImGui.cmake)
 
+# stb
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSTB.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source
@@ -70,6 +73,7 @@ include_directories(
 	${GLFW_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
 	${ImGui_INCLUDE_DIRS}
+	${STB_INCLUDE_DIRS}
 )
 
 # Define the link libraries

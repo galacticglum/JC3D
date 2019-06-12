@@ -92,6 +92,16 @@
                 "imgui-docking/imgui_widgets.cpp",
                 "imgui-docking/imgui_demo.cpp"
             ]
+        },
+        "stb": {
+            "url": "https://github.com/nothings/stb/archive/master.zip",
+            "url_type": "archive",
+            "includes": [
+                {
+                    "source": "stb-master/stb_image.h",
+                    "destination": "stb"
+                }
+            ]
         }
     }
 }
