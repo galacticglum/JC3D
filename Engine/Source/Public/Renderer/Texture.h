@@ -160,7 +160,7 @@ public:
 	/**
 	 * @brief Gets the stride from TextureFormat.
 	 */
-	static uint32_t GetStride(const TextureFormat textureFormat);
+	static uint32_t GetStride(TextureFormat textureFormat);
 protected:
 	static TextureWrap s_WrapMode;
 	static TextureFilter s_FilterMode;
