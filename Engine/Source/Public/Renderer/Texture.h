@@ -132,11 +132,6 @@ public:
 	virtual void Unbind(uint32_t slot = 0) const = 0;
 
 	/**
-	 * @brief Gets the name of this Texture.
-	 */
-	virtual const std::string& GetName() const = 0;
-
-	/**
 	 * @brief Gets the filepath of this Texture.
 	 */
 	virtual const std::string& GetFilepath() const = 0;
