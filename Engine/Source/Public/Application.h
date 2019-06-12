@@ -43,6 +43,27 @@ public:
 	void Run();
 
 	/**
+	 * @brief Called when this Application is initialized.
+	 */
+	virtual void OnInitialize()
+	{
+	}
+
+	/**
+	 * @brief Called when this Application updates.
+	 */
+	virtual void OnUpdate()
+	{
+	}
+
+	/**
+	 * @brief Called when this Application is shutting down.
+	 */
+	virtual void OnShutdown()
+	{
+	}
+
+	/**
 	 * @brief Called when an Event is dispatched.
 	 */
 	void OnEvent(Event& event);
@@ -80,6 +101,14 @@ public:
 	float GetDeltaTime() const
 	{
 		return m_DeltaTime;
+	}
+
+	/**
+	 * @brief Get the Time instance.
+	 */
+	Time& GetTimeContext() const
+	{
+		return *m_Time;
 	}
 private:
 	/**

@@ -32,6 +32,8 @@ Application::~Application() = default;
 
 void Application::Run()
 {
+	OnInitialize();
+
 	float lastFrame = 0;
 	while (m_IsRunning)
 	{
@@ -60,6 +62,8 @@ void Application::Run()
 		// Update the window
 		m_Window->OnUpdate();
 	}
+
+	OnShutdown();
 }
 
 void Application::OnEvent(Event& event)
