@@ -13,31 +13,6 @@
 #include <string>
 
 /**
- * @enum TextureWrap Texture.h
- * @brief Texture coordinate wrapping mode.
- */
-enum class TextureWrap
-{
-	None = 0,
-	Repeat,
-	Clamp,
-	MirroredRepeat,
-	ClampToEdge,
-	ClampToBorder
-};
-
-/**
- * @enum TextureFilter Texture.h
- * @brief Filtering mode for textures.
- */
-enum class TextureFilter
-{
-	None = 0,
-	Linear,
-	Nearest
-};
-
-/**
  * @enum TextureFormat Texture.h
  * @brief Format modes for textures.
  */
@@ -45,68 +20,7 @@ enum class TextureFormat
 {
 	None = 0,
 	RGB,
-	RGBA,
-	Luminance,
-	LuminanceAlpha
-};
-
-/**
- * @struct TextureParameters Texture.h
- * @brief Parameters for a Texture.
- */
-struct TextureParameters
-{
-	/**
-	 * @brief The format mode for the Texture.
-	 */
-	TextureFormat Format;
-
-	/**
-	 * @brief The filtering mode for the Texture.
-	 */
-	TextureFilter Filter;
-
-	/**
-	 * @brief The wrap mode for the Texture.
-	 */
-	TextureWrap Wrap;
-
-	/**
-	 * @brief Initialize a new TextureParameters.
-	 * @note By default, TextureParameters::Format is TextureFormat::RGBA,
-	 *		 TextureParameters::Filter is TextureFilter::Linear, and
-	 *		 TextureParameters::Wrap is TextureWrap::Clamp.
-	 */
-	explicit TextureParameters(const TextureFormat format = TextureFormat::RGBA, 
-		const TextureFilter filter = TextureFilter::Linear, const TextureWrap wrap = TextureWrap::Clamp)
-		: Format(format), Filter(filter), Wrap(wrap)
-	{
-	}
-};
-
-/**
- * @struct TextureLoadOptions Texture.h
- * @brief Texture loading options.
- */
-struct TextureLoadOptions
-{
-	/**
-	 * @brief A boolean indicating whether the Texture should be flipped about the x-axis.
-	 */
-	bool FlipX;
-
-	/**
-	 * @brief A boolean indicating whether the Texture should be flipped about the y-axis.
-	 */
-	bool FlipY;
-
-	/**
-	 * @brief Initialize a new TextureLoadOptions.
-	 */
-	explicit TextureLoadOptions(const bool flipX = false, const bool flipY = false)
-		: FlipX(flipX), FlipY(flipY)
-	{
-	}
+	RGBA
 };
 
 /**
@@ -137,26 +51,7 @@ public:
 	virtual const std::string& GetFilepath() const = 0;
 
 	/**
-	 * @brief Set the Texture wrap mode.
+	 * @brief Gets the texture handle.
 	 */
-	static void SetWrap(const TextureWrap wrapMode)
-	{
-		s_WrapMode = wrapMode;
-	}
-
-	/**
-	 * @brief Set the Texture filter mode.
-	 */
-	static void SetFilter(const TextureFilter filterMode)
-	{
-		s_FilterMode = filterMode;
-	}
-
-	/**
-	 * @brief Gets the stride from TextureFormat.
-	 */
-	static uint32_t GetStride(TextureFormat textureFormat);
-protected:
-	static TextureWrap s_WrapMode;
-	static TextureFilter s_FilterMode;
+	virtual uint32_t GetHandle() const = 0;
 };

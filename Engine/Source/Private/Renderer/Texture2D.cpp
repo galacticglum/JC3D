@@ -3,46 +3,30 @@
 #include <Renderer/Renderer.h>
 #include <Logger.h>
 
-Texture2D* Texture2D::Create(const uint32_t width, const uint32_t height, const TextureParameters parameters,
-	const TextureLoadOptions loadOptions)
+Texture2D* Texture2D::Create(const TextureFormat format, const uint32_t width, const uint32_t height)
 {
-	switch (Renderer::GetAPI())
+	switch (RendererAPI::Current())
 	{
-		case RendererAPI::None:
+		case RendererAPIType::None:
 			LOG_CATEGORY_ASSERT(false, "Renderer", "RendererAPI::None is not supported!");
 			return nullptr;
-		case RendererAPI::OpenGL:
-			return new OpenGLTexture2D(width, height, parameters, loadOptions);
+		case RendererAPIType::OpenGL:
+			return new OpenGLTexture2D(format, width, height);
 	}
 
 	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown RendererAPI!");
 	return nullptr;
 }
 
-Texture2D* Texture2D::Create(const std::string& filepath, TextureParameters parameters, TextureLoadOptions loadOptions)
+Texture2D* Texture2D::Create(const std::string& filepath, const bool srgb)
 {
-	switch (Renderer::GetAPI())
+	switch (RendererAPI::Current())
 	{
-		case RendererAPI::None:
+		case RendererAPIType::None:
 			LOG_CATEGORY_ASSERT(false, "Renderer", "RendererAPI::None is not supported!");
 			return nullptr;
-		case RendererAPI::OpenGL:
-			return new OpenGLTexture2D(filepath, parameters, loadOptions);
-	}
-
-	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown RendererAPI!");
-	return nullptr;
-}
-
-Texture2D* Texture2D::Create(const std::string& filepath, TextureLoadOptions loadOptions)
-{
-	switch (Renderer::GetAPI())
-	{
-		case RendererAPI::None:
-			LOG_CATEGORY_ASSERT(false, "Renderer", "RendererAPI::None is not supported!");
-			return nullptr;
-		case RendererAPI::OpenGL:
-			return new OpenGLTexture2D(filepath, TextureParameters(), loadOptions);
+		case RendererAPIType::OpenGL:
+			return new OpenGLTexture2D(filepath, srgb);
 	}
 
 	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown RendererAPI!");
