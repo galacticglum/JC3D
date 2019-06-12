@@ -112,6 +112,11 @@ public:
 	}
 private:
 	/**
+	 * @brief Handle the WindowResizeEvent.
+	 */
+	bool OnWindowResize(WindowResizeEvent& event);
+
+	/**
 	 * @brief Handle the WindowCloseEvent.
 	 */
 	bool OnWindowClose(WindowCloseEvent& event);
@@ -132,6 +137,11 @@ private:
 	 *		 should terminate.
 	 */
 	bool m_IsRunning = true;
+
+	/**
+	 * @brief A boolean indicating whether this Application is minimized.
+	 */
+	bool m_Minimized = false;
 
 	/**
 	 * @brief The time, in seconds, between consecutive frames.

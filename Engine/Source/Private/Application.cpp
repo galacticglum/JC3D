@@ -10,7 +10,7 @@
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application()
+Application::Application() : m_DeltaTime(0)
 {
 	// Ensure that there is only application instance
 	LOG_CATEGORY_ASSERT(!s_Instance, "Engine", "Application already exists!");
@@ -70,8 +70,9 @@ void Application::OnEvent(Event& event)
 {
 	EventDispather dispatcher(event);
 
-	// Bind the WindowCloseEvent handler
+	// Bind window event handlers
 	dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT(Application::OnWindowClose));
+	dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT(Application::OnWindowResize));
 
 	// Dispatch events on our layers
 	for(auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
@@ -94,6 +95,20 @@ void Application::PushOverlay(Layer* layer)
 {
 	layer->OnAttach();
 	m_LayerStack.PushOverlay(layer);
+}
+
+bool Application::OnWindowResize(WindowResizeEvent& event)
+{
+	const int width = event.GetWidth();
+	const int height = event.GetHeight();
+	if (width == 0 || height == 0)
+	{
+		m_Minimized = true;
+		return false;
+	}
+
+	m_Minimized = false;
+	return true;
 }
 
 bool Application::OnWindowClose(WindowCloseEvent& event)
