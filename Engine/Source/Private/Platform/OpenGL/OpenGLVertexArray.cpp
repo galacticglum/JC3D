@@ -9,16 +9,20 @@ static GLenum ShaderDataTypeToGLType(const ShaderDataType type)
 	switch (type)
 	{
 		case ShaderDataType::Float: return GL_FLOAT;
+		case ShaderDataType::Float2: return GL_FLOAT;
+		case ShaderDataType::Float3: return GL_FLOAT;
+		case ShaderDataType::Float4: return GL_FLOAT;
 		case ShaderDataType::Int: return GL_INT;
+		case ShaderDataType::Int2: return GL_INT;
+		case ShaderDataType::Int3: return GL_INT;
+		case ShaderDataType::Int4: return GL_INT;
+		case ShaderDataType::Uint32: return GL_UNSIGNED_INT;
 		case ShaderDataType::Bool: return GL_BOOL;
-		case ShaderDataType::Vector2f: return GL_FLOAT;
-		case ShaderDataType::Vector3f: return GL_FLOAT;
-		case ShaderDataType::Vector4f: return GL_FLOAT;
-		case ShaderDataType::Vector2i: return GL_INT;
-		case ShaderDataType::Vector3i: return GL_INT;
-		case ShaderDataType::Vector4i: return GL_INT;
-		case ShaderDataType::Matrix3f: return GL_FLOAT;
-		case ShaderDataType::Matrix4f: return GL_FLOAT;
+		case ShaderDataType::Bool2: return GL_BOOL;
+		case ShaderDataType::Bool3: return GL_BOOL;
+		case ShaderDataType::Bool4: return GL_BOOL;
+		case ShaderDataType::Matrix3x3: return GL_FLOAT;
+		case ShaderDataType::Matrix4x4: return GL_FLOAT;
 	}
 
 	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown ShaderDataType!");
