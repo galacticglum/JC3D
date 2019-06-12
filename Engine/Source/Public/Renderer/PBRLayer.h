@@ -9,12 +9,21 @@
 
 #pragma once
 
+#include <vector>
 #include <memory>
 
+#include <Math/Vector.h>
 #include <Layer.h>
 
 #include <Renderer/Shader.h>
 #include <Renderer/Texture2D.h>
+#include <Renderer/Camera.h>
+
+struct Light
+{
+	Vector3f Position;
+	Vector4f Colour;
+};
 
 /**
  * @clas PBRLayer PBRLayer.h
@@ -34,4 +43,7 @@ private:
 	std::unique_ptr<Texture2D> m_MetallicMap;
 	std::unique_ptr<Texture2D> m_RoughnessMap;
 	std::unique_ptr<Texture2D> m_AmbientOcclusionMap;
+	std::unique_ptr<Camera> m_Camera;
+
+	std::vector<Light> m_Lights;
 };

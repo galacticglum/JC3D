@@ -1,4 +1,5 @@
 #include <Renderer/PBRLayer.h>
+#include <Application.h>
 #include <glad/glad.h>
 
 void PBRLayer::OnAttach()
@@ -21,6 +22,16 @@ void PBRLayer::OnAttach()
 	m_MetallicMap.reset(Texture2D::Create("Content/Textures/pbr/rusted_iron/metallic.png"));
 	m_RoughnessMap.reset(Texture2D::Create("Content/Textures/pbr/rusted_iron/roughness.png"));
 	m_AmbientOcclusionMap.reset(Texture2D::Create("Content/Textures/pbr/rusted_iron/ao.png"));
+
+	m_Camera.reset(new Camera(Vector3f(0, 0, 3)));
+	m_Lights = {
+		{ Vector3f(0, 0, 10), Vector4f(150, 150, 150, 255) }
+	};
+
+	Window& window = Application::Get().GetWindow();
+
+	const Matrix4f projection = Matrix4f::Perspective(m_Camera->Zoom, window.GetWidth(), window.GetHeight(), 0.1f, 100.0f);
+	m_PBRShader->SetUniform("projection", projection);
 }
 
 void PBRLayer::OnDetach()
