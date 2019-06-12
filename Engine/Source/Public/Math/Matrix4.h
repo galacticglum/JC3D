@@ -14,6 +14,7 @@
 #include <Math/MathFunctions.h>
 
 #include <cmath>
+#include <algorithm>
 
  /**
   * @struct Matrix Matrix4.h
@@ -191,8 +192,8 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 		Matrix<4, 4, T> frame;
 		Matrix<4, 4, T> translate;
 
-		Vector<3, T> forward = Vector<3, T>::Normalize(destination - source);
-		Vector<3, T> right = Vector<3, T>::Normalize(Vector<3, T>::Cross(forward, up));
+		Vector<3, T> forward = (destination - source).Normalized();
+		Vector<3, T> right = Vector<3, T>::Cross(forward, up).Normalized();
 		Vector<3, T> u = Vector<3, T>::Cross(right, forward);
 
 		frame[0] = Vector<4, T>(right, frame[0].W);

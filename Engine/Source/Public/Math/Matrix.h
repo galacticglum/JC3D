@@ -70,6 +70,19 @@ struct MatrixBase
 	 */
 	const Vector2<std::size_t> Size = Vector2<std::size_t>(Width, Height);
 
+	/**
+	 * @brief Copy constructor.
+	 */
+	MatrixBase(MatrixBase const &) = default;
+
+	/**
+	 * @brief Assignment operator.
+	 */
+	MatrixBase& operator= (MatrixBase const & other)
+	{
+		return *this;
+	}
+
 	union
 	{
 		/**

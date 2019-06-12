@@ -19,7 +19,7 @@
   * @tparam T The type of the vector elements.
   */
 template<typename T>
-struct Vector<3, T> : VectorBase<T, Vector<3, T>>
+struct Vector<3, T> : VectorBase<3, T, Vector<3, T>>
 {
 	union
 	{

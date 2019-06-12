@@ -17,6 +17,20 @@
 #include <string>
 #include <sstream>
 
+ /**
+  * @brief Macro definition for the generic vector template typename definition.
+  * @note Restricts to arithmetic types only.
+  */
+#define VECTOR_TYPENAME_TEMPLATE typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
+
+  /**
+   * @brief Macro definition for the generic vector template definition including typename restriction to only numeric types.
+   */
+#define VECTOR_TEMPLATE template <std::size_t n, VECTOR_TYPENAME_TEMPLATE>
+
+VECTOR_TEMPLATE
+struct Vector;
+
 /**
  * @struct VectorBase Vector.h
  * @brief A base generic vector supporting arbitrary element types.
@@ -26,18 +40,18 @@
  * @tparam Derived The type of the derived vector class.
  *		   @p Derived is assumed to be a Vector type (base or subclass of Vector).
  */
-template<typename T, typename Derived>
+template<std::size_t n, typename T, typename Derived>
 struct VectorBase
 {
 	/**
 	 * @brief Get the derived instance.
 	 */
-	Derived& GetDerived() { return static_cast<Derived&>(*this); }
+	Vector<n, T>& GetDerived() { return static_cast<Vector<n, T>&>(*this); }
 
 	/**
 	 * @brief Get the derived instance.
 	 */
-	const Derived& GetDerived() const { return static_cast<const Derived&>(*this); }
+	const Vector<n, T>& GetDerived() const { return static_cast<const Vector<n, T>&>(*this); }
 
 	/**
 	 * @brief The size of this Vector.
@@ -107,7 +121,7 @@ struct VectorBase
 	 *		 use the Vector<n, T>::Normalized method instead.
 	 * @returns A reference to @p vector.
 	 */
-	static Derived& Normalize(const Derived& vector)
+	static Vector<n, T>& Normalize(Vector<n, T>& vector)
 	{
 		T magnitude = vector.Magnitude();
 		if (magnitude == 0) return vector;
@@ -126,9 +140,10 @@ struct VectorBase
 	 *		 use the Vector<n, T>::Normalize method instead.
 	 *	@returns A normalized copy of this Vector.
 	 */
-	Derived Normalized() const
+	Vector<n, T> Normalized() const
 	{
-		return Derived(GetDerived()).Normalize();
+		Vector<n, T> vector = Vector<n, T>(GetDerived());
+		return Vector<n, T>::Normalize(vector);
 	}
 
 	/**
@@ -147,13 +162,13 @@ struct VectorBase
 	 * @brief Gets a copy of this Vector with negative elements.
 	 * @returns A copy of this Vector whose elements have been negated.
 	 */
-	Derived Negative() const
+	Vector<n, T> Negative() const
 	{
-		Derived result;
-		GetDerived().Foreach([](std::size_t index, const T& element)
+		Vector<n, T> result;
+		for (std::size_t i = 0; i < n; ++i)
 		{
-			result[index] = -element;
-		});
+			result[i] = -GetDerived()[i];
+		}
 
 		return result;
 	}
@@ -164,7 +179,7 @@ struct VectorBase
 	 *	     together and then multiplied by the cosine of the angle between them.
 	 * @returns The dot product of vector @p a and @p b.
 	 */
-	static T Dot(const Derived& a, const Derived& b)
+	static T Dot(const Vector<n, T>& a, const Vector<n, T>& b)
 	{
 		T result;
 
@@ -182,7 +197,7 @@ struct VectorBase
 	 * @note The distance between two vectors is the same as the magnitude of their difference.
 	 * @returns The distance between vector @p a and @p b.
 	 */
-	static T Distance(const Derived& a, const Derived&  b)
+	static T Distance(const Vector<n, T>& a, const Vector<n, T>&  b)
 	{
 		return (a - b).Magnitude();
 	}
@@ -192,7 +207,7 @@ struct VectorBase
 	 * @note The square distance between two vectors is the same as the square magnitude of their difference.
 	 * @returns The square distance between vector @p and @p b.
 	 */
-	static T SquareDistance(const Derived& a, const Derived&  b)
+	static T SquareDistance(const Vector<n, T>& a, const Vector<n, T>&  b)
 	{
 		return (a - b).SquareMagnitude();
 	}
@@ -203,7 +218,7 @@ struct VectorBase
 	 *		 The parameter @p t is clamped within the range [0, 1].
 	 *	@returns A new interpolated vector between @p a and @p b.
 	 */
-	static Derived Lerp(const Derived& a, const Derived& b, T t)
+	static Derived Lerp(const Vector<n, T>& a, const Vector<n, T>& b, T t)
 	{
 		return a + (b - a) * t;
 	}
@@ -260,17 +275,6 @@ struct VectorBase
 };
 
 /**
- * @brief Macro definition for the generic vector template typename definition.
- * @note Restricts to arithmetic types only.
- */
-#define VECTOR_TYPENAME_TEMPLATE typename T, typename = typename std::enable_if<std::is_arithmetic<T>::value, T>::type
-
-/**
- * @brief Macro definition for the generic vector template definition including typename restriction to only numeric types.
- */
-#define VECTOR_TEMPLATE template <std::size_t n, VECTOR_TYPENAME_TEMPLATE>
-
-/**
  * @struct Vector Vector.h
  * @brief A generic vector implementation supporting arbitrary element types.
  * 
@@ -278,7 +282,7 @@ struct VectorBase
  * @tparam T The type of the vector elements.
  */
 VECTOR_TEMPLATE
-struct Vector : VectorBase<T, Vector<n, T>>
+struct Vector : VectorBase<n, T, Vector<n, T>>
 {
 	union
 	{
@@ -442,10 +446,10 @@ Vector<n, T> operator /(T scalar, const Vector<n, T>& right)
 VECTOR_TEMPLATE
 Vector<n, T>& operator +=(Vector<n, T>& left, const Vector<n, T>& right)
 {
-	right.Foreach([](std::size_t index, const T& element)
+	for (std::size_t i = 0; i < n; ++i)
 	{
-		left[index] += element;
-	});
+		left[i] += right[i];
+	}
 
 	return left;
 }
@@ -466,10 +470,10 @@ Vector<n, T>& operator -=(Vector<n, T>& left, const Vector<n, T>& right)
 VECTOR_TEMPLATE
 Vector<n, T>& operator *=(Vector<n, T>& left, const Vector<n, T>& right)
 {
-	right.Foreach([](std::size_t index, const T& element)
+	for (std::size_t i = 0; i < n; ++i)
 	{
-		left[index] *= element;
-	});
+		left[i] *= right[i];
+	}
 	
 	return left;
 }
@@ -480,10 +484,10 @@ Vector<n, T>& operator *=(Vector<n, T>& left, const Vector<n, T>& right)
 VECTOR_TEMPLATE
 Vector<n, T>& operator /=(Vector<n, T>& left, const Vector<n, T>& right)
 {
-	right.Foreach([](std::size_t index, const T& element)
+	for (std::size_t i = 0; i < n; ++i)
 	{
-		left[index] /= element;
-	});
+		left[i] /= right[i];
+	}
 
 	return left;
 }
