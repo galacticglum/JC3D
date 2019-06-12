@@ -204,4 +204,47 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 		translate[3] = Vector<4, T>(-source, translate[3].W);
 		return frame * translate;
 	}
+
+	/**
+	 * @brief Creates an orthogonal projection matrix. 
+	 */
+	static Matrix<4, 4, T> Orthographic(const T left, const T right, const T top, const T bottom, const T nearPlane, const T farPlane)
+	{
+		Matrix<4, 4, T> result;
+
+		result[0][0] = static_cast<T>(2.0 / (right - left));
+		result[1][1] = static_cast<T>(2.0 / (top - bottom));
+		result[2][2] = static_cast<T>(-2.0 / (farPlane - nearPlane));
+		result[3][0] = static_cast<T>(-(right + left) / (right - left));
+		result[3][1] = static_cast<T>(-(top + bottom) / (top - bottom));
+		result[3][2] = static_cast<T>(-(farPlane + nearPlane) / (farPlane - nearPlane));
+		result[3][3] = static_cast<T>(1);
+
+		return result;
+	}
+
+	/**
+	 * @brief Creates a perspective projection matrix.
+	 */
+	static Matrix<4, 4, T> Perspective(const T fov, const T aspectRatio, const T nearPlane, const float farPlane, bool isFovDegrees = true)
+	{
+		if (isFovDegrees)
+		{
+			fov = MathFunctions::DegreesToRadians(fov);
+		}
+
+		T q = static_cast<T>(1 / std::tan(fov * 0.5));
+		T a = q / aspectRatio;
+		T b = (nearPlane + farPlane) / (nearPlane - farPlane);
+		T c = (2 * nearPlane * farPlane) / (nearPlane - farPlane);
+
+		Matrix<4, 4, T> result;
+		result[0][0] = a;
+		result[1][1] = q;
+		result[2][2] = b;
+		result[2][3] = -1;
+		result[3][2] = c;
+
+		return result;
+	}
 };
