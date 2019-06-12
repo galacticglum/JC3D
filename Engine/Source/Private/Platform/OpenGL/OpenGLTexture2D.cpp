@@ -49,12 +49,23 @@ uint32_t OpenGLTexture2D::Load()
 	{
 		uint32_t channels;
 		pixels = Image::Load(m_FilePath, &m_Width, &m_Height, &channels, m_LoadOptions.FlipY);
-		if (channels != 3 && channels != 4)
+		if (channels != 1 && channels != 3 && channels != 4)
 		{
-			Logger::Log("Renderer", LoggerVerbosity::Error, "Unsupported image bit-depth! ({0})!", channels);
+			Logger::Log("Renderer", LoggerVerbosity::Error, "Unsupported image bit-depth! (channels: {0}, filepath: {1})!", channels, m_FilePath);
 		}
 
-		m_Parameters.Format = channels == 3 ? TextureFormat::RGB : TextureFormat::RGBA;
+		if (channels == 1)
+		{
+			m_Parameters.Format = TextureFormat::Luminance;
+		}
+		else if (channels == 3)
+		{
+			m_Parameters.Format = TextureFormat::RGB;
+		}
+		else if (channels == 4)
+		{
+			m_Parameters.Format = TextureFormat::RGBA;
+		}
 	}
 
 	uint32_t textureId;
