@@ -11,12 +11,15 @@
 
 #include <string>
 
-/**
- * @brief Loads an image at the specified @p filepath.
- */
-unsigned char* LoadImage(const char* filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false);
+struct Image
+{
+	/**
+	 * @brief Loads an image at the specified @p filepath.
+	 */
+	static unsigned char* Load(const char* filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false) const;
 
-/**
- * @brief Loads an image at the specified @p filepath.
- */
-unsigned char* LoadImage(const std::string& filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false);
+	/**
+	 * @brief Loads an image at the specified @p filepath.
+	 */
+	static unsigned char* Load(const std::string& filepath, uint32_t* width = nullptr, uint32_t* height = nullptr, uint32_t* components = nullptr, bool flipY = false) const;
+};

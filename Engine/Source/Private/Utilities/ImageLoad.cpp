@@ -1,13 +1,16 @@
 #include <Utilities/ImageLoad.h>
+#include <Logger.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
-#include <Logger.h>
 
-unsigned char* LoadImage(const char* filepath, uint32_t* width, uint32_t* height, uint32_t* components, bool flipY)
+unsigned char* Image::Load(const char* filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY) const
 {
 	int x, y, channels;
+
+	stbi_set_flip_vertically_on_load(flipY);
 	unsigned char* data = stbi_load(filepath, &x, &y, &channels, 0);
+
 	LOG_CATEGORY_ASSERT(data, "Engine", "Could not load image \"{0}\"!", filepath);
 
 	*width = x;
@@ -17,7 +20,7 @@ unsigned char* LoadImage(const char* filepath, uint32_t* width, uint32_t* height
 	return data;
 }
 
-unsigned char* LoadImage(const std::string& filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY)
+unsigned char* Image::Load(const std::string& filepath, uint32_t* width, uint32_t* height, uint32_t* components, const bool flipY) const
 {
-	return LoadImage(filepath.c_str(), width, height, components, flipY);
+	return Load(filepath.c_str(), width, height, components, flipY);
 }
