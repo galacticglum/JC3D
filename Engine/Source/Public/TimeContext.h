@@ -1,6 +1,6 @@
 /**
  * Author: Shon Verch
- * File Name: Time.h
+ * File Name: TimeContext.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/12/19
  * Modified Date: 06/12/19
@@ -10,20 +10,20 @@
 #pragma once
 
 /**
- * @class Time Time.h
+ * @class TimeContext TimeContext.h
  * @brief Platform independent timing utilities.
  */
-class Time
+class TimeContext
 {
 public:
-	virtual ~Time() = default;
+	virtual ~TimeContext() = default;
 	/**
 	 * @brief Get the time, in seconds, from the start of the application.
 	 */
 	virtual double GetTime() = 0;
 
 	/**
-	 * @brief Create a Time context.
+	 * @brief Create a TimeContext context.
 	 */
-	static Time* Create();
+	static TimeContext* Create();
 };

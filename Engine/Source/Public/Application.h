@@ -12,7 +12,7 @@
 #include <memory>
 #include <Events/Event.h>
 #include <Window.h>
-#include <Time.h>
+#include <TimeContext.h>
 
 #include <Events/ApplicationEvent.h>
 #include <Layer.h>
@@ -104,11 +104,11 @@ public:
 	}
 
 	/**
-	 * @brief Get the Time instance.
+	 * @brief Get the TimeContext instance.
 	 */
-	Time& GetTimeContext() const
+	TimeContext& GetTimeContext() const
 	{
-		return *m_Time;
+		return *m_TimeContext;
 	}
 private:
 	/**
@@ -151,7 +151,7 @@ private:
 	/**
 	 * @brief The time context.
 	 */
-	std::unique_ptr<Time> m_Time;
+	std::unique_ptr<TimeContext> m_TimeContext;
 
 	/**
 	 * @brief The LayerStack of this Application.

@@ -25,7 +25,7 @@ Application::Application() : m_DeltaTime(0)
 	PushOverlay(m_ImGuiLayer);
 
 	// Initialize the time
-	m_Time = std::unique_ptr<Time>(Time::Create());
+	m_TimeContext = std::unique_ptr<TimeContext>(TimeContext::Create());
 }
 
 Application::~Application() = default;
@@ -37,7 +37,7 @@ void Application::Run()
 	float lastFrame = 0;
 	while (m_IsRunning)
 	{
-		const float currentFrame = static_cast<float>(m_Time->GetTime());
+		const float currentFrame = static_cast<float>(m_TimeContext->GetTime());
 		m_DeltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
@@ -108,7 +108,7 @@ bool Application::OnWindowResize(WindowResizeEvent& event)
 	}
 
 	m_Minimized = false;
-	return true;
+	return false;
 }
 
 bool Application::OnWindowClose(WindowCloseEvent& event)
