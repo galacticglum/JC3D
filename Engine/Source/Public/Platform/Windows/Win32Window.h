@@ -91,26 +91,15 @@ public:
 
 private:
 	/**
-	 * @brief Initialize this Win32Window.
-	 * @param props The properties of this Win32Window.
-	 */
-	void Initialize(const WindowProperties& props);
-
-	/**
-	 * @brief Initialize the events for this Win32Window.
-	 */
-	void InitializeEvents() const;
-
-	/**
-	 * @brief Shutdown this Win32Window.
-	 */
-	void Shutdown() const;
-
-	/**
 	 * @brief The GLFW window.
 	 * @note The native window context.
 	 */
 	GLFWwindow* m_Window;
+
+	/**
+	 * @brief Mouse cursor tracking for ImGui.
+	 */
+	GLFWcursor* m_ImGuiMouseCursors[9] = { nullptr };
 
 	/**
 	 * @brief The RenderContext instance for this Window.
@@ -131,4 +120,26 @@ private:
 		bool IsVSyncEnabled;
 		EventHandler Handler;
 	} m_Data;
+
+	/**
+	 * @brief Initialize this Win32Window.
+	 * @param props The properties of this Win32Window.
+	 */
+	void Initialize(const WindowProperties& props);
+
+	/**
+	 * @brief Initialize the events for this Win32Window.
+	 */
+	void InitializeEvents() const;
+
+	/**
+	 * @brief Initialize the ImGui mouse cursors.
+	 */
+	void InitializeMouseCursors();
+
+	/**
+	 * @brief Shutdown this Win32Window.
+	 */
+	void Shutdown() const;
+
 };

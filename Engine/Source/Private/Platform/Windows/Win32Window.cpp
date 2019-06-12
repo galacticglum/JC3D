@@ -8,6 +8,8 @@
 #include <Events/MouseEvent.h>
 #include <Platform/OpenGL/OpenGLContext.h>
 
+#include <imgui.h>
+
 static bool s_IsGLFWInitialized = false;
 
 /**
@@ -33,18 +35,6 @@ Win32Window::~Win32Window()
 	Shutdown();
 }
 
-void Win32Window::OnUpdate() const
-{
-	glfwPollEvents();
-	m_RenderContext->SwapBuffers();
-}
-
-void Win32Window::ToggleVSync(const bool enabled)
-{
-	glfwSwapInterval(enabled ? 1 : 0);
-	m_Data.IsVSyncEnabled = enabled;
-}
-
 void Win32Window::Initialize(const WindowProperties& props)
 {
 	m_Data.Title = props.Title;
@@ -52,12 +42,14 @@ void Win32Window::Initialize(const WindowProperties& props)
 	m_Data.Height = props.Height;
 
 	Logger::Log("Engine", LoggerVerbosity::Info, "Create window \"{}\" ({} x {})", props.Title, props.Width, props.Height);
+
 	if (!s_IsGLFWInitialized)
 	{
 		const int success = glfwInit();
 		LOG_CATEGORY_ASSERT(success, "Engine", "Could not initialize GLFW!");
 		glfwSetErrorCallback(GLFWErrorCallback);
-		s_IsGLFWInitialized = success;
+
+		s_IsGLFWInitialized = true;
 	}
 
 	m_Window = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Data.Title.c_str(), nullptr, nullptr);
@@ -70,7 +62,6 @@ void Win32Window::Initialize(const WindowProperties& props)
 
 	InitializeEvents();
 }
-
 
 void Win32Window::InitializeEvents() const
 {
@@ -159,6 +150,36 @@ void Win32Window::InitializeEvents() const
 		MouseMovedEvent mouseMovedEvent(Vector2f(static_cast<float>(x), static_cast<float>(y)));
 		data.Handler(mouseMovedEvent);
 	});
+}
+
+void Win32Window::InitializeMouseCursors()
+{
+	m_ImGuiMouseCursors[ImGuiMouseCursor_Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+	m_ImGuiMouseCursors[ImGuiMouseCursor_TextInput] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+	m_ImGuiMouseCursors[ImGuiMouseCursor_ResizeAll] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);   // FIXME: GLFW doesn't have this.
+	m_ImGuiMouseCursors[ImGuiMouseCursor_ResizeNS] = glfwCreateStandardCursor(GLFW_VRESIZE_CURSOR);
+	m_ImGuiMouseCursors[ImGuiMouseCursor_ResizeEW] = glfwCreateStandardCursor(GLFW_HRESIZE_CURSOR);
+	m_ImGuiMouseCursors[ImGuiMouseCursor_ResizeNESW] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);  // FIXME: GLFW doesn't have this.
+	m_ImGuiMouseCursors[ImGuiMouseCursor_ResizeNWSE] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);  // FIXME: GLFW doesn't have this.
+	m_ImGuiMouseCursors[ImGuiMouseCursor_Hand] = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
+}
+
+
+void Win32Window::OnUpdate() const
+{
+	glfwPollEvents();
+	m_RenderContext->SwapBuffers();
+
+	// Update ImGui cursor
+	const ImGuiMouseCursor imguiCursor = ImGui::GetMouseCursor();
+	glfwSetCursor(m_Window, m_ImGuiMouseCursors[imguiCursor] ? m_ImGuiMouseCursors[imguiCursor] : m_ImGuiMouseCursors[ImGuiMouseCursor_Arrow]);
+	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Win32Window::ToggleVSync(const bool enabled)
+{
+	glfwSwapInterval(enabled ? 1 : 0);
+	m_Data.IsVSyncEnabled = enabled;
 }
 
 void Win32Window::Shutdown() const
