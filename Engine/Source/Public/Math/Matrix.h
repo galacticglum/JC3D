@@ -405,10 +405,10 @@ std::ostream& operator<<(std::ostream& stream, const Matrix<m, n, T>& matrix)
 
 #include <Math/Matrix4.h>
 
-template <MATRIX_TYPENAME_TEMPLATE>
 /**
  * @brief A 4x4 matrix with arbitrary element type.
  */
+template <MATRIX_TYPENAME_TEMPLATE>
 using Matrix4 = Matrix<4, 4, T>;
 
 /**
@@ -425,3 +425,24 @@ using Matrix4d = Matrix4<double>;
  * @brief An integer 4x4 matrix.
  */
 using Matrix4i = Matrix4<int>;
+
+/**
+ * @brief A 3x3 matrix with arbitrary element type.
+ */
+template <MATRIX_TYPENAME_TEMPLATE>
+using Matrix3 = Matrix<3, 3, T>;
+
+/**
+ * @brief A floating-point precision 4x4 matrix.
+ */
+using Matrix3f = Matrix3<float>;
+
+/**
+ * @brief A double-precision 4x4 matrix.
+ */
+using Matrix3d = Matrix3<double>;
+
+/**
+ * @brief An integer 4x4 matrix.
+ */
+using Matrix3i = Matrix3<int>;
