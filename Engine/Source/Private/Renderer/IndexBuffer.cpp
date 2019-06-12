@@ -6,12 +6,12 @@
 
 IndexBuffer* IndexBuffer::Create(uint32_t* indices, const std::size_t size)
 {
-	switch (Renderer::GetAPI())
+	switch (RendererAPI::Current())
 	{
-		case RendererAPI::None:
+		case RendererAPIType::None:
 			LOG_CATEGORY_ASSERT(false, "Renderer", "RendererAPI::None is not supported!");
 			return nullptr;
-		case RendererAPI::OpenGL:
+		case RendererAPIType::OpenGL:
 			return new OpenGLIndexBuffer(indices, size);
 	}
 
