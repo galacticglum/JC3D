@@ -1,4 +1,5 @@
 #include <Platform/OpenGL/OpenGLTexture2D.h>
+#include <Platform/OpenGL/OpenGLConvertHelper.h>
 #include <Renderer/Renderer.h>
 #include <Logger.h>
 
@@ -7,20 +8,6 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
-
-/**
- * @brief Convert the TextureFormat to OpenGL.
- */
-static GLenum TextureFormatToGL(const TextureFormat format)
-{
-	switch (format)
-	{
-		case TextureFormat::RGB: return GL_RGB;
-		case TextureFormat::RGBA: return GL_RGBA;
-	}
-
-	return 0;
-}
 
 /**
  * @brief Calculates mipmap count from @p width and @p height.
