@@ -44,11 +44,11 @@ OpenGLTexture2D::OpenGLTexture2D(const TextureFormat format, const uint32_t widt
 }
 
 OpenGLTexture2D::OpenGLTexture2D(std::string filepath,  bool srgb)
-	: m_FilePath(std::move(filepath)), m_TextureId(0)
+	: m_FilePath(std::move(filepath))
 {
 	int width, height, channels;
-	Logger::Log("Renderer", LoggerVerbosity::Info, "Loading texture \"{0}\" (srgb = {1})", filepath, srgb);
-	m_ImageData = stbi_load(filepath.c_str(), &width, &height, &channels, srgb ? STBI_rgb : STBI_rgb_alpha);
+	Logger::Log("Renderer", LoggerVerbosity::Info, "Loading texture \"{0}\" (srgb = {1})", m_FilePath, srgb);
+	m_ImageData = stbi_load(m_FilePath.c_str(), &width, &height, &channels, srgb ? STBI_rgb : STBI_rgb_alpha);
 	m_Width = width;
 	m_Height = height;
 	m_TextureFormat = TextureFormat::RGBA;

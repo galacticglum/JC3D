@@ -31,7 +31,7 @@ void Camera::Update()
 	{
 		const Vector2f& mouse = Input::GetMousePosition();
 		const Vector2f delta = mouse - m_InitialMousePosition;
-		m_InitialMousePosition = mouse;
+		m_InitialMousePosition = mouse; 
 
 		if (Input::IsMouseButtonPressed(MouseButton::Middle))
 		{
@@ -42,7 +42,7 @@ void Camera::Update()
 			MouseRotate(delta);
 		}
 		else if (Input::IsMouseButtonPressed(MouseButton::Right))
-		{
+		{\
 			MouseZoom(delta.Y);
 		}
 	}

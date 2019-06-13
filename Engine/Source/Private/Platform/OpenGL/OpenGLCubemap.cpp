@@ -12,7 +12,7 @@ OpenGLCubemap::OpenGLCubemap(std::string filepath) : m_FilePath(std::move(filepa
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(false);
 
-	m_ImageData = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb);
+	m_ImageData = stbi_load(m_FilePath.c_str(), &width, &height, &channels, STBI_rgb);
 
 	m_Width = width;
 	m_Height = height;
@@ -23,10 +23,10 @@ OpenGLCubemap::OpenGLCubemap(std::string filepath) : m_FilePath(std::move(filepa
 
 	LOG_CATEGORY_ASSERT(faceWidth == faceHeight, "Renderer", "Non-square faces!");
 
-	std::array<unsigned char*, 6> faces;
-	for (size_t i = 0; i < faces.size(); i++)
+	std::array<unsigned char*, 6> faces{};
+	for (auto& face : faces)
 	{
-		faces[i] = new unsigned char[faceWidth * faceHeight * 3];
+		face = new unsigned char[faceWidth * faceHeight * 3];
 	}
 
 	int faceIndex = 0;
@@ -77,7 +77,7 @@ OpenGLCubemap::OpenGLCubemap(std::string filepath) : m_FilePath(std::move(filepa
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTextureParameterf(self->m_TextureId, GL_TEXTURE_MAX_ANISOTROPY, RendererAPI::GetCapabilities().MaxAnisotropy);
 
-		GLenum format = TextureFormatToGL(self->m_TextureFormat);
+		const GLenum format = TextureFormatToGL(self->m_TextureFormat);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, faces[2]);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE, faces[0]);
 
@@ -90,9 +90,9 @@ OpenGLCubemap::OpenGLCubemap(std::string filepath) : m_FilePath(std::move(filepa
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
-		for (size_t i = 0; i < faces.size(); i++)
+		for (auto& face : faces)
 		{
-			delete[] faces[i];
+			delete[] face;
 		}
 
 		stbi_image_free(self->m_ImageData);

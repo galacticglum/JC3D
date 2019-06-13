@@ -6,18 +6,16 @@
 
 #include <string>
 #include <fstream>
-#include <sstream>
-#include <limits>
 
 OpenGLShader::OpenGLShader(const std::string& filepath) : m_Filepath(filepath)
 {
 	// Find the name of the shader
-	size_t found = filepath.find_last_of("/\\");
+	const size_t found = filepath.find_last_of("/\\");
 
 	// If we couldn't find the name, use the filepath name.
 	m_Name = found != std::string::npos ? filepath.substr(found + 1) : filepath;
 
-	Reload();
+	OpenGLShader::Reload();
 }
 
 OpenGLShader::~OpenGLShader()
@@ -154,19 +152,19 @@ void OpenGLShader::Compile()
 	// Link our shader program
 	glLinkProgram(shaderProgramId);
 	GLint isLinked = 0;
-	glGetProgramiv(m_ShaderProgramId, GL_LINK_STATUS, static_cast<int*>(&isLinked));
+	glGetProgramiv(shaderProgramId, GL_LINK_STATUS, static_cast<int*>(&isLinked));
 
 	if (isLinked == GL_FALSE)
 	{
 		GLint maxLength = 0;
-		glGetProgramiv(m_ShaderProgramId, GL_INFO_LOG_LENGTH, &maxLength);
+		glGetProgramiv(shaderProgramId, GL_INFO_LOG_LENGTH, &maxLength);
 
 		// The maxLength includes the NULL character
 		std::vector<GLchar> infoLog(maxLength);
-		glGetProgramInfoLog(m_ShaderProgramId, maxLength, &maxLength, &infoLog[0]);
+		glGetProgramInfoLog(shaderProgramId, maxLength, &maxLength, &infoLog[0]);
 
 		// We don't need the program nor the shaders anymore.
-		glDeleteProgram(m_ShaderProgramId);
+		glDeleteProgram(shaderProgramId);
 		for (auto id : shaderIds)
 		{
 			glDeleteShader(id);
@@ -217,8 +215,8 @@ void OpenGLShader::Compile()
 #define VERIFY_UNIFORM(name) 																						\
 	glUseProgram(m_ShaderProgramId);																				\
 	const GLint UNIQUE_UNIFORM_LOCATION_NAME(name) = glGetUniformLocation(m_ShaderProgramId, name.c_str());			\
-	LOG_CATEGORY_ASSERT(UNIQUE_UNIFORM_LOCATION_NAME(name) != -1, "Renderer",										\
-		"Error in shader file \"{0}\":\nCould not find location of uniform with name \"{1}\"!",	m_Filepath, name);	\
+	LOG_CATEGORY_ASSERT_NOBREAK(UNIQUE_UNIFORM_LOCATION_NAME(name) != -1, "Renderer",								\
+		"Error in shader file "{0}":\nCould not find location of uniform with name "{1}"!",	m_Filepath, name);	\
 
 /**
  * @brief Internal macro to set the value of a uniform.
@@ -310,7 +308,7 @@ void OpenGLShader::UploadUniformBuffer(const ShaderUniformBufferBase& uniformBuf
 		const ShaderUniformDeclaration& declaration = uniformBuffer.GetUniforms()[i];
 
 		const bool isTypeValid = declaration.Type != ShaderDataType::None && declaration.Type != ShaderDataType::Unknown;
-		LOG_CATEGORY_ASSERT(i, "Renderer", "Shader uniform declaration with invalid type!");
+		LOG_CATEGORY_ASSERT(isTypeValid, "Renderer", "Shader uniform declaration with invalid type!");
 
 		const std::string& name = declaration.Name;
 		switch(declaration.Type)
