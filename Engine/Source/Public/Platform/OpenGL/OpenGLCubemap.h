@@ -19,7 +19,7 @@
 class OpenGLCubemap : public Cubemap
 {
 public:
-	OpenGLCubemap(std::string filepath);
+	explicit OpenGLCubemap(std::string filepath);
 	~OpenGLCubemap();
 
 	void Bind(uint32_t slot) const override;

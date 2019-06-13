@@ -108,7 +108,7 @@ private:
 	std::string m_Name;
 	std::string m_ShaderSource;
 
-	uint32_t m_ShaderProgramId;
+	uint32_t m_ShaderProgramId{};
 
 	void ReadFromFile(const std::string& filepath);
 	void Compile();
