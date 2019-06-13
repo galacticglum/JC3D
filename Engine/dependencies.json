@@ -82,7 +82,7 @@
             ]
         },
         "assimp": {
-            "url": "https://drive.google.com/uc?export=download&confirm=aV2w&id=1QGa2tgEzSgNwda1ozbrjhQsIeAZ-lSdn",
+            "url": "https://drive.google.com/uc?id=1QGa2tgEzSgNwda1ozbrjhQsIeAZ-lSdn&export=download",
             "url_type": "archive",
             "binaries": [
                 {
