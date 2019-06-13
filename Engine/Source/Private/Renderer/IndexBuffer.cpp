@@ -4,7 +4,7 @@
 
 #include <Logger.h>
 
-IndexBuffer* IndexBuffer::Create(uint32_t* indices, const std::size_t size)
+IndexBuffer* IndexBuffer::Create(const uint32_t size)
 {
 	switch (RendererAPI::Current())
 	{
@@ -12,7 +12,7 @@ IndexBuffer* IndexBuffer::Create(uint32_t* indices, const std::size_t size)
 			LOG_CATEGORY_ASSERT(false, "Renderer", "RendererAPI::None is not supported!");
 			return nullptr;
 		case RendererAPIType::OpenGL:
-			return new OpenGLIndexBuffer(indices, size);
+			return new OpenGLIndexBuffer(size);
 	}
 
 	LOG_CATEGORY_ASSERT(false, "Renderer", "Unknown RendererAPI!");

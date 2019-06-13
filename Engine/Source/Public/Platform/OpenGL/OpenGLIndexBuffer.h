@@ -21,11 +21,8 @@ class OpenGLIndexBuffer : public IndexBuffer
 public:
 	/**
 	 * @brief Initialize a new OpenGLIndexBuffer.
-	 * @param indices The data of the OpenGLIndexBuffer.
-	 * @param count The number of indices in the data (@p indices).
-	 *		  This value is NOT in bytes. It is an element count.
 	 */
-	explicit OpenGLIndexBuffer(uint32_t* indices, std::size_t count);
+	explicit OpenGLIndexBuffer(uint32_t size);
 
 	/**
 	 * @brief Destroy this OpenGLIndexBuffer.
@@ -43,14 +40,34 @@ public:
 	void Unbind() const override;
 
 	/**
+	 * @brief Set the data of this OpenGLIndexBuffer.
+	 */
+	void SetData(void* buffer, uint32_t size, uint32_t offset = 0) override;
+
+	/**
 	 * @brief Gets the number of indices in this IndexBuffer.
 	 */
 	uint32_t GetCount() const override
 	{
-		return m_Count;
+		return m_Size / sizeof(uint32_t);
 	}
 
+	/**
+	 * @brief Get the resource handle for this OpenGLIndexBuffer.
+	 */
+	uint32_t GetHandle() const override
+	{
+		return m_IndexBufferId;
+	}
+
+	/**
+	 * @brief Get the size of this OpenGLIndexBuffer.
+	 */
+	uint32_t GetSize() const override
+	{
+		return m_Size;
+	}
 private:
 	uint32_t m_IndexBufferId{};
-	uint32_t m_Count{};
+	uint32_t m_Size{};
 };
