@@ -146,6 +146,27 @@ struct MatrixBase
 	}
 
 	/**
+	 * @brief Initializes a new Matrix from an array of values in column-major order.
+	 * @note The elements should be specified in column-major order; that is, the first m elements denote the elements
+	 *		 of the first column, the second m elements denote the elements of the second column, and so on until the n-th
+	 *		 row.
+	 */
+	static Matrix<m, n, T> FromColumns(const std::array<T, m * n> data)
+	{
+		Matrix<m, n, T> result;
+		for (std::size_t column = 0; column < n; ++column)
+		{
+			for (std::size_t row = 0; row < m; ++row)
+			{
+				// Essentially just a transpose operation...
+				result[column][row] = data[row * n + column];
+			}
+		}
+
+		return result;
+	}
+
+	/**
 	 * @brief Converts a @p scale vector to the scale-transformation matrix.
 	 */
 	static Matrix<n, n, T> Scale(const Vector<n, T>& scale)
@@ -227,19 +248,19 @@ struct MatrixBase
 	Matrix<m - 1, n - 1, T> Submatrix(const int row, const int column) const
 	{
 		Matrix<m - 1, n - 1, T> result;
-		std::size_t ri = 0;
+		std::size_t currentRow = 0;
 		for (std::size_t i = 0; i < m; ++i)
 		{
 			if (i == row) continue;
 
-			std::size_t rj = 0;
+			std::size_t currentColumn = 0;
 			for (std::size_t j = 0; j < n; ++j)
 			{
 				if (j == column) continue;
-				result.Data[ri][rj++] = Data[i][j];
+				result.Data[currentColumn++][currentRow] = Data[j][i];
 			}
 
-			++ri;
+			++currentRow;
 		}
 
 		return result;

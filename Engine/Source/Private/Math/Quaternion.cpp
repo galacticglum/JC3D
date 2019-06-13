@@ -3,17 +3,76 @@
 #include <Math/MathFunctions.h>
 #include <cmath>
 
-Vector<3, float> Quaternion::GetXYZ() const
+Vector<4, float> Quaternion::ToAxisAngle() const
 {
-	return Vector<3, float>(X, Y, Z);
+	Vector<4, float> result;
+	const float angle = 2.0f * std::acosf(W);
+	const float length = sqrt(1.0f - angle * angle);
+
+	const Vector<3, float> axis = Vector<3, float>(X, Y, Z) / length;
+	result.X = axis.X;
+	result.Y = axis.Y;
+	result.Z = axis.Z;
+	result.W = angle;
+
+	return result;
 }
 
-Quaternion& Quaternion::SetXYZ(const Vector<3, float>& vector)
+Matrix4f Quaternion::ToMatrix() const
 {
-	X = vector.X;
-	Y = vector.Y;
-	Z = vector.Z;
-	return *this;
+	Matrix4f matrix;
+
+	matrix[0][0] = 1.0f - 2.0f * Y * Y - 2.0f* Z * Z;
+	matrix[0][1] = 2.0f* X * Y + 2.0f* W * Z;
+	matrix[0][2] = 2.0f * X * Z - 2.0f * W * Y;
+
+	matrix[1][0] = 2.0f * X * Y - 2.0f * W * Z;
+	matrix[1][1] = 1.0f - 2.0f * X * X - 2.0f * Z * Z;
+	matrix[1][2] = 2.0f * Y * Z + 2.0f * W * X;
+
+	matrix[2][0] = 2.0f * X * Z + 2.0f * W * Y;
+	matrix[2][1] = 2.0f * Y * Z - 2.0f * W * X;
+	matrix[2][2] = 1.0f - 2.0f * X * X - 2.0f * Y * Y;
+
+	return matrix;
+}
+
+Quaternion Quaternion::operator-() const
+{
+	return Quaternion(-X, -Y, -Z, -W);
+}
+
+Quaternion operator*(const Quaternion& left, const Quaternion& right)
+{
+	const Vector<3, float> v1(right.X, right.Y, right.Z);
+	const Vector<3, float> v2(left.X, left.Y, left.Z);
+
+	const float w = right.W * left.W - Quaternion::Dot(right, left);
+	const Vector<3, float> v = right.W * v2 + left.W * v1 + Vector<3, float>::Cross(v2, v1);
+
+	return Quaternion(v.X, v.Y, v.Z, w);
+}
+
+Vector<3, float> operator*(const Quaternion& quaternion, const Vector<3, float>& vector)
+{
+	const float w2 = quaternion.W * quaternion.W;
+	return (2.0f * w2 - 1.0f) * vector + 2.0f * Vector<3, float>::Dot(quaternion.GetAxis(), vector) 
+		* quaternion.GetAxis() + w2 * Vector<3, float>::Cross(quaternion.GetAxis(), vector);
+}
+
+Quaternion operator+(const Quaternion& left, const Quaternion& right)
+{
+	return Quaternion(left.X + right.X, left.Y + right.Y, left.Z + right.Z, left.W + right.W);
+}
+
+Quaternion operator*(const Quaternion& left, const float scalar)
+{
+	return Quaternion(scalar * left.X, scalar * left.Y, scalar * left.Z, scalar * left.W);
+}
+
+Quaternion operator*(const float scalar, const Quaternion& right)
+{
+	return Quaternion(scalar * right.X, scalar * right.Y, scalar * right.Z, scalar * right.W);
 }
 
 float Quaternion::Magnitude() const
@@ -23,18 +82,13 @@ float Quaternion::Magnitude() const
 
 float Quaternion::SquareMagnitude() const
 {
-	return X * X + Y * Y + Z * Z + W * W;
-}
-
-Quaternion Quaternion::Negative() const
-{
-	return Quaternion(-X, -Y, -Z, -W);
+	return W * W + X * X + Y * Y + Z * Z;
 }
 
 Quaternion Quaternion::Normalized() const
 {
-	const float length = Magnitude();
-	return Quaternion(X / length, Y / length, Z / length, W / length);
+	Quaternion quaternion = Quaternion(*this);
+	return Normalize(quaternion);
 }
 
 Quaternion Quaternion::Conjugate() const
@@ -42,130 +96,39 @@ Quaternion Quaternion::Conjugate() const
 	return Quaternion(-X, -Y, -Z, W);
 }
 
-Vector<3, float> Quaternion::GetAxis() const
-{
-	const float x = 1 - W * W;
-
-	// Check so we don't divide by zero!
-	if (x < MathFunctions::Epsilon)
-	{
-		return Vector<3, float>::XAxis;
-	}
-
-	return GetXYZ() / (x * x);
-}
-
 Vector<3, float> Quaternion::ToEulerAngles() const
 {
-	const float x1 = 2 * X * W - 2 * Y * Z;
-	const float x2 = 1 - 2 * X * X - 2 * Z * Z;
-	const float y1 = 2 * Y * W - 2 * X * Z;
-	const float y2 = 1 - 2 * Y * Y - 2 * Z * Z;
-	const float z = 2 * X * Y + 2 * Z * W;
+	// roll (x-axis rotation)
+	const float sinrcosp = 2.0 * (W * X + Y * Z);
+	const float cosrosp = 1.0 - 2.0 * (X * X + Y * Y);
+	
+	float roll = std::atan2f(sinrcosp, cosrosp);
 
-	return Vector<3, float>(std::atan2f(x1, x2), std::atan2f(y1, y2), std::asinhf(z));
-}
-
-#define QUATERNION_COMPONENT_WISE_OP_COPY(x, op) (Quaternion(X op x.X, Y op x.Y, Z op x.Z, W op x.W))
-#define QUATERNION_SCALAR_OP_COPY(x, op) (Quaternion(X op x, Y op x, Z op x, W op x))
-
-Quaternion Quaternion::operator+(const Quaternion& quaternion) const
-{
-	return QUATERNION_COMPONENT_WISE_OP_COPY(quaternion, +);
-}
-
-Quaternion Quaternion::operator-(const Quaternion& quaternion) const
-{
-	return QUATERNION_COMPONENT_WISE_OP_COPY(quaternion, -);
-}
-
-Quaternion Quaternion::operator*(const Quaternion& quaternion) const
-{
-	return Quaternion(
-		(((W * quaternion.X) + (X * quaternion.W)) + (Y * quaternion.Z)) - (Z * quaternion.Y),
-		(((W * quaternion.Y) + (Y * quaternion.W)) + (Z * quaternion.X)) - (X * quaternion.Z),
-		(((W * quaternion.Z) + (Z * quaternion.W)) + (X * quaternion.Y)) - (Y * quaternion.X),
-		(((W * quaternion.W) - (X * quaternion.X)) - (Y * quaternion.Y)) - (Z * quaternion.Z)
-	);
-}
-
-Quaternion Quaternion::operator*(const float scalar) const
-{
-	return QUATERNION_SCALAR_OP_COPY(scalar, *);
-}
-
-Quaternion Quaternion::operator/(const float scalar) const
-{
-	return QUATERNION_SCALAR_OP_COPY(scalar, /);
-}
-
-float Quaternion::operator[](const uint32_t index) const
-{
-	LOG_ASSERT(index >= 0 && index < 4, "Index out of bounds!");
-	switch (index)
+	// pitch (y-axis rotation)
+	const float sinp = 2.0 * (W * Y - Z * X);
+	float pitch = std::asinf(sinp);
+	if (std::fabs(sinp) >= 1)
 	{
-		case 0: return X;
-		case 1: return Y;
-		case 2: return Z;
-		case 3: return W;
+		pitch = std::copysign(MathFunctions::PI_OVER_2, sinp);
 	}
 
-	// We should never reach here due to the assert
-	return 0;
-}
-
-Quaternion Quaternion::operator-() const
-{
-	return this->Negative();
-}
-
-bool Quaternion::operator==(const Quaternion& quaternion) const
-{
-	return (X == quaternion.X) && (Y == quaternion.Y) && (Z == quaternion.Z) && (W == quaternion.W);
-}
-
-bool Quaternion::operator!=(const Quaternion& quaternion) const
-{
-	return !(*this == quaternion);
-}
-
-Vector<3, float> Quaternion::Rotate(const Quaternion& quaternion, const Vector<3, float>& vector)
-{
-	const float x = (((quaternion.W * vector.X) + (quaternion.Y * vector.Z)) - (quaternion.Z * vector.Y));
-	const float y = (((quaternion.W * vector.Y) + (quaternion.Z * vector.X)) - (quaternion.X * vector.Z));
-	const float z = (((quaternion.W * vector.Z) + (quaternion.X * vector.Y)) - (quaternion.Y * vector.X));
-	const float w = (((quaternion.X * vector.X) + (quaternion.Y * vector.Y)) + (quaternion.Z * vector.Z));
-
-	return Vector<3, float>(
-		((((w * quaternion.X) + (x * quaternion.W)) - (y * quaternion.Z)) + (z * quaternion.Y)),
-		((((w * quaternion.Y) + (y * quaternion.W)) - (z * quaternion.X)) + (x * quaternion.Z)),
-		((((w * quaternion.Z) + (z * quaternion.W)) - (x * quaternion.Y)) + (y * quaternion.X))
-	);
+	// yaw (z-axis rotation)
+	const float sinycosp = 2.0 * (W * Z + X * Y);
+	const float cosycosp = 1.0 - 2.0 * (Y * Y + Z * Z);
+	const float yaw = std:: atan2f(sinycosp, cosycosp);
+	return Vector3f(roll, pitch, yaw);
 }
 
 Quaternion& Quaternion::Normalize(Quaternion& quaternion)
 {
-	quaternion /= quaternion.Magnitude();
+	const float magnitude = quaternion.Magnitude();
+	quaternion = quaternion * (1.0f / magnitude);
 	return quaternion;
 }
 
 float Quaternion::Dot(const Quaternion& a, const Quaternion& b)
 {
-	float result = (a.X * b.X);
-	result += (a.Y * b.Y);
-	result += (a.Z * b.Z);
-	result += (a.W * b.W);
-
-	return result;
-}
-
-Quaternion Quaternion::FromEulerAngles(const Vector<3, float>& angles)
-{
-	const Quaternion pitch(Vector3f::XAxis, angles.X);
-	const Quaternion yaw(Vector3f::YAxis, angles.Y);
-	const Quaternion roll(Vector3f::ZAxis, angles.Z);
-
-	return pitch * yaw * roll;
+	return a.W * b.W + a.X * b.X + a.Y * b.Y + a.Z * b.Z;
 }
 
 Quaternion Quaternion::Lerp(const Quaternion& a, const Quaternion& b, float t, bool shortest)
@@ -175,7 +138,7 @@ Quaternion Quaternion::Lerp(const Quaternion& a, const Quaternion& b, float t, b
 
 	if (shortest && Dot(a, b) < 0)
 	{
-		correctDestination = b.Negative();
+		correctDestination = -b;
 	}
 
 	return Quaternion(MathFunctions::Lerp(correctedStart.X, correctDestination.X, t),
@@ -192,7 +155,7 @@ Quaternion Quaternion::Slerp(const Quaternion& a, const Quaternion& b, float t, 
 	if (shortest && destinationDot < 0)
 	{
 		destinationDot = -destinationDot;
-		correctDestination = b.Negative();
+		correctDestination = -b;
 	}
 
 	if (std::abs(destinationDot) >= 1 - MathFunctions::Epsilon)
@@ -215,25 +178,54 @@ std::string Quaternion::ToString() const
 	return "(" + std::to_string(X) + ", " + std::to_string(Y) + ", " + std::to_string(Z) + ", " + std::to_string(W) + ")";
 }
 
+Quaternion Quaternion::FromEulerAngles(const Vector<3, float>& angles)
+{
+	const float yaw = angles.Z;
+	const float pitch = angles.Y;
+	const float roll = angles.X;
+
+	const float cy = std::cosf(yaw * 0.5);
+	const float sy = std::sinf(yaw * 0.5);
+	const float cp = std::cosf(pitch * 0.5);
+	const float sp = std::sinf(pitch * 0.5);
+	const float cr = std::cosf(roll * 0.5);
+	const float sr = std::sinf(roll * 0.5);
+
+	Quaternion quaternion;
+	quaternion.W = cy * cp * cr + sy * sp * sr;
+	quaternion.X = cy * cp * sr - sy * sp * cr;
+	quaternion.Y = sy * cp * sr + cy * sp * cr;
+	quaternion.Z = sy * cp * cr - cy * sp * sr;
+
+	return quaternion;
+}
+
+Vector<3, float> Quaternion::Rotate(const Quaternion& quaternion, const Vector<3, float>& vector)
+{
+	return quaternion * vector;
+}
+
+Quaternion Quaternion::Rotation(const Vector<3, float>& u, const Vector<3, float>& v)
+{
+	const float uv = std::sqrtf(Vector<3, float>::Dot(u, u) * Vector<3, float>::Dot(v, v));
+	float real = uv + Vector<3, float>::Dot(u, v);
+	Vector<3, float> w;
+
+	if (real < 1.e-6f * uv)
+	{
+		// Rotate 180 around an arbitrary orthogonal axis.
+		real = 0.0f;
+		w = std::abs(u.X) > std::abs(u.Z) ? Vector<3, float>(-u.Y, u.X, 0.f) : Vector<3, float>(0.f, -u.Z, u.Y);
+	}
+	else
+	{
+		w = Vector<3, float>::Cross(u, v);
+	}
+
+	return Quaternion(w.X, w.Y, w.Z, real).Normalized();
+}
+
 std::ostream& operator<<(std::ostream& stream, const Quaternion& right)
 {
 	return stream << right.ToString();
-}
-
-Quaternion Quaternion::Rotation(const Vector<3, float>& directionA, const Vector<3, float>& directionB)
-{
-	const float cosHalfAngleX2 = std::sqrt((2.0f * (1.0f + Vector3f::Dot(directionA, directionB))));
-	const float reciprocalCosHlfAngleX2 = 1.0f / cosHalfAngleX2;
-	return Quaternion(Vector3f::Cross(directionA, directionB) * reciprocalCosHlfAngleX2, cosHalfAngleX2 * 0.5f);
-}
-
-Quaternion Quaternion::Rotation(const Vector<3, float>& axis, float angle, const bool radians)
-{
-	if (!radians)
-	{
-		angle = MathFunctions::DegreesToRadians(angle);
-	}
-
-	const float halfAngle = radians * 0.5f;
-	return Quaternion(axis * std::sin(halfAngle),  std::cos(halfAngle));
 }

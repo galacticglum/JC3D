@@ -39,7 +39,9 @@ struct Matrix<3, 3, T> : MatrixBase<3, 3, T,  Matrix<3, 3, T>>
 
 	/**
 	 * @brief Initializes a new Matrix using an std::initializer_list<T> for accepting an arbitrary number of arguments.
-	 * @note The elements go from the top-left corner of the Matrix and then go column-to-column for each row.
+	 * @note The elements should be specified in column-major order; that is, the first m elements denote the elements
+	 *		 of the first column, the second m elements denote the elements of the second column, and so on until the n-th
+	 *		 row.
 	 * @param args The std::initializer_list<T> used to initialize this Matrix's elements.
 	 */
 	Matrix(const std::initializer_list<T> args) : MatrixBase<3, 3, T, Matrix<3, 3, T>>(args)
@@ -52,6 +54,6 @@ struct Matrix<3, 3, T> : MatrixBase<3, 3, T,  Matrix<3, 3, T>>
 	 */
 	T Determinant() const
 	{
-		return Data[0][0] * Subdeterminant(0, 0) - Data[0][1] * Subdeterminant(0, 1) + Data[0][2] * Subdeterminant(0, 2);
+		return Data[0][0] * Subdeterminant(0, 0) - Data[1][0] * Subdeterminant(0, 1) + Data[2][0] * Subdeterminant(0, 2);
 	}
 };

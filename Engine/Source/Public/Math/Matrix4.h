@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include <Math/Quaternion.h>
 #include <Math/MathFunctions.h>
-
 #include <cmath>
+
+struct Quaternion;
 
 /**
   * @struct Matrix Matrix4.h
@@ -65,7 +65,12 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	static Matrix<4, 4, T> Scale(const Vector<3, T>& scale)
 	{
 		Matrix<4, 4, T> result;
-		return Matrix<4, 4, T>::Scale(Vector<4, T>({ scale.X, scale.Y, scale.Z, 0 }));
+
+		result[0][0] = scale.X;
+		result[1][1] = scale.Y;
+		result[2][2] = scale.Z;
+
+		return result;
 	}
 
 	/**
@@ -92,18 +97,18 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 		}
 
 		rx[1][1] = static_cast<T>(std::cos(x));
-		rx[1][2] = static_cast<T>(-std::sin(x));
-		rx[2][1] = static_cast<T>(std::sin(x));
+		rx[2][1] = static_cast<T>(-std::sin(x));
+		rx[1][2] = static_cast<T>(std::sin(x));
 		rx[2][2] = static_cast<T>(std::cos(x));
 											 
 		ry[0][0] = static_cast<T>(std::cos(y));
-		ry[0][2] = static_cast<T>(-std::sin(y));
-		ry[2][0] = static_cast<T>(std::sin(y));
+		ry[2][0] = static_cast<T>(-std::sin(y));
+		ry[0][2] = static_cast<T>(std::sin(y));
 		ry[2][2] = static_cast<T>(std::cos(y));
 											 
 		rz[0][0] = static_cast<T>(std::cos(z));
-		rz[0][1] = static_cast<T>(-std::sin(z));
-		rz[1][0] = static_cast<T>(std::sin(z));
+		rz[1][0] = static_cast<T>(-std::sin(z));
+		rz[0][1] = static_cast<T>(std::sin(z));
 		rz[1][1] = static_cast<T>(std::cos(z));
 
 		return rx * ry * rz;
@@ -146,7 +151,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	static Matrix<4, 4, T> Rotate(const Vector<3, T>& forward, const Vector<3, T>& up)
 	{
 		Matrix<4, 4, T> result;
-		Vector<3, T> n = Vector<3, T>::Normalize(forward);
+		Vector<3, T> n = forward.Normalized();
 		Vector<3, T> u = Vector<3, T>::Cross(up.Normalized(), n);
 		Vector<3, T> v = Vector<3, T>::Cross(n, u);
 
@@ -219,20 +224,25 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 */
 	static Matrix<4, 4, T> LookAt(const Vector<3, T>& source, const Vector<3, T>& destination, const Vector<3, T>& up)
 	{
-		Matrix<4, 4, T> frame;
-		Matrix<4, 4, T> translate;
+		Vector3f direction = (destination - source).Normalize();
+		Vector3f right = Vector3f::Cross(direction, up).Normalized();
+		Vector3f vup = Vector3f::Cross(right, direction).Normalized();
 
-		Vector<3, T> forward = (destination - source).Normalized();
-		Vector<3, T> right = Vector<3, T>::Cross(forward, up).Normalized();
-		Vector<3, T> u = Vector<3, T>::Cross(right, forward);
+		Matrix<4, 4, T> rotation;
+		rotation[0][0] = right.X;
+		rotation[1][0] = right.Y;
+		rotation[2][0] = right.Z;
 
-		frame[0] = Vector<4, T>(right, frame[0].W);
-		frame[1] = Vector<4, T>(u, frame[1].W);
-		frame[2] = Vector<4, T>(-forward, frame[2].W);
-		frame = Matrix<4, 4, T>::Transpose(frame);
+		rotation[0][1] = vup.X;
+		rotation[1][1] = vup.Y;
+		rotation[2][1] = vup.Z;
 
-		translate[3] = Vector<4, T>(-source, translate[3].W);
-		return frame * translate;
+		rotation[0][2] = -direction.X;
+		rotation[1][2] = -direction.Y;
+		rotation[2][2] = -direction.Z;
+
+		Matrix<4, 4, T> translation = Translate(source);
+		return rotation * translation;
 	}
 
 	/**
@@ -240,15 +250,17 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 */
 	static Matrix<4, 4, T> Orthographic(const T left, const T right, const T top, const T bottom, const T nearPlane, const T farPlane)
 	{
-		Matrix<4, 4, T> result;
+		T dx = right - left;
+		T dy = top - bottom;
+		T dz = farPlane - nearPlane;
 
-		result[0][0] = static_cast<T>(2.0 / (right - left));
-		result[1][1] = static_cast<T>(2.0 / (top - bottom));
-		result[2][2] = static_cast<T>(-2.0 / (farPlane - nearPlane));
-		result[3][0] = static_cast<T>(-(right + left) / (right - left));
-		result[3][1] = static_cast<T>(-(top + bottom) / (top - bottom));
-		result[3][2] = static_cast<T>(-(farPlane + nearPlane) / (farPlane - nearPlane));
-		result[3][3] = static_cast<T>(1);
+		Matrix<4, 4, T> result;
+		result[0][0] = 2.0 / dx;
+		result[1][1] = 2.0 / dy;
+		result[2][2] = -2.0 / dz;
+		result[3][0] = -(right + left) / dx;
+		result[3][1] = -(top + bottom) / dy;
+		result[3][2] = -(nearPlane + farPlane) / dz;
 
 		return result;
 	}
@@ -263,17 +275,15 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 			fov = MathFunctions::DegreesToRadians(fov);
 		}
 
-		T q = static_cast<T>(1 / std::tan(fov * 0.5));
-		T a = q / aspectRatio;
-		T b = (nearPlane + farPlane) / (nearPlane - farPlane);
-		T c = (2 * nearPlane * farPlane) / (nearPlane - farPlane);
+		T s = static_cast<T>(1.0 / std::tan(fov * 0.5));
+		T range = nearPlane - farPlane;
 
-		Matrix<4, 4, T> result;
-		result[0][0] = a;
-		result[1][1] = q;
-		result[2][2] = b;
-		result[2][3] = -1;
-		result[3][2] = c;
+		Matrix<4, 4, T> result(0);
+		result[0][0] = s / aspectRatio;
+		result[1][1] = s;
+		result[2][2] = (nearPlane + farPlane) / range;
+		result[3][2] = 2 * nearPlane * farPlane / range;
+		result[2][3] = static_cast<T>(-1.0);
 
 		return result;
 	}
@@ -284,8 +294,8 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	 */
 	T Determinant() const
 	{
-		return Data[0][0] * Subdeterminant(0, 0) - Data[0][1] * Subdeterminant(0, 1) +
-			Data[0][2] * Subdeterminant(0, 2) - Data[0][3] * Subdeterminant(0, 3);
+		return Data[0][0] * Subdeterminant(0, 0) - Data[1][0] * Subdeterminant(0, 1) +
+			Data[2][0] * Subdeterminant(0, 2) - Data[3][0] * Subdeterminant(0, 3);
 	}
 
 	/**
@@ -304,11 +314,11 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	static Matrix<4, 4, T> Cofactor(const Matrix<4, 4, T>& matrix)
 	{
 		Matrix<4, 4, T> result;
-		for (std::size_t i = 0; i < 4; ++i)
+		for (std::size_t row = 0; row < 4; ++row)
 		{
-			for (std::size_t j = 0; j < 4; ++j)
+			for (std::size_t column = 0; column < 4; ++column)
 			{
-				result.Data[i][j] = matrix.ElementCofactor(i, j);
+				result.Data[column][row] = matrix.ElementCofactor(row, column);
 			}
 		}
 

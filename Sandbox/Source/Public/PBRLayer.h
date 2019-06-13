@@ -27,6 +27,7 @@
 
 #include <Math/Vector.h>
 #include <Math/Matrix.h>
+#include <Logger.h>
 
 static void ImGuiShowHelpMarker(const char* desc)
 {
@@ -44,8 +45,11 @@ static void ImGuiShowHelpMarker(const char* desc)
 class PBRLayer : public Layer
 {
 public:
-	PBRLayer() : m_Camera(Matrix4f::Perspective(45, 1280/720.0f, 0.1f, 10000.0f)), m_Scene(Scene::Spheres)
+	PBRLayer() : m_Camera(Matrix4f()), m_Scene(Scene::Spheres)
 	{
+		Window& window = Application::Get().GetWindow();
+		m_Camera.SetProjectionMatrix(Matrix4f::Perspective(45, 
+			window.GetWidth() / static_cast<float>(window.GetHeight()), 0.1f, 10000.0f));
 	}
 
 	virtual ~PBRLayer() = default;
@@ -117,7 +121,7 @@ public:
 		// - Tonemapping and proper HDR pipeline
 
 		m_Camera.Update();
-		Matrix4f viewProjection = m_Camera.GetProjectionMatrix() * m_Camera.GetViewMatrix();
+		const Matrix4f viewProjection = m_Camera.GetProjectionMatrix() * m_Camera.GetViewMatrix();
 
 		m_Framebuffer->Bind();
 		Renderer::Clear();
@@ -329,9 +333,9 @@ public:
 
 		// Editor Panel ------------------------------------------------------------------------------
 		ImGui::Begin("Model");
-		ImGui::RadioButton("Spheres", (int*)&m_Scene, (int)Scene::Spheres);
+		ImGui::RadioButton("Spheres", reinterpret_cast<int*>(&m_Scene), static_cast<int>(Scene::Spheres));
 		ImGui::SameLine();
-		ImGui::RadioButton("Model", (int*)&m_Scene, (int)Scene::Model);
+		ImGui::RadioButton("Model", reinterpret_cast<int*>(&m_Scene), static_cast<int>(Scene::Model));
 
 		ImGui::Begin("Environment");
 
