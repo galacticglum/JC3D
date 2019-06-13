@@ -8,9 +8,7 @@
  */
 
 #pragma once
-
-#include <cstddef>
-#include <Renderer/BufferLayout.h>
+#include <cstdint>
 
 /**
  * @class VertexBuffer VertexBuffer.h
@@ -38,17 +36,22 @@ public:
 	virtual void Unbind() const = 0;
 
 	/**
-	 * @brief Get the BufferLayout of this VertexBuffer.
+	 * @brief Set the data of this VertexBuffer.
 	 */
-	virtual const BufferLayout& GetLayout() const = 0;
+	virtual void SetData(void* buffer, uint32_t size, uint32_t offset = 0) = 0;
 
 	/**
-	 * @brief Set the BufferLayout of this VertexBuffer.
+	 * @brief Get the resource handle for this VertexBuffer.
 	 */
-	virtual void SetLayout(const BufferLayout& layout) = 0;
+	virtual uint32_t GetHandle() const = 0;
+
+	/**
+	 * @brief Get the size of this VertexBuffer.
+	 */
+	virtual uint32_t GetSize() const = 0;
 
 	/**
 	 * @brief Create a new VertexBuffer.
 	 */
-	static VertexBuffer* Create(float* vertices, std::size_t size);
+	static VertexBuffer* Create(uint32_t size = 0);
 };

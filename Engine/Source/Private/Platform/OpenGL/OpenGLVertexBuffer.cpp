@@ -1,25 +1,50 @@
 #include <Platform/OpenGL/OpenGLVertexBuffer.h>
+#include <Renderer/Renderer.h>
 #include <glad/glad.h>
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, const std::size_t size)
+OpenGLVertexBuffer::OpenGLVertexBuffer(const uint32_t size)
+	: m_Size(size)
 {
-	glCreateBuffers(1, &m_VertexBufferId);
-	OpenGLVertexBuffer::Bind();
-
-	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+	ENGINE_RENDER_S({
+		glGenBuffers(1, &self->m_VertexBufferId);
+	});
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
-	glDeleteBuffers(1, &m_VertexBufferId);
+	ENGINE_RENDER_S({
+		glDeleteBuffers(1, &self->m_VertexBufferId);
+	});
+}
+
+void OpenGLVertexBuffer::SetData(void* buffer, uint32_t size, uint32_t offset = 0)
+{
+	m_Size = size;
+	ENGINE_RENDER_S3(buffer, size, offset, {
+		glBindBuffer(GL_ARRAY_BUFFER, self->m_VertexBufferId);
+		glBufferData(GL_ARRAY_BUFFER, size, buffer, GL_STATIC_DRAW);
+	});
 }
 
 void OpenGLVertexBuffer::Bind() const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, m_VertexBufferId);
+	ENGINE_RENDER_S({
+		glBindBuffer(GL_ARRAY_BUFFER, self->m_VertexBufferId);
+
+		// Enable vertex attrib arrays for positions and texture coordinates.
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, 0);
+
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, reinterpret_cast<const void*>(3 * sizeof(float)));
+	});
 }
 
 void OpenGLVertexBuffer::Unbind() const
 {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	ENGINE_RENDER({
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+	})
 }

@@ -22,7 +22,7 @@ public:
 	/**
 	 * @brief Initialize a new OpenGLVertexBuffer.
 	 */
-	explicit OpenGLVertexBuffer(float* vertices, std::size_t size);
+	explicit OpenGLVertexBuffer(uint32_t size);
 
 	/**
 	 * @brief Destroy this OpenGLVertexBuffer.
@@ -38,23 +38,28 @@ public:
 	 * @brief Unbind this OpenGLVertexBuffer.
 	 */
 	void Unbind() const override;
+	
+	/**
+	 * @brief Set the data of this OpenGLVertexBuffer.
+	 */
+	void SetData(void* buffer, uint32_t size, uint32_t offset = 0) override;
 
 	/**
-	 * @Brief Get the BufferLayout of this OpenGLVertexBuffer.
+	 * @brief Get the resource handle for this OpenGLVertexBuffer.
 	 */
-	const BufferLayout& GetLayout() const override
+	uint32_t GetHandle() const override
 	{
-		return m_Layout;
+		return m_VertexBufferId;
 	}
 
 	/**
-	 * @brief Set the BufferLayout of this OpenGLVertexBuffer.
+	 * @brief Get the size of this OpenGLVertexBuffer.
 	 */
-	void SetLayout(const BufferLayout& layout) override
+	uint32_t GetSize() const override
 	{
-		m_Layout = layout;
+		return m_Size;
 	}
 private:
 	uint32_t m_VertexBufferId{};
-	BufferLayout m_Layout;
+	uint32_t m_Size;
 };
