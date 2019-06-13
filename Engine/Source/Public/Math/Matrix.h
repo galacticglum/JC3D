@@ -14,6 +14,7 @@
 #include <string>
 #include <sstream>
 
+#include <Logger.h>
 #include <Math/Vector.h>
 
  /**
@@ -80,6 +81,17 @@ struct MatrixBase
 	 */
 	MatrixBase& operator= (MatrixBase const & other)
 	{
+		LOG_ASSERT(other.Size.X == Size.X && other.Size.Y == Size.Y, "Matrix assignment requires same dimensions!");
+
+		// Initialize as identity matrix.
+		for (std::size_t column = 0; column < n; ++column)
+		{
+			for (std::size_t row = 0; row < m; ++row)
+			{
+				Data[column][row] = other.Data[column][row];
+			}
+		}
+		
 		return *this;
 	}
 

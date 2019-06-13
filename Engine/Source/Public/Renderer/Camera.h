@@ -20,7 +20,7 @@
 class Camera
 {
 public:
-	explicit Camera(const Matrix4f& projectionMatrix);
+	explicit Camera(Matrix4f projectionMatrix);
 
 	void Focus() const;
 	void Update();

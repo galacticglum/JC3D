@@ -55,7 +55,10 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	static Matrix<4, 4, T> Translate(const Vector<3, T>& translation)
 	{
 		Matrix<4, 4, T> result;
-		result[3] = Vector<4, T>(translation, 1);
+		result[3][0] = translation.X;
+		result[3][1] = translation.Y;
+		result[3][2] = translation.Z;
+
 		return result;
 	}
 
@@ -189,27 +192,28 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	{
 		Matrix<4, 4, T> result;
 
-		const T qx = static_cast<T>(quaternion.X);
-		const T qy = static_cast<T>(quaternion.Y);
-		const T qz = static_cast<T>(quaternion.Z);
-		const T qw = static_cast<T>(quaternion.W);
-		const T qx2 = (qx + qx);
-		const T qy2 = (qy + qy);
-		const T qz2 = (qz + qz);
-		const T qxqx2 = (qx * qx2);
-		const T qxqy2 = (qx * qy2);
-		const T qxqz2 = (qx * qz2);
-		const T qxqw2 = (qw * qx2);
-		const T qyqy2 = (qy * qy2);
-		const T qyqz2 = (qy * qz2);
-		const T qyqw2 = (qw * qy2);
-		const T qzqz2 = (qz * qz2);
-		const T qzqw2 = (qw * qz2);
+		T qxx(quaternion.X * quaternion.X);
+		T qyy(quaternion.Y * quaternion.Y);
+		T qzz(quaternion.Z * quaternion.Z);
+		T qxz(quaternion.X * quaternion.Z);
+		T qxy(quaternion.X * quaternion.Y);
+		T qyz(quaternion.Y * quaternion.Z);
+		T qwx(quaternion.W * quaternion.X);
+		T qwy(quaternion.W * quaternion.Y);
+		T qwz(quaternion.W * quaternion.Z);
 
-		result.Columns[0] = Vector<4, T>(((1.0 - qyqy2) - qzqz2), (qxqy2 + qzqw2), (qxqz2 - qyqw2), 0);
-		result.Columns[1] = Vector<4, T>((qxqy2 - qzqw2), ((1.0f - qxqx2) - qzqz2), (qyqz2 + qxqw2), 0);
-		result.Columns[2] = Vector<4, T>((qxqz2 + qyqw2), (qyqz2 - qxqw2), ((1.0 - qxqx2) - qyqy2), 0);
-
+		result[0][0] = T(1) - T(2) * (qyy + qzz);
+		result[0][1] = T(2) * (qxy + qwz);
+		result[0][2] = T(2) * (qxz - qwy);
+		
+		result[1][0] = T(2) * (qxy - qwz);
+		result[1][1] = T(1) - T(2) * (qxx + qzz);
+		result[1][2] = T(2) * (qyz + qwx);
+		
+		result[2][0] = T(2) * (qxz + qwy);
+		result[2][1] = T(2) * (qyz - qwx);
+		result[2][2] = T(1) - T(2) * (qxx + qyy);
+		
 		return result;
 	}
 

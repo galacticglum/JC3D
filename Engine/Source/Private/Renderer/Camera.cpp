@@ -2,9 +2,10 @@
 #include <Math/MathFunctions.h>
 
 #include <Input.h>
+#include <utility>
 
-Camera::Camera(const Matrix4f& projectionMatrix)
-	: m_ProjectionMatrix(projectionMatrix), m_Panning(false), m_Rotating(false)
+Camera::Camera(Matrix4f projectionMatrix)
+	: m_ProjectionMatrix(std::move(projectionMatrix)), m_Panning(false), m_Rotating(false)
 {
 	// Sensible defaults
 	m_PanSpeed = 0.0015f;
@@ -42,7 +43,7 @@ void Camera::Update()
 			MouseRotate(delta);
 		}
 		else if (Input::IsMouseButtonPressed(MouseButton::Right))
-		{\
+		{
 			MouseZoom(delta.Y);
 		}
 	}
@@ -51,7 +52,17 @@ void Camera::Update()
 
 	Quaternion orientation = GetOrientation();
 	m_Rotation = orientation.ToEulerAngles() * static_cast<float>(180.0f / MathFunctions::PI);
-	m_ViewMatrix = Matrix4f::Translate(Vector3f(0, 0, 1)) * Matrix4f::Rotate(orientation.Conjugate()) * Matrix4f::Translate(-m_Position);
+
+	const Matrix4f scale = Matrix4f::Translate(Vector3f(0, 0, 1));
+	const Matrix4f rotation = Matrix4f::Rotate(orientation.Conjugate());
+	const Matrix4f translation = Matrix4f::Translate(-m_Position);
+
+	m_ViewMatrix = scale * rotation * translation;
+
+	if (!Input::IsKeyPressed(KeyCode::D)) return;
+	const Matrix4f p = scale * rotation * translation;
+	Logger::Log(LoggerVerbosity::Info, m_ViewMatrix);
+	Logger::Log(LoggerVerbosity::Info, p);
 }
 
 void Camera::MousePan(const Vector2f& delta)
@@ -89,7 +100,7 @@ Vector3f Camera::GetRightDirection() const
 
 Vector3f Camera::GetForwardDirection() const
 {
-	return Quaternion::Rotate(GetOrientation(), Vector3f(0, 0, 1));
+	return Quaternion::Rotate(GetOrientation(), Vector3f(0, 0, -1));
 }
 
 Vector3f Camera::CalculatePosition() const

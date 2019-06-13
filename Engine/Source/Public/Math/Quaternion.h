@@ -10,8 +10,6 @@
 #pragma once
 
 #include <Math/Vector.h>
-#include <Math/MathFunctions.h>
-#include <Math/Matrix.h>
 
 /**
  * @struct Quaternion Quaternion.h
@@ -40,170 +38,224 @@ struct Quaternion
 	float W;
 
 	/**
-	 * @brief Initializes a new Quaternion with its components set to zero.
-	 */
-	Quaternion() : X(0), Y(0), Z(0), W(0)
-	{
-	}
-
-	/**
 	 * @brief Initializes a new Quaternion given the components.
-	 * @param x The x-component of this Quaternion.
-	 * @param y The y-component of this Quaternion.
-	 * @param z The z-component of this Quaternion.
-	 * @param w The w-component of this Quaternion.
+	 * @param x The x-component of this Quaternion. Defaults to zero.
+	 * @param y The y-component of this Quaternion. Defaults to zero.
+	 * @param z The z-component of this Quaternion. Defaults to zero.
+	 * @param w The w-component of this Quaternion. Defaults to one.
 	 */
-	Quaternion(const float x, const float y, const float z, const float w) : X(x), Y(y), Z(z), W(w)
+	explicit Quaternion(const float x = 0, const float y = 0, const float z = 0, const float w = 1)
+		: X(x), Y(y), Z(z), W(w)
 	{
 	}
 
 	/**
-	 * @brief Create a rotation from an @p axis and @p angle.
-	 * @param axis The rotation axis.
-	 * @param angle The angle about the @p axis.
-	 * @param isRadians A boolean indicating whether or not the specified @p angle is in radians.
-	 *				  If true, @p angle is in radians; otherwise, @p angle is in degrees.
-	 *				  This value defaults to true.
+	 * @brief Initialize a new Quaternion from a scalar.
 	 */
-	Quaternion(const Vector<3, float>& axis, float angle, const bool isRadians = true)
+	explicit Quaternion(const float scalar)
+		: X(scalar), Y(scalar), Z(scalar), W(scalar)
 	{
-		if(!isRadians)
-		{
-			angle = MathFunctions::DegreesToRadians(angle);
-		}
-
-		const float halfAngle = 0.5f * angle;
-		W = std::cosf(halfAngle);
-		X = axis.X * std::sinf(halfAngle);
-		Y = axis.Y * std::sinf(halfAngle);
-		Z = axis.Z * std::sinf(halfAngle);
 	}
 
 	/**
-	 * @brief Initialize a Quaternion from an axis.
+	 * @brief Initialize a new Quaternion from a Vector4f.
 	 */
-	explicit Quaternion(const Vector<3, float>& axis)
+	explicit Quaternion(const Vector<4, float>& vector)
+		: X(vector.X), Y(vector.Y), Z(vector.Z), W(vector.W)
 	{
-		W = 0.0f;
-		X = axis.X;
-		Y = axis.Y;
-		Z = axis.Z;
 	}
 
 	/**
-	 * @brief Gets axis-angle representation of this Quaternion as a Vector4f.
+	 * @brief Initialize a new Quaternion from a @p vector 
+	 *		  and scalar, @p w, part.
 	 */
-	Vector<4, float> ToAxisAngle() const;
+	explicit Quaternion(const Vector<3, float>& vector, const float w)
+		: X(vector.X), Y(vector.Y), Z(vector.Z), W(w)
+	{
+		
+	}
 
 	/**
-	 * @brief Gets the rotation matrix from this Quaternion.
+	 * @brief Gets the vector part of this Quaternion.
 	 */
-	Matrix<4, 4, float> ToMatrix() const;
+	Vector<3, float> GetVectorPart() const
+	{
+		return Vector<3, float>(X, Y, Z);
+	}
 
 	/**
-	 * @brief Negate operator.
+	 * @brief Sets the vector part of this Quaternion.
+	 */
+	Quaternion& SetVectorPart(const Vector<3, float>& vector)
+	{
+		X = vector.X;
+		Y = vector.Y;
+		Z = vector.Z;
+
+		return *this;
+	}
+
+	/**
+	 * @brief Get the semi-rotational axis of this Quaternion.
+	 */
+	Vector<3, float> GetAxis() const;
+
+	/**
+	 * @brief The raw pitch in radians.
+	 */
+	float GetPitch() const;
+
+	/**
+	 * @brief The raw yaw in radians.
+	 */
+	float GetYaw() const;
+
+	/**
+	 * @brief The raw roll in radians.
+	 */
+	float GetRoll() const;
+
+	/**
+	 * @brief Gets this Quaternion in euler angles.
+	 */
+	Vector<3, float> ToEulerAngles() const;
+
+	/**
+	 * @brief Gets a new Quaternion representing the sum of this Quaternion and @p quaternion.
+	 */
+	Quaternion operator+(const Quaternion& quaternion) const;
+
+	/**
+	 * @brief Gets a new Quaternion representing the difference of this Quaternion and @p quaternion.
+	 */
+	Quaternion operator-(const Quaternion& quaternion) const;
+
+	/**
+	 * @brief Gets a new Quaternion representing the product of this Quaternion and @p quaternion.
+	 */
+	Quaternion operator*(const Quaternion& quaternion) const;
+
+	/**
+	 * @brief Gets a new Quaternion representing the product of this Quaternion and @p scalar.
+	 */
+	Quaternion operator*(float scalar) const;
+
+	/**
+	 * @brief Gets a new Quaternion representing the quotient of this Quaternion and @p scalar.
+	 */
+	Quaternion operator/(float scalar) const;
+
+	/**
+	 * @brief Adds the @p quaternion to this Quaternion.
+	 */
+	Quaternion& operator+=(const Quaternion& quaternion)
+	{
+		*this = *this + quaternion;
+		return *this;
+	}
+
+	/**
+	 * @brief Subtracts @p quaternion from this Quaternion.
+	 */
+	Quaternion& operator-=(const Quaternion& quaternion)
+	{
+		*this = *this - quaternion;
+		return *this;
+	}
+
+	/**
+	 * @brief Multiplies this Quaternion by @p quaternion.
+	 */
+	Quaternion& operator*=(const Quaternion& quaternion)
+	{
+		*this = *this * quaternion;
+		return *this;
+	}
+
+	/*
+	 * @brief Multiplies this Quaternion by @p scalar.
+	 */
+	Quaternion& operator*=(const float scalar)
+	{
+		*this = *this * scalar;
+		return *this;
+	}
+
+	/**
+	 * @brief Negate this Quaternion.
 	 */
 	Quaternion operator-() const;
 
 	/**
-	 * @brief Gets the magnitude of this Quaternion.
+	 * @brief Determine whether this Quaternion equals @p quaternion.
 	 */
-	float Magnitude() const;
+	bool operator==(const Quaternion& quaternion) const;
 
 	/**
-	 * @brief Gets the square magnitude of this Quaternion.
+	 * @brief Determine whether this Quaternion does not equals @p quaternion.
 	 */
-	float SquareMagnitude() const;
+	bool operator!=(const Quaternion& quaternion) const;
 
 	/**
-	 * @brief Gets this Quaternion with a magnitude of 1.
+	 * @brief The identity quaternion.
 	 */
-	Quaternion Normalized() const;
+	static const Quaternion Identity;
+
+	/**
+	 * @brief Creates a new Quaternion from euler angles given by the three-dimensional Vector @p angles.
+	 * @note @p angles is a three-dimensional vector (x, y, z) that corresponds to (pitch, yaw, roll).
+	 */
+	static Quaternion FromEulerAngles(const Vector<3, float>& angles);
+
+	/**
+	 * @brief Rotates @p vector by @p quaternion.
+	 */
+	static Vector<3, float> Rotate(const Quaternion& quaternion, const Vector<3, float>& vector);
+
+	/**
+	 * @brief Creates a Quaternion from two unit-vector directions.
+	 */
+	static Quaternion Rotation(const Vector<3, float>& a, const Vector<3, float>& b);
+
+	/**
+	 * @brief Creates a Quaternion from an angle and axis.
+	 */
+	static Quaternion Rotation(float radians, const Vector<3, float>& axis);
+
+	/**
+	 * @brief Creates a Quaternion rotated about the x-axis by @p radians.
+	 */
+	static Quaternion RotationX(const float radians)
+	{
+		const float angle = radians * 0.5f;
+		return Quaternion(sin(angle), 0.0f, 0.0f, cos(angle));
+	}
+
+	/**
+	 * @brief Creates a Quaternion rotated about the y-axis by @p radians.
+	 */
+	static Quaternion RotationY(const float radians)
+	{
+		const float angle = radians * 0.5f;
+		return Quaternion(0.0f, sin(angle), 0.0f, cos(angle));
+	}
+
+	/**
+	 * @brief Creates a Quaternion rotated about the z-axis by @p radians.
+	 */
+	static Quaternion RotationZ(const float radians)
+	{
+		const float angle = radians * 0.5f;
+		return Quaternion(0.0f, 0.0f, sin(angle), cos(angle));
+	}
+
+	/**
+	 * @brief Gets the dot product of this Quaternion and @p other.
+	 */
+	float Dot(const Quaternion& other) const;
 
 	/**
 	 * @brief Gets the conjugate of this Quaternion.
 	 */
 	Quaternion Conjugate() const;
-
-	/**
-	 * @brief Gets this Quaternion as euler angles.
-	 */
-	Vector<3, float> ToEulerAngles() const;
-
-	/**
-	 * @brief Gets the vector part of this Quaternion.
-	 */
-	Vector3f GetAxis() const
-	{
-		return Vector3f(X, Y, Z);
-	}
-
-	/**
-	 * @brief Makes the specified @p quaternion have a magnitude of 1.
-	 * @note This will change this Quaternion. If you want to keep the quaternion unchanged,
-	 *		 use the Quaternion::Normalized method instead.
-	 * @returns A reference to @p quaternion.
-	 */
-	static Quaternion& Normalize(Quaternion& quaternion);
-
-	/**
-	 * @brief Dot product of two quaternions.
-	 * @returns The dot product of quaternion @p a and @p b.
-	 */
-	static float Dot(const Quaternion& a, const Quaternion& b);
-
-	/**
-	 * @brief Linear interpolation between two Quaternions by the interpolant.
-	 */
-	static Quaternion Lerp(const Quaternion& a, const Quaternion& b, float t, bool shortest);
-
-	/**
-	 * @brief Spherical interpolation between two Quaternions by the interpolant.
-	 */
-	static Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t, bool shortest);
-
-	/**
-	 * @brief Convert this Quaternion to its string representation.
-	 */
-	std::string ToString() const;
-
-	/**
-	 * @brief Create a Quaternion from Euler angles.
-	 * @note Angles represents (roll, pitch, yaw) which
-	 *		 maps to (x, y, z) components of the @p angles vector.
-	 */
-	static Quaternion FromEulerAngles(const Vector<3, float>& angles);
-
-	/**
-	 * @brief Rotate a quaternion by a vector.
-	 */
-	static Vector<3, float> Rotate(const Quaternion& quaternion, const Vector<3, float>& vector);
-
-	/**
-	 * @brief Create a rotation from the two specified direction vectors.
-	 */
-	static Quaternion Rotation(const Vector<3, float>& u, const Vector<3, float>& v);
-
-	/**
-	 * @brief Create a rotation from an @p axis and @p angle.
-	 * @param axis The rotation axis.
-	 * @param angle The angle about the @p axis.
-	 * @param radians A boolean indicating whether or not the specified @p angle is in radians.
-	 *				  If true, @p angle is in radians; otherwise, @p angle is in degrees.
-	 *				  This value defaults to true.
-	 */
-	static Quaternion Rotation(const Vector<3, float>& axis, const float angle, const bool radians = true)
-	{
-		return Quaternion(axis, angle, radians);
-	}
-
-	/**
-	 * @brief Stream operator.
-	 */
-	friend std::ostream& operator<<(std::ostream& stream, const Quaternion& right);
-
-	/**
-	 * @brief The identity Quaternion.
-	 */
-	static const Quaternion Identity;
 };

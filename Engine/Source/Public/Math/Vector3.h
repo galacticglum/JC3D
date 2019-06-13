@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <Math/Vector.h>
-
  /**
   * @struct Vector Vector3.h
   * @brief A specialized implementation of a three-dimensional vector
