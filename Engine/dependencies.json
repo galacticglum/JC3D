@@ -16,28 +16,6 @@
                     "url_type": "archive"
                 }
             },
-            "binaries": [
-                {
-                    "filepath": "glfw_x64/glfw-3.3.bin.WIN64/lib-vc2017/glfw3.dll",
-                    "platforms": [
-                        "x64"
-                    ],
-                    "configs": [
-                        "Release",
-                        "Debug"
-                    ]
-                },
-                {
-                    "filepath": "glfw_win32/glfw-3.3.bin.WIN32/lib-vc2017/glfw3.dll",
-                    "platforms": [
-                        "Win32"
-                    ],
-                    "configs": [
-                        "Release",
-                        "Debug"
-                    ]
-                }
-            ],
             "libraries": [
                 {
                     "filepath": "glfw_x64/glfw-3.3.bin.WIN64/lib-vc2017/glfw3.lib",
@@ -101,6 +79,89 @@
                     "source": "stb-master/stb_image.h",
                     "destination": "stb"
                 }
+            ]
+        },
+        "assimp": {
+            "url": "https://drive.google.com/uc?export=download&confirm=aV2w&id=1QGa2tgEzSgNwda1ozbrjhQsIeAZ-lSdn",
+            "url_type": "archive",
+            "binaries": [
+                {
+                    "filepath": "assimp/bin_x64/Release/assimp-vc140-mt.dll",
+                    "platforms": [
+                        "x64"
+                    ],
+                    "configs": [
+                        "Release"
+                    ]
+                },
+                {
+                    "filepath": "assimp/bin_x64/Debug/assimp-vc140-mtd.dll",
+                    "platforms": [
+                        "x64"
+                    ],
+                    "configs": [
+                        "Debug"
+                    ]
+                },
+                {
+                    "filepath": "assimp/bin_win32/Release/assimp-vc140-mt.dll",
+                    "platforms": [
+                        "Win32"
+                    ],
+                    "configs": [
+                        "Release"
+                    ]
+                },
+                {
+                    "filepath": "assimp/bin_win32/Debug/assimp-vc140-mtd.dll",
+                    "platforms": [
+                        "Win32"
+                    ],
+                    "configs": [
+                        "Debug"
+                    ]
+                }
+            ],
+            "libraries": [
+                {
+                    "filepath": "assimp/lib_x64/Release/assimp-vc140-mt.lib",
+                    "platforms": [
+                        "x64"
+                    ],
+                    "configs": [
+                        "Release"
+                    ]
+                },
+                {
+                    "filepath": "assimp/lib_x64/Debug/assimp-vc140-mtd.lib",
+                    "platforms": [
+                        "x64"
+                    ],
+                    "configs": [
+                        "Debug"
+                    ]
+                },
+                {
+                    "filepath": "assimp/lib_win32/Release/assimp-vc140-mt.lib",
+                    "platforms": [
+                        "Win32"
+                    ],
+                    "configs": [
+                        "Release"
+                    ]
+                },
+                {
+                    "filepath": "assimp/lib_win32/Debug/assimp-vc140-mtd.lib",
+                    "platforms": [
+                        "Win32"
+                    ],
+                    "configs": [
+                        "Debug"
+                    ]
+                }
+            ],
+            "includes": [
+                "assimp/include"
             ]
         }
     }
