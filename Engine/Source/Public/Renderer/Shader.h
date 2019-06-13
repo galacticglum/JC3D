@@ -139,31 +139,10 @@ struct ShaderUniformBufferDeclaration : public ShaderUniformBufferBase
 		// the ShaderDataType implementation.
 
 		ShaderDataType type = ShaderDataTypeHelper::FromType<T>();
-
 		Uniforms[Index++] = { type, Cursor, name };
 
-		void const* ptr;
-		std::size_t size;
-
-		// Since we got the shader type from a runtime type (which is a function that is defined by the
-		// engine), we can be sure that if type is a vector or matrix type, that it INHERITS from the
-		// Vector or Matrix base types defined in the engine maths library.
-		if (ShaderDataTypeHelper::IsVectorType(type) || ShaderDataTypeHelper::IsMatrixType(type))
-		{
-			// If the data is a vector or matrix, our ptr needs to point to the vector/matrix elements.
-			// data should have a Data member since it is a vector or matrix.
-			ptr = data.Data.data();
-
-			// Use the Data member for the size to ensure that no memory padding is included.
-			size = sizeof(data.Data);
-		}
-		else
-		{
-			ptr = &data;
-			size = sizeof(data);
-		}
-
-		memcpy(Buffer + Cursor, ptr, size);
+		std::size_t size = sizeof(data);
+		memcpy(Buffer + Cursor, &data, size);
 		Cursor += size;
 	}
 };
