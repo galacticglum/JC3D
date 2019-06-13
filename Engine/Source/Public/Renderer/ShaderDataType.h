@@ -12,8 +12,6 @@
 #include <Logger.h>
 #include <Math/Vector.h>
 #include <Math/Matrix.h>
-#include <typeindex>
-
 
 /**
  * @enum ShaderDataType ShaderDataType.h
@@ -21,7 +19,7 @@
  */
 enum class ShaderDataType
 {
-	None = 0,
+	None = 0, Unknown = 1,
 	Float, Float2, Float3, Float4,
 	Int, Int2, Int3, Int4, Uint32,
 	Bool, Bool2, Bool3, Bool4,
@@ -29,16 +27,47 @@ enum class ShaderDataType
 };
 
 /**
+ * @brief A mapping of ShaderDataTypes to their respective C++ types.
+ */
+template <typename T>
+struct ShaderDataTypeMapping
+{
+	static constexpr ShaderDataType Type = ShaderDataType::Unknown;
+};
+
+#define MAP_SHADER_DATA_TYPE(cppType, shaderDataType)			            \
+template<>														            \
+struct ShaderDataTypeMapping<cppType>							            \
+{																            \
+	static constexpr ShaderDataType Type = ShaderDataType::shaderDataType;  \
+};																			\
+
+MAP_SHADER_DATA_TYPE(std::nullptr_t, None)
+
+MAP_SHADER_DATA_TYPE(float, Float)
+MAP_SHADER_DATA_TYPE(Vector2f, Float2)
+MAP_SHADER_DATA_TYPE(Vector3f, Float3)
+
+MAP_SHADER_DATA_TYPE(int, Int)
+MAP_SHADER_DATA_TYPE(Vector2i, Int2)
+MAP_SHADER_DATA_TYPE(Vector3i, Int3)
+MAP_SHADER_DATA_TYPE(Vector4i, Int4)
+MAP_SHADER_DATA_TYPE(uint32_t, Uint32)
+
+MAP_SHADER_DATA_TYPE(bool, Bool)
+MAP_SHADER_DATA_TYPE(Vector2<bool>, Bool2)
+MAP_SHADER_DATA_TYPE(Vector3<bool>, Bool3)
+MAP_SHADER_DATA_TYPE(Vector4<bool>, Bool4)
+
+MAP_SHADER_DATA_TYPE(Matrix3f, Matrix3x3)
+MAP_SHADER_DATA_TYPE(Matrix4f, Matrix4x4)
+
+/**
  * @struct ShaderDataTypeHelper ShaderDataType.h
  * @brief A collection of helper functionality related to the ShaderDataType enum.
  */
 struct ShaderDataTypeHelper
 {
-	/**
-	 * @brief A mapping of ShaderDataTypes to their respective C++ types.
-	 */
-	static std::unordered_map<std::type_index, ShaderDataType> s_RuntimeTypeMapping;
-
 	/**
 	 * @brief Get the number of components making up this BufferElement.
 	 */
@@ -102,30 +131,47 @@ struct ShaderDataTypeHelper
 	/**
 	 * @brief Gets a ShaderDataType from a std::type_index.
 	 */
-	static ShaderDataType FromTypeInfo(const std::type_index type)
+	template <typename T>
+	static ShaderDataType FromType()
 	{
-		const bool exists = s_RuntimeTypeMapping.find(type) != s_RuntimeTypeMapping.end();
-		LOG_CATEGORY_ASSERT(exists, "Renderer", "Invalid runtime type provided for ShaderDataType conversion!");
+		ShaderDataType type = ShaderDataTypeMapping<T>::Type;
+		LOG_CATEGORY_ASSERT(type != ShaderDataType::Unknown, "Renderer", "Invalid type provided for ShaderDataType conversion!");
 
-		return s_RuntimeTypeMapping[type];
+		return type;
 	}
-};
 
-std::unordered_map<std::type_index, ShaderDataType> ShaderDataTypeHelper::s_RuntimeTypeMapping = {
-	{ typeid(nullptr), ShaderDataType::None  },
-	{ typeid(float), ShaderDataType::Float  },
-	{ typeid(Vector2f), ShaderDataType::Float2 },
-	{ typeid(Vector3f), ShaderDataType::Float3  },
-	{ typeid(Vector4f), ShaderDataType::Float4 },
-	{ typeid(int), ShaderDataType::Int },
-	{ typeid(Vector2i), ShaderDataType::Int2 },
-	{ typeid(Vector3i), ShaderDataType::Int3 },
-	{ typeid(Vector4i), ShaderDataType::Int4 },
-	{ typeid(uint32_t), ShaderDataType::Uint32 },
-	{ typeid(bool), ShaderDataType::Bool },
-	{ typeid(Vector2<bool>), ShaderDataType::Bool2 },
-	{ typeid(Vector3<bool>), ShaderDataType::Bool3 },
-	{ typeid(Vector4<bool>), ShaderDataType::Bool4 },
-	{ typeid(Matrix3f), ShaderDataType::Matrix3x3 },
-	{ typeid(Matrix4f), ShaderDataType::Matrix4x4 },
+	/**
+	 * @brief Gets whether the specified @p type is a vector type.
+	 */
+	static bool IsVectorType(const ShaderDataType type)
+	{
+		switch (type)
+		{
+			case ShaderDataType::Float2: return true;
+			case ShaderDataType::Float3: return true;
+			case ShaderDataType::Float4: return true;
+			case ShaderDataType::Int2: return true;
+			case ShaderDataType::Int3: return true;
+			case ShaderDataType::Int4: return true;
+			case ShaderDataType::Bool2: return true;
+			case ShaderDataType::Bool3: return true;
+			case ShaderDataType::Bool4: return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * @brief Gets whether the specified @p type is a vector type.
+	 */
+	static bool IsMatrixType(const ShaderDataType type)
+	{
+		switch (type)
+		{
+			case ShaderDataType::Matrix3x3: return true;
+			case ShaderDataType::Matrix4x4: return true;
+		}
+
+		return false;
+	}
 };

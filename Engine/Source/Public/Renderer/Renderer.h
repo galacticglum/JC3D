@@ -23,7 +23,7 @@ public:
 
 	static void Clear();
 	static void Clear(float r, float g, float b, float a = 1.0f);
-	static void SetClearColor(float r, float g, float b, float a);
+	static void SetClearColor(float r, float g, float b, float a = 1.0f);
 
 	static void DrawIndexed(unsigned int count, bool depthTest = true);
 	static void ClearMagenta();

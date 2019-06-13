@@ -3,16 +3,170 @@
  * File Name: Shader.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/10/2019
- * Modified Date: 06/10/2019
+ * Modified Date: 06/12/2019
  * Description: Shader scripts used for rendering.
  */
 
 #pragma once
 
+#include <cstddef>
 #include <string>
+#include <type_traits>
+
+#include <Renderer/Renderer.h>
+#include <Renderer/ShaderDataType.h>
 
 #include <Math/Vector.h>
 #include <Math/Matrix.h>
+
+/**
+ * @struct ShaderUniformDeclaration Shader.h
+ * @brief A shader uniform declaration.
+ * @note Used for binding the uniform to the shader.
+ */
+struct ShaderUniformDeclaration
+{
+	/**
+	 * @brief The type of the uniform variable.s
+	 */
+	ShaderDataType Type;
+
+	/**
+	 * @brief The uniform variable offset.
+	 */
+	std::ptrdiff_t Offset;
+
+	/**
+	 * @brief The name of the uniform variable.
+	 */
+	std::string Name;
+};
+
+/**
+ * @struct ShaderUniformBufferBase Shader.h
+ * @brief A byte buffer packed with uniforms.
+ * @note This is simply a CPU-side buffer abstraction.
+ */
+struct ShaderUniformBufferBase
+{
+	/**
+	 * @brief Destroy this ShaderUniformBufferBase.
+	 */
+	virtual ~ShaderUniformBufferBase() = default;
+
+	/**
+	 * @brief Gets the uniform buffer.
+	 */
+	virtual const unsigned char* GetBuffer() const = 0;
+
+	/**
+	 * @brief Gets the uniform declarations.
+	 */
+	virtual const ShaderUniformDeclaration* GetUniforms() const = 0;
+
+	/**
+	 * @brief Gets the number of uniforms in this ShaderUniformBufferBase.
+	 */
+	virtual std::size_t GetUniformCount() const = 0;
+};
+
+/**
+ * @struct ShaderUniformBufferDeclaration Shader.h
+ * @brief Implementation of the ShaderUniformBufferBase.
+ * @tparam N The size of the buffer.
+ * @tparam U The number of uniforms in this buffer.
+ */
+template<uint32_t N, uint32_t U>
+struct ShaderUniformBufferDeclaration : public ShaderUniformBufferBase
+{	
+	/**
+	 * @brief The uniform buffer.
+	 */
+	unsigned char Buffer[N]{};
+
+	/**
+	 * @brief The uniforms of this ShaderUniformBufferDeclaration.
+	 */
+	ShaderUniformDeclaration Uniforms[U];
+
+	/**
+	 * @brief The access cursor.
+	 * @note Used for seeking various parts of the buffer.
+	 */
+	std::ptrdiff_t Cursor = 0;
+
+	/**
+	 * @brief The insertion index for the ShaderUniformBufferDeclaration::Uniforms array.
+	 */
+	int Index = 0;
+
+	/**
+	 * @brief Gets the byte buffer for this ShaderUniformBufferDeclaration.
+	 */
+	const unsigned char* GetBuffer() const override
+	{
+		return Buffer;
+	}
+
+	/**
+	 * @brief Gets the uniforms for this ShaderUniformBufferDeclaration.
+	 */
+	const ShaderUniformDeclaration* GetUniforms() const override
+	{
+		return Uniforms;
+	}
+
+	/**
+	 * @brief Gets the number of uniforms in this ShaderUniformBufferDeclaration.
+	 */
+	std::size_t GetUniformCount() const override
+	{
+		return U;
+	}
+
+	/**
+	 * @brief Push a uniform of type @p T with the specified @p name onto this ShaderUniformBufferDeclaration.
+	 */
+	template <typename T>
+	void Push(const std::string& name, const T& data)
+	{
+		// Check whether the templated type is supported and which
+		// ShaderDataType it aligns with. Since this is doing a direct
+		// type check, implicit type-casting is not supported.
+
+		// This is a little hacky but its the only way to do it...
+		// Fortunately, the ugly code is mostly abstracted into
+		// the ShaderDataType implementation.
+
+		ShaderDataType type = ShaderDataTypeHelper::FromType<T>();
+
+		Uniforms[Index++] = { type, Cursor, name };
+
+		void const* ptr;
+		std::size_t size;
+
+		// Since we got the shader type from a runtime type (which is a function that is defined by the
+		// engine), we can be sure that if type is a vector or matrix type, that it INHERITS from the
+		// Vector or Matrix base types defined in the engine maths library.
+		if (ShaderDataTypeHelper::IsVectorType(type) || ShaderDataTypeHelper::IsMatrixType(type))
+		{
+			// If the data is a vector or matrix, our ptr needs to point to the vector/matrix elements.
+			// data should have a Data member since it is a vector or matrix.
+			ptr = &data.Data;
+
+			// Use the Data member for the size to ensure that no memory padding is included.
+			size = sizeof(data.Data);
+		}
+		else
+		{
+			ptr = &data;
+			size = sizeof(data);
+		}
+
+		memcpy(Buffer + Cursor, ptr, size);
+		Cursor += size;
+	}
+};
 
 /**
  * @class Shader Shader.h
@@ -27,6 +181,11 @@ public:
 	virtual ~Shader() = default;
 
 	/**
+	 * @brief Reload this shader.
+	 */
+	virtual void Reload() = 0;
+
+	/**
 	 * @brief Bind this Shader.
 	 */
 	virtual void Bind() const = 0;
@@ -37,25 +196,19 @@ public:
 	virtual void Unbind() const = 0;
 
 	/**
-	 * @brief Gets the path to the vertex shader source file.
+	 * @brief Get the name of this shader.
 	 */
-	virtual const std::string& GetVertexPath() const = 0;
+	virtual const std::string& GetName() const = 0;
 
 	/**
-	 * @brief Gets the path to the fragment shader source file.
+	 * @brief Get the filepath of this shader.
 	 */
-	virtual const std::string& GetFragmentPath() const = 0;
+	virtual const std::string& GetFilepath() const = 0;
 
 	/**
-	 * @brief Gets the path to the geometry shader source file.
-	 * @note This method will return null if there is no geometry shader. 
+	 * @brief Upload a uniform buffer onto this Shader.
 	 */
-	virtual const std::string& GetGeometryPath() const = 0;
-
-	/**
-	 * @brief Add a uniform with the specified @p uniformName.
-	 */
-	virtual void AddUniform(const std::string& uniformName) = 0;
+	virtual void UploadUniformBuffer(const ShaderUniformBufferBase& uniformBuffer) const = 0;
 
 	/**
 	 * @brief Set the value of the integer uniform with the specified @p uniformName.
@@ -94,11 +247,12 @@ public:
 
 	/**
 	 * @brief Create a new Shader.
-	 * @param vertexPath The path to the vertex shader.
-	 * @param fragmentPath The path to the fragment shader.
-	 * @param geometryPath The path to the geometry shader. This is an optional parameter.
-	 *					   If it is null or empty, it is assumed that there is no geometry shader.
+	 * @param filepath The path to the shader.
 	 */
-	static Shader* Create(const std::string& vertexPath, const std::string& fragmentPath, 
-		const std::string& geometryPath = "");
+	static Shader* Create(const std::string& filepath);
+
+	/**
+	 * @brief All the shaders.
+	 */
+	static std::vector<Shader*> s_AllShaders;
 };
