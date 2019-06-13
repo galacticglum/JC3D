@@ -11,12 +11,13 @@
 #pragma once
 
 #include <Math/Matrix.h>
+#include <Math/Quaternion.h>
 #include <Math/MathFunctions.h>
 
 #include <cmath>
 #include <algorithm>
 
- /**
+/**
   * @struct Matrix Matrix4.h
   * @brief A specialized implementation of a square matrix
   *		   with dimension four.
@@ -174,6 +175,37 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 		result[1][3] = static_cast<T>(0);
 		result[2][3] = static_cast<T>(0);
 		result[3][3] = static_cast<T>(1);
+
+		return result;
+	}
+
+	/**
+	 * Creates a rotation matrix from a @p quaternion.
+	 */
+	static Matrix<4, 4, T> Rotate(const Quaternion& quaternion)
+	{
+		Matrix<4, 4, T> result;
+
+		const T qx = static_cast<T>(quaternion.X);
+		const T qy = static_cast<T>(quaternion.Y);
+		const T qz = static_cast<T>(quaternion.Z);
+		const T qw = static_cast<T>(quaternion.W);
+		const T qx2 = (qx + qx);
+		const T qy2 = (qy + qy);
+		const T qz2 = (qz + qz);
+		const T qxqx2 = (qx * qx2);
+		const T qxqy2 = (qx * qy2);
+		const T qxqz2 = (qx * qz2);
+		const T qxqw2 = (qw * qx2);
+		const T qyqy2 = (qy * qy2);
+		const T qyqz2 = (qy * qz2);
+		const T qyqw2 = (qw * qy2);
+		const T qzqz2 = (qz * qz2);
+		const T qzqw2 = (qw * qz2);
+
+		result.Columns[0] = Vector<4, T>(((1.0 - qyqy2) - qzqz2), (qxqy2 + qzqw2), (qxqz2 - qyqw2), 0);
+		result.Columns[1] = Vector<4, T>((qxqy2 - qzqw2), ((1.0f - qxqx2) - qzqz2), (qyqz2 + qxqw2), 0);
+		result.Columns[2] = Vector<4, T>((qxqz2 + qyqw2), (qyqz2 - qxqw2), ((1.0 - qxqx2) - qyqy2), 0);
 
 		return result;
 	}
