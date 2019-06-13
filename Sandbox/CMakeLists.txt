@@ -47,6 +47,9 @@ INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindSPDLOG.cmake)
 # imgui
 INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindImGui.cmake)
 
+# assimp
+INCLUDE(${JesusChristIn3D_CMAKE_DIR}/FindASSIMP.cmake)
+
 # Define the include DIRs
 include_directories(
 	${JesusChristIn3D_SOURCE_DIR}/Engine/Source/Public
@@ -55,6 +58,7 @@ include_directories(
 	${GLAD_INCLUDE_DIRS}
 	${SPDLOG_INCLUDE_DIRS}
 	${ImGui_INCLUDE_DIRS}
+	${ASSIMP_INCLUDE_DIRS}
 )
 
 target_link_libraries( Sandbox Engine )
@@ -70,6 +74,20 @@ set_property(TARGET Sandbox PROPERTY CXX_STANDARD_REQUIRED ON)
 add_custom_command(TARGET Sandbox PRE_BUILD
 				   COMMAND ${CMAKE_COMMAND} -E copy_directory
 				   ${JesusChristIn3D_SOURCE_DIR}/Sandbox/Content $<TARGET_FILE_DIR:Sandbox>/Content)
+
+# Copy binaries to output directory...
+# Find all dependencies that have a bin folder...
+include(${JesusChristIn3D_CMAKE_DIR}/utils.cmake)
+SUBDIRLIST(DEPENDENCY_DIRS ${JesusChristIn3D_Engine_DEPEND_DIR})
+foreach(dependency_name ${DEPENDENCY_DIRS})
+	# check if there is a bin directory
+	if(EXISTS "${JesusChristIn3D_Engine_DEPEND_DIR}/${dependency_name}/bin")
+		# there is a bin directory which means that we should copy this dependency
+		add_custom_command(TARGET Sandbox PRE_BUILD
+						   COMMAND ${CMAKE_COMMAND} -E copy_directory
+						   "${JesusChristIn3D_Engine_DEPEND_DIR}/${dependency_name}/bin/${_config}/$<$<EQUAL:4,${CMAKE_SIZEOF_VOID_P}>:Win32>$<$<EQUAL:8,${CMAKE_SIZEOF_VOID_P}>:x64>" $<TARGET_FILE_DIR:Sandbox>)
+	endif()
+endforeach()
 
 # Set the working directory
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/Sandbox.vcxproj.user" 
