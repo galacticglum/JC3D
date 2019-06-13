@@ -71,7 +71,11 @@ struct Vector<2, T> : VectorBase<2, T, Vector<2, T>>
 	Vector(const std::initializer_list<T> args)
 	{
 		assert(args.size() <= Size());
-		Data = args;
+		std::size_t index = 0;
+		for (auto it = args.begin(); it != args.end(); ++it)
+		{
+			Data.at(index++) = *it;
+		}
 	}
 
 	/**
