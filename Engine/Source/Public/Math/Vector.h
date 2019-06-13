@@ -181,7 +181,7 @@ struct VectorBase
 	 */
 	static T Dot(const Vector<n, T>& a, const Vector<n, T>& b)
 	{
-		T result;
+		T result{};
 
 		const std::size_t size = a.Size();
 		for (std::size_t i = 0; i < size; ++i)
