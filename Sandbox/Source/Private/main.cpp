@@ -3,18 +3,19 @@
  * File Name: main.cpp
  * Project Name: JesusChristIn3D
  * Creation Date: 06/09/2019
- * Modified Date: 06/09/2019
+ * Modified Date: 06/12/2019
  * Description: Entry point for the sandbox application.
  */
 
 #include <Application.h>
+#include <PBRLayer.h>
 
 class Sandbox : public Application
 {
 public:
 	Sandbox()
 	{
-		//PushLayer(new TestLayer());
+		PushLayer(new PBRLayer());
 	}
 
 	~Sandbox() = default;
