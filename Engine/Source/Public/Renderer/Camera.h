@@ -4,128 +4,84 @@
  * Project Name: JesusChristIn3D
  * Creation Date: 06/11/2019
  * Modified Date: 06/11/2019
- * Description: Base camera.
+ * Description: Camera implementation.
  */
 
 #pragma once
 
-#include <cmath>
 #include <Math/Vector.h>
 #include <Math/Matrix.h>
-#include <Math/MathFunctions.h>
+#include <Math/Quaternion.h>
 
-enum class CameraMovement
-{
-	Forward,
-	Backward,
-	Left,
-	Right
-};
-
-#define DEFAULT_YAW -90.0f
-#define DEFAULT_PITCH 0.0f
-#define DEFAULT_SPEED 2.5f
-#define DEFAULT_SENSITIVITY 0.1f
-#define DEFAULT_ZOOM 45.0f
-
+/**
+ * @class Camera Camera.h
+ * @brief Camera implementation.
+ */
 class Camera
 {
 public:
-	Vector3f Position;
-	Vector3f Front;
-	Vector3f Up;
-	Vector3f Right;
-	Vector3f WorldUp;
+	explicit Camera(const Matrix4f& projectionMatrix);
 
-	float Yaw;
-	float Pitch;
-	float MovementSpeed;
-	float MouseSensitivity;
-	float Zoom;
+	void Focus() const;
+	void Update();
 
-	explicit Camera(Vector3f position = Vector3f(0, 0, 0), Vector3f up = Vector3f(0, 1, 0), float yaw = DEFAULT_YAW, float pitch = DEFAULT_PITCH)
-		: Front(Vector3f(0, 0, -1)), MovementSpeed(DEFAULT_SPEED), MouseSensitivity(DEFAULT_SENSITIVITY), Zoom(DEFAULT_ZOOM)
+	float GetDistance() const
 	{
-		Position = position;
-		WorldUp = up;
-		Yaw = yaw;
-		Pitch = pitch;
-		UpdateCameraVectors();
+		return m_Distance;
 	}
 
-	Camera(float posX, float posY, float posZ, float upX, float upY, float upZ, float yaw, float pitch) 
-		: Front(Vector3f(0.0f, 0.0f, -1.0f)), MovementSpeed(DEFAULT_SPEED), MouseSensitivity(DEFAULT_SENSITIVITY), Zoom(DEFAULT_ZOOM)
+	void SetDistance(const float distance)
 	{
-		Position = Vector3f(posX, posY, posZ);
-		WorldUp = Vector3f(upX, upY, upZ);
-		Yaw = yaw;
-		Pitch = pitch;
-		UpdateCameraVectors();
+		m_Distance = distance;
+	}
+
+	void SetProjectionMatrix(const Matrix4f& projectionMatrix)
+	{
+		m_ProjectionMatrix = projectionMatrix;
+	}
+
+	const Matrix4f& GetProjectionMatrix() const
+	{
+		return m_ProjectionMatrix;
 	}
 
 	Matrix4f GetViewMatrix() const
 	{
-		return Matrix4f::LookAt(Position, Position + Front, Up);
+		return m_ViewMatrix;
 	}
 
-	// Processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)
-	void ProcessKeyboard(CameraMovement direction, float deltaTime)
+	Vector3f GetUpDirection() const;
+	Vector3f GetRightDirection() const;
+	Vector3f GetForwardDirection() const;
+	const Vector3f& GetPosition() const
 	{
-		const float velocity = MovementSpeed * deltaTime;
-		if (direction == CameraMovement::Forward)
-			Position += Front * velocity;
-		if (direction == CameraMovement::Backward)
-			Position -= Front * velocity;
-		if (direction == CameraMovement::Left)
-			Position -= Right * velocity;
-		if (direction == CameraMovement::Right)
-			Position += Right * velocity;
-	}
-
-	// Processes input received from a mouse input system. Expects the offset value in both the x and y direction.
-	void ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true)
-	{
-		xoffset *= MouseSensitivity;
-		yoffset *= MouseSensitivity;
-
-		Yaw += xoffset;
-		Pitch += yoffset;
-
-		// Make sure that when pitch is out of bounds, screen doesn't get flipped
-		if (constrainPitch)
-		{
-			if (Pitch > 89.0f)
-				Pitch = 89.0f;
-			if (Pitch < -89.0f)
-				Pitch = -89.0f;
-		}
-
-		// Update Front, Right and Up Vectors using the updated Euler angles
-		UpdateCameraVectors();
-	}
-
-	// Processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-	void ProcessMouseScroll(float yoffset)
-	{
-		if (Zoom >= 1.0f && Zoom <= 45.0f)
-			Zoom -= yoffset;
-		if (Zoom <= 1.0f)
-			Zoom = 1.0f;
-		if (Zoom >= 45.0f)
-			Zoom = 45.0f;
+		return m_Position;
 	}
 private:
-	// Calculates the front vector from the Camera's (updated) Euler Angles
-	void UpdateCameraVectors()
-	{
-		// Calculate the new Front vector
-		Vector3f front;
-		front.X = std::cos(MathFunctions::DegreesToRadians(Yaw)) * std::cos(MathFunctions::DegreesToRadians(Pitch));
-		front.Y = std::sin(MathFunctions::DegreesToRadians(Pitch));
-		front.Z = std::sin(MathFunctions::DegreesToRadians(Yaw)) * std::cos(MathFunctions::DegreesToRadians(Pitch));
-		Front = Vector3f::Normalize(front);
-		// Also re-calculate the Right and Up vector
-		Right = Vector3f::Cross(Front, WorldUp).Normalized();  // Normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
-		Up = Vector3f::Cross(Right, Front).Normalized();
-	}
+	Matrix4f m_ProjectionMatrix;
+	Matrix4f m_ViewMatrix;
+	Vector3f m_Position;
+	Vector3f m_Rotation;
+	Vector3f m_FocalPoint;
+
+	bool m_Panning;
+	bool m_Rotating;
+	Vector2f m_InitialMousePosition;
+	Vector3f m_InitialFocalPoint;
+	Vector3f m_InitialRotation;
+
+	float m_Distance;
+	float m_PanSpeed;
+	float m_RotationSpeed;
+	float m_ZoomSpeed;
+
+	float m_Pitch;
+	float m_Yaw;
+
+	void MousePan(const Vector2f& delta);
+	void MouseRotate(const Vector2f& delta);
+	void MouseZoom(float delta);
+
+	Vector3f CalculatePosition() const;
+	Quaternion GetOrientation() const;
 };
