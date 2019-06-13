@@ -4,8 +4,6 @@
 #include <Logger.h>
 
 #include <utility>
-
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
 #include <glad/glad.h>
 
