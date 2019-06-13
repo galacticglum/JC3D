@@ -115,6 +115,11 @@ public:
 	{
 		return *m_TimeContext;
 	}
+
+	/**
+	 * @brief Open a file dialog with the given @p filter.
+	 */
+	std::string OpenFile(const std::string& filter) const;
 private:
 	/**
 	 * @brief Handle the WindowResizeEvent.
