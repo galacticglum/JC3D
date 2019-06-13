@@ -135,7 +135,8 @@ struct ShaderDataTypeHelper
 	static ShaderDataType FromType()
 	{
 		ShaderDataType type = ShaderDataTypeMapping<T>::Type;
-		LOG_CATEGORY_ASSERT(type != ShaderDataType::Unknown, "Renderer", "Invalid type provided for ShaderDataType conversion!");
+		LOG_CATEGORY_ASSERT(type != ShaderDataType::Unknown && type != ShaderDataType::None, 
+			"Renderer", "Invalid type provided for ShaderDataType conversion!");
 
 		return type;
 	}
