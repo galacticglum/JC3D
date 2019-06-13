@@ -152,7 +152,7 @@ struct ShaderUniformBufferDeclaration : public ShaderUniformBufferBase
 		{
 			// If the data is a vector or matrix, our ptr needs to point to the vector/matrix elements.
 			// data should have a Data member since it is a vector or matrix.
-			ptr = &data.Data;
+			ptr = data.Data.data();
 
 			// Use the Data member for the size to ensure that no memory padding is included.
 			size = sizeof(data.Data);
