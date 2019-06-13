@@ -16,6 +16,8 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
+#include <Utilities/MacroUtilities.h>
+
 #define GLOBAL_LOGGER_IDENTIFIER "Global"
 #define DEFAULT_MESSAGE_FORMAT "%^[%T] %n: %v%$"
 
@@ -109,5 +111,35 @@ private:
 	static std::string m_DefaultMessageFormat;
 };
 
-#define LOG_CATEGORY_ASSERT(x, category, ...) { if (!(x)) { Logger::Log(category, LoggerVerbosity::Error, "Assertion Failed: {0}", __VA_ARGS__); __debugbreak(); } } 
+/**
+ * @brief Assert a condition.
+ * @note Triggers a breakpoint if the condition is false.
+ */
+#define LOG_CATEGORY_ASSERT(x, category, message, ...) {																	\
+	if (!(x))																												\
+	{																														\
+		Logger::Log(category, LoggerVerbosity::Error, "Assertion Failed: " XSTR(message), __VA_ARGS__);						\
+		__debugbreak();																										\
+	}																														\
+}
+
+/**
+ * @brief Assert a condition without triggering a breakpoint.
+ */
+#define LOG_CATEGORY_ASSERT_NOBREAK(x, category, message, ...) {															\
+	if (!(x))																												\
+	{																														\
+		Logger::Log(category, LoggerVerbosity::Error, "Assertion Failed: " XSTR(message), __VA_ARGS__);						\
+	}																														\
+}
+
+/**
+ * @brief Assert a condition.
+ * @note Triggers a breakpoint if the condition is false.
+ */
 #define LOG_ASSERT(x, ...) LOG_CATEGORY_ASSERT(x, GLOBAL_LOGGER_IDENTIFIER, __VA_ARGS__)
+
+/**
+ * @brief Assert a condition without triggering a breakpoint.
+ */
+#define LOG_ASSERT_NOBREAK(x, ...) LOG_CATEGORY_ASSERT_NOBREAK(x, GLOBAL_LOGGER_IDENTIFIER, __VA_ARGS__)
