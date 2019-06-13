@@ -236,13 +236,21 @@ struct MatrixBase
 			for (std::size_t j = 0; j < n; ++j)
 			{
 				if (j == column) continue;
-				result[ri][rj++] = this[i][j];
+				result.Data[ri][rj++] = Data[i][j];
 			}
 
 			++ri;
 		}
 
 		return result;
+	}
+
+	/**
+	 * @brief The subdeterminant.
+	 */
+	T Subdeterminant(const int row, const int column) const
+	{
+		return Submatrix(row, column).Determinant();
 	}
 
 	/**
@@ -428,6 +436,8 @@ std::ostream& operator<<(std::ostream& stream, const Matrix<m, n, T>& matrix)
 }
 
 #include <Math/Matrix4.h>
+#include <Math/Matrix3.h>
+#include <Math/Matrix2.h>
 
 /**
  * @brief A 4x4 matrix with arbitrary element type.
@@ -457,16 +467,37 @@ template <MATRIX_TYPENAME_TEMPLATE>
 using Matrix3 = Matrix<3, 3, T>;
 
 /**
- * @brief A floating-point precision 4x4 matrix.
+ * @brief A floating-point precision 3x3 matrix.
  */
 using Matrix3f = Matrix3<float>;
 
 /**
- * @brief A double-precision 4x4 matrix.
+ * @brief A double-precision 3x3 matrix.
  */
 using Matrix3d = Matrix3<double>;
 
 /**
- * @brief An integer 4x4 matrix.
+ * @brief An integer 3x3 matrix.
  */
 using Matrix3i = Matrix3<int>;
+
+/**
+ * @brief A 2x2 matrix with arbitrary element type.
+ */
+template <MATRIX_TYPENAME_TEMPLATE>
+using Matrix2 = Matrix<2, 2, T>;
+
+/**
+ * @brief A floating-point precision 2x2 matrix.
+ */
+using Matrix2f = Matrix2<float>;
+
+/**
+ * @brief A double-precision 2x2 matrix.
+ */
+using Matrix2d = Matrix2<double>;
+
+/**
+ * @brief An integer 2x2 matrix.
+ */
+using Matrix2i = Matrix2<int>;

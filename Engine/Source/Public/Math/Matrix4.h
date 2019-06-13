@@ -3,25 +3,23 @@
  * File Name: Matrix4.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/06/19
- * Modified Date: 06/07/19
+ * Modified Date: 06/13/19
  * Description: Specialized implementation of a square matrix
  *				with dimension four.
  */
 
 #pragma once
 
-#include <Math/Matrix.h>
 #include <Math/Quaternion.h>
 #include <Math/MathFunctions.h>
 
 #include <cmath>
-#include <algorithm>
 
 /**
   * @struct Matrix Matrix4.h
   * @brief A specialized implementation of a square matrix
   *		   with dimension four.
-  * @tparam T The type of the vector elements.
+  * @tparam T The type of the matrix elements.
   */
 template<typename T>
 struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
@@ -258,7 +256,7 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	/**
 	 * @brief Creates a perspective projection matrix.
 	 */
-	static Matrix<4, 4, T> Perspective(const T fov, const T aspectRatio, const T nearPlane, const float farPlane, bool isFovDegrees = true)
+	static Matrix<4, 4, T> Perspective(T fov, const T aspectRatio, const T nearPlane, const float farPlane, const bool isFovDegrees = true)
 	{
 		if (isFovDegrees)
 		{
@@ -281,21 +279,40 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 	}
 
 	/**
-	 * @brief The subdeterminant.
-	 */
-	T Subdeterminant(int row, int column) const
-	{
-		return Submatrix(row, column).Determinant();
-	}
-
-	/**
 	 * @brief The determinant.
 	 * @note Implemented as a Laplace expansion.
 	 */
 	T Determinant() const
 	{
-		return this[0][0] * Subdeterminant(0, 0) - this[0][1] * Subdeterminant(0, 1) +
-			this[0][2] * Subdeterminant(0, 2) - this[0][3] * Subdeterminant(0, 3);
+		return Data[0][0] * Subdeterminant(0, 0) - Data[0][1] * Subdeterminant(0, 1) +
+			Data[0][2] * Subdeterminant(0, 2) - Data[0][3] * Subdeterminant(0, 3);
+	}
+
+	/**
+	 * @brief The cofactor of the element at the @p row and @column.
+	 */
+	T ElementCofactor(const int row, const int column) const
+	{
+		T min = Subdeterminant(row, column);
+		return (row + column) & 1 ? -min : min;
+	}
+
+
+	/**
+	 * @brief The cofactor matrix for the specified @p matrix.
+	 */
+	static Matrix<4, 4, T> Cofactor(const Matrix<4, 4, T>& matrix)
+	{
+		Matrix<4, 4, T> result;
+		for (std::size_t i = 0; i < 4; ++i)
+		{
+			for (std::size_t j = 0; j < 4; ++j)
+			{
+				result.Data[i][j] = matrix.ElementCofactor(i, j);
+			}
+		}
+
+		return result;
 	}
 
 	/**
