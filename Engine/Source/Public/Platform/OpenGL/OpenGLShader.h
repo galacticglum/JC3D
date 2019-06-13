@@ -24,9 +24,9 @@ class OpenGLShader : public Shader
 public:
 	/**
 	 * @brief Initialize a new OpenGLShader.
-	 * @param vertexPath The path to the shader.
+	 * @param filepath The path to the shader.
 	 */
-	OpenGLShader(const std::string& filepath);
+	explicit OpenGLShader(const std::string& filepath);
 	
 	/**
 	 * @brief Destroy this OpenGLShader.

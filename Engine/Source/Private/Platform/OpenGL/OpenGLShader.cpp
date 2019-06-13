@@ -20,6 +20,19 @@ OpenGLShader::OpenGLShader(const std::string& filepath) : m_Filepath(filepath)
 	Reload();
 }
 
+OpenGLShader::~OpenGLShader()
+{
+	// Delete the shader
+	ENGINE_RENDER_S({
+		// Delete the shader program if one already exists.
+		if (self->m_ShaderProgramId)
+		{
+			glDeleteShader(self->m_ShaderProgramId);
+		}
+	});
+}
+
+
 void OpenGLShader::Reload()
 {
 	ReadFromFile(m_Filepath);
