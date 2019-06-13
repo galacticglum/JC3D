@@ -222,6 +222,30 @@ struct MatrixBase
 	}
 
 	/**
+	 * @brief Gets the resulting matrix of crossing out @p row and @p column.
+	 */
+	Matrix<m - 1, n - 1, T> Submatrix(const int row, const int column) const
+	{
+		Matrix<m - 1, n - 1, T> result;
+		std::size_t ri = 0;
+		for (std::size_t i = 0; i < m; ++i)
+		{
+			if (i == row) continue;
+
+			std::size_t rj = 0;
+			for (std::size_t j = 0; j < n; ++j)
+			{
+				if (j == column) continue;
+				result[ri][rj++] = this[i][j];
+			}
+
+			++ri;
+		}
+
+		return result;
+	}
+
+	/**
 	  * @brief Gets the column Vector at the specified @p index.
 	  * @param index The index of the column whose vector to retrieve.
 	  * @returns A reference to the vector at the specified @p columnIndex.

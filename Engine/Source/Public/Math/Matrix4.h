@@ -247,4 +247,32 @@ struct Matrix<4, 4, T> : MatrixBase<4, 4, T, Matrix<4, 4, T>>
 
 		return result;
 	}
+
+	/**
+	 * @brief The subdeterminant.
+	 */
+	T Subdeterminant(int row, int column) const
+	{
+		return Submatrix(row, column).Determinant();
+	}
+
+	/**
+	 * @brief The determinant.
+	 * @note Implemented as a Laplace expansion.
+	 */
+	T Determinant() const
+	{
+		return this[0][0] * Subdeterminant(0, 0) - this[0][1] * Subdeterminant(0, 1) +
+			this[0][2] * Subdeterminant(0, 2) - this[0][3] * Subdeterminant(0, 3);
+	}
+
+	/**
+	 * @brief The inverse of the specified @p matrix.
+	 * @note An inverted matrix is such that if multiplied by the original it would result in the identity matrix.
+	 */
+	static Matrix<4, 4, T> Inverse(const Matrix<4, 4, T>& matrix)
+	{
+		const float determinant = matrix.Determinant();
+		return Matrix<4, 4, T>::Transpose(Matrix<4, 4, T>::Cofactor(matrix) * static_cast<T>(1.0 / determinant));
+	}
 };
