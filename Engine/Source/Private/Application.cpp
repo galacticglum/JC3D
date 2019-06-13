@@ -4,9 +4,12 @@
 #include <Engine.h>
 
 #include <Events/Event.h>
-#include <Renderer/BufferLayout.h>
+
+#include <Renderer/Renderer.h>
+#include <Renderer/Framebuffer.h>
 
 #include <glad/glad.h>
+#include <imgui.h>
 
 Application* Application::s_Instance = nullptr;
 
@@ -23,6 +26,9 @@ Application::Application() : m_DeltaTime(0)
 	// Initialize the ImGuiLayer instance
 	m_ImGuiLayer = new ImGuiLayer();
 	PushOverlay(m_ImGuiLayer);
+
+	// Initialize the renderer
+	Renderer::Initialize();
 
 	// Initialize the time
 	m_TimeContext = std::unique_ptr<TimeContext>(TimeContext::Create());
@@ -41,29 +47,48 @@ void Application::Run()
 		m_DeltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		glClearColor(0.1f, 0.1f, 0.1f, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Update the layers.
-		for (Layer* layer : m_LayerStack)
+		// We only render if the screen is not minimized
+		if (!m_Minimized)
 		{
-			layer->OnUpdate();
-		}
+			// Update the layers.
+			for (Layer* layer : m_LayerStack)
+			{
+				layer->OnUpdate();
+			}
 
-		// Render ImGui
-		m_ImGuiLayer->Begin();
-		for (Layer* layer : m_LayerStack)
-		{
-			layer->OnImGuiRender();
-		}
+			// Render ImGui
+			Application* application = this;
+			ENGINE_RENDER_1(application, {
+				application->RenderImGui();
+			});
 
-		m_ImGuiLayer->End();
+			Renderer::WaitAndRender();
+		}
 
 		// Update the window
 		m_Window->OnUpdate();
 	}
 
 	OnShutdown();
+}
+
+void Application::RenderImGui()
+{
+	m_ImGuiLayer->Begin();
+
+	ImGui::Begin("Renderer");
+	auto& renderApiCapabilities = RendererAPI::GetCapabilities();
+	ImGui::Text("Vendor: %s", renderApiCapabilities.Vendor.c_str());
+	ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
+	ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
+	ImGui::End();
+
+	for (Layer* layer : m_LayerStack)
+	{
+		layer->OnImGuiRender();
+	}
+
+	m_ImGuiLayer->End();
 }
 
 void Application::OnEvent(Event& event)
@@ -108,6 +133,19 @@ bool Application::OnWindowResize(WindowResizeEvent& event)
 	}
 
 	m_Minimized = false;
+
+	// Resize the viewport
+	ENGINE_RENDER_2(width, height, {
+		glViewport(0, 0, width, height);
+	});
+
+	// Resize all framebuffers
+	auto& framebuffers = FramebufferPool::GetGlobal()->GetAll();
+	for (auto& framebuffer : framebuffers)
+	{
+		framebuffer->Resize(width, height);
+	}
+
 	return false;
 }
 

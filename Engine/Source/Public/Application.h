@@ -64,6 +64,11 @@ public:
 	}
 
 	/**
+	 * @brief Render ImGui.
+	 */
+	void RenderImGui();
+
+	/**
 	 * @brief Called when an Event is dispatched.
 	 */
 	void OnEvent(Event& event);

@@ -19,6 +19,8 @@ Framebuffer* Framebuffer::Create(const uint32_t width, const uint32_t height, co
 	return result;
 }
 
+FramebufferPool* FramebufferPool::s_Instance = new FramebufferPool;
+
 FramebufferPool::FramebufferPool(uint32_t maximumFramebuffers)
 {
 }
