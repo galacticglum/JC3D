@@ -86,6 +86,10 @@ struct Vector<4, T> : VectorBase<4, T, Vector<4, T>>
 	Vector(const std::initializer_list<T> args)
 	{
 		assert(args.size() <= Size());
-		Data = args;
+		std::size_t index = 0;
+		for (auto it = args.begin(); it != args.end(); ++it)
+		{
+			Data.at(index++) = *it;
+		}
 	}
 };

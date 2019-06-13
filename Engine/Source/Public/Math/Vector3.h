@@ -84,7 +84,11 @@ struct Vector<3, T> : VectorBase<3, T, Vector<3, T>>
 	Vector(const std::initializer_list<T> args)
 	{
 		assert(args.size() <= Size());
-		Data = args;
+		std::size_t index = 0;
+		for (auto it = args.begin(); it != args.end(); ++it)
+		{
+			Data.at(index++) = *it;
+		}
 	}
 
 	/**
@@ -99,4 +103,92 @@ struct Vector<3, T> : VectorBase<3, T, Vector<3, T>>
 
 		return Vector<3, T>(rx, ry, rz);
 	}
+
+	/**
+	 * @brief All components are zero.
+	 */
+	static const Vector<3, T> Zero;
+
+	/**
+	 * @brief All components are one.
+	 */
+	static const Vector<3, T> One;
+
+	/**
+	 * @brief Unit up vector.
+	 */
+	static const Vector<3, T> Up;
+
+	/**
+	 * @brief Unit down vector.
+	 */
+	static const Vector<3, T> Down;
+
+	/**
+	 * @brief Unit left vector.
+	 */
+	static const Vector<3, T> Left;
+
+	/**
+	 * @brief Unit right vector.
+	 */
+	static const Vector<3, T> Right;
+
+	/**
+	 * @brief Unit forward vector.
+	 */
+	static const Vector<3, T> Forward;
+
+	/**
+	 * @brief Unit back vector.
+	 */
+	static const Vector<3, T> Back;
+
+	/**
+	 * @brief X-axis vector.
+	 */
+	static const Vector<3, T> XAxis;
+
+	/**
+	 * @brief Y-axis vector.
+	 */
+	static const Vector<3, T> YAxis;
+
+	/**
+	 * @brief Z-axis vector.
+	 */
+	static const Vector<3, T> ZAxis;
 };
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Zero = Vector<3, T>(0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::One = Vector<3, T>(1);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Up = Vector<3, T>(0, 1, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Down = Vector<3, T>(0, -1, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Left = Vector<3, T>(-1, 0, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Right = Vector<3, T>(1, 0, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Forward = Vector<3, T>(0, 0, 1);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::Back = Vector<3, T>(0, 0, -1);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::XAxis = Vector<3, T>(1, 0, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::YAxis = Vector<3, T>(0, 1, 0);
+
+template <typename T>
+const Vector<3, T> Vector<3, T>::ZAxis = Vector<3, T>(0, 0, 1);

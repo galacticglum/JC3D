@@ -160,7 +160,7 @@ struct VectorBase
 
 	/**
 	 * @brief Gets a copy of this Vector with negative elements.
-	 * @returns A copy of this Vector whose elements have been negated.
+	 * @returns A copy of this Vector whose elements have b een negated.
 	 */
 	Vector<n, T> Negative() const
 	{
@@ -318,7 +318,11 @@ struct Vector : VectorBase<n, T, Vector<n, T>>
 	Vector(const std::initializer_list<T> args)
 	{
 		assert(args.size() <= n);
-		Data = args;
+		std::size_t index = 0;
+		for (auto it = args.begin(); it != args.end(); ++it)
+		{
+			Data.at(index++) = *it;
+		}
 	}
 };
 
