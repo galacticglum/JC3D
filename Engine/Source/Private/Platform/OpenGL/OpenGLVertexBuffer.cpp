@@ -17,7 +17,7 @@ OpenGLVertexBuffer::~OpenGLVertexBuffer()
 	});
 }
 
-void OpenGLVertexBuffer::SetData(void* buffer, uint32_t size, uint32_t offset = 0)
+void OpenGLVertexBuffer::SetData(void* buffer, uint32_t size, uint32_t offset)
 {
 	m_Size = size;
 	ENGINE_RENDER_S3(buffer, size, offset, {
