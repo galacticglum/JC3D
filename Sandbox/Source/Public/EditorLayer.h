@@ -259,6 +259,61 @@ public:
 	}
 
 	/**
+	 * @brief Renders the help menu.
+	 */
+	static void RenderHelpMenu()
+	{
+		// Help menu bar
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("Help"))
+			{
+				// About section
+				ImGui::TextDisabled("About");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("A modular and extensible real-time physically based rendering engine library built in modern C++ and OpenGL.\n"
+						"At its core, a deferred rendering pipeline powers the engine enabling it to render realistically lit scenes.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				// What is PBR section
+				ImGui::TextDisabled("What is PBR?");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("At the core of the engine sits PBR: a physically-based lighting technique."
+						"PBR is based on the theory of microfacets. These are reflective surfaces, that at a microscopic scale,"
+						"dictate the appearance of a surface due to various physical properties (e.g. roughness).");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				// Editor explanation section.
+				ImGui::TextDisabled("The Editor");
+				if (ImGui::IsItemHovered())
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted("The Editor allows you to play around with the engine giving two modes: sphere and models."
+						"The sphere scene type presents a matrix of spheres showcasing the material properties of PBR."
+						"The model scene type allows you to import your own model to play around with the engine.");
+					ImGui::PopTextWrapPos();
+					ImGui::EndTooltip();
+				}
+
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
+	}
+
+	/**
 	 * @brief Render the editor UI.
 	 */
 	void OnImGuiRender() override
@@ -554,54 +609,7 @@ public:
 		ImGui::End();
 		ImGui::PopStyleVar();
 
-		// Help menu bar
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("Help"))
-			{
-				// About section
-				ImGui::TextDisabled("About");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("A modular and extensible real-time physically based rendering engine library built in modern C++ and OpenGL.\n"
-						"At its core, a deferred rendering pipeline powers the engine enabling it to render realistically lit scenes.");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
-
-				// What is PBR section
-				ImGui::TextDisabled("What is PBR?");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("At the core of the engine sits PBR: a physically-based lighting technique."
-					"PBR is based on the theory of microfacets. These are reflective surfaces, that at a microscopic scale,"
-						"dictate the appearance of a surface due to various physical properties (e.g. roughness).");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
-
-				// Editor explanation section.
-				ImGui::TextDisabled("The Editor");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("The Editor allows you to play around with the engine giving two modes: sphere and models."
-					"The sphere scene type presents a matrix of spheres showcasing the material properties of PBR."
-						"The model scene type allows you to import your own model to play around with the engine.");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
-
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
-		}
+		RenderHelpMenu();
 
 		ImGui::End();
 	}
@@ -630,7 +638,6 @@ private:
 		Vector3f Direction;
 		Vector3f Radiance;
 	} m_Light;
-
 
 	float m_LightMultiplier = 0.3f;
 	float m_Exposure = 1.0f;
