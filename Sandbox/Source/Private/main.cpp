@@ -8,7 +8,7 @@
  */
 
 #include <Application.h>
-#include <PBRLayer.h>
+#include <EditorLayer.h>
 
 #include <Math/Quaternion.h>
 #include <Math/Matrix.h>
@@ -19,7 +19,7 @@ class Sandbox : public Application
 public:
 	Sandbox()
 	{
-		PushLayer(new PBRLayer());
+		PushLayer(new EditorLayer());
 	}
 
 	~Sandbox() = default;

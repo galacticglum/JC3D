@@ -1,9 +1,9 @@
 /**
  * Author: Shon Verch
- * File Name: PBRLayer.h
+ * File Name: EditorLayer.h
  * Project Name: JesusChristIn3D
  * Creation Date: 06/12/2019
- * Modified Date: 06/12/2019
+ * Modified Date: 06/13/2019
  * Description: Layer responsible for PBR.
  */
 
@@ -42,17 +42,17 @@ static void ImGuiShowHelpMarker(const char* desc)
 	}
 }
 
-class PBRLayer : public Layer
+class EditorLayer : public Layer
 {
 public:
-	PBRLayer() : m_Camera(Matrix4f()), m_Scene(Scene::Spheres)
+	EditorLayer() : m_Camera(Matrix4f()), m_Scene(Scene::Spheres)
 	{
 		Window& window = Application::Get().GetWindow();
 		m_Camera.SetProjectionMatrix(Matrix4f::Perspective(45, 
 			window.GetWidth() / static_cast<float>(window.GetHeight()), 0.1f, 10000.0f));
 	}
 
-	virtual ~PBRLayer() = default;
+	virtual ~EditorLayer() = default;
 
 	void OnAttach() override
 	{
@@ -115,11 +115,6 @@ public:
 
 	void OnUpdate() override
 	{
-		// THINGS TO LOOK AT:
-		// - BRDF LUT
-		// - Cubemap mips and filtering
-		// - Tonemapping and proper HDR pipeline
-
 		m_Camera.Update();
 		const Matrix4f viewProjection = m_Camera.GetProjectionMatrix() * m_Camera.GetViewMatrix();
 
@@ -267,12 +262,12 @@ public:
 		ImGui::PopItemWidth();
 		ImGui::NextColumn();
 	}
-
+	
 	void Property(const std::string& name, Vector4f& value, PropertyFlag flags)
 	{
 		Property(name, value, -1.0f, 1.0f, flags);
 	}
-
+	
 	void Property(const std::string& name, Vector4f& value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None)
 	{
 		ImGui::Text(name.c_str());
