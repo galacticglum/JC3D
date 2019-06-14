@@ -293,6 +293,21 @@ public:
 	static void RenderHelpMenuBar()
 	{
 		static bool showInfoMenu = false;
+
+		// The FPS samples used for drawing the plot
+		static std::vector<float> fpsOverTimeSamples;
+
+		// The interval, in seconds, to collect fps samples.
+		static float fpsSampleInterval = 1;
+		static float previousSampleTime = 0;
+
+		const float currentTime = Application::Get().GetTimeContext().GetTime();
+		if (currentTime - previousSampleTime >= fpsSampleInterval)
+		{
+			fpsOverTimeSamples.push_back(Application::Get().GetFPS());
+			previousSampleTime = currentTime;
+		}
+
 		if(showInfoMenu)
 		{
 			// Open a new ImGui window that displays render stats.
@@ -309,6 +324,10 @@ public:
 			// Convert deltatime to milliseconds
 			const float deltaTimeMS = Application::Get().GetDeltaTime() * 1000;
 			ImGui::Text("Frame Time: %s ms", std::to_string(deltaTimeMS).c_str());
+
+			// Draw a plot of the framerate over time
+			ImGui::PlotLines("FPS/time", fpsOverTimeSamples.data(), 
+				fpsOverTimeSamples.size(), 0, nullptr, FLT_MAX, FLT_MAX, ImVec2(0, 0));
 
 			ImGui::End();
 		}
