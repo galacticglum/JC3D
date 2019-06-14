@@ -23,6 +23,7 @@
 #include <Renderer/Camera.h>
 #include <Renderer/Mesh.h>
 #include <Renderer/Material.h>
+#include <Renderer/SceneObject.h>
 
 #include <imgui.h>
 
@@ -42,7 +43,7 @@ public:
 	/**
 	 * @brief Initialize a new EditorLayer.
 	 */
-	EditorLayer() : m_Camera(Matrix4f()), m_Scene(SceneType::Spheres)
+	EditorLayer() : m_Camera(Matrix4f()), m_SceneType(SceneType::Spheres)
 	{
 		// Setup our camera with a projection matrix for the size of our window.
 		// The camera's projection will be updated later but we initialize the projection
@@ -50,7 +51,7 @@ public:
 		Window& window = Application::Get().GetWindow();
 		m_Camera.SetProjectionMatrix(Matrix4f::Perspective(45,  window.GetWidth() / static_cast<float>(window.GetHeight()), 0.1f, 10000.0f));
 
-		m_Material.reset(new Material());
+		m_ModelObject = std::make_unique<SceneObject>();
 	}
 
 	/**
@@ -69,9 +70,9 @@ public:
 		m_HDRShader.reset(Shader::Create("Content/Shaders/hdr.glsl"));
 
 		// Load default meshes
-		m_Mesh.reset(new Mesh("Content/Meshes/cerberus.fbx"));
+		m_ModelObject->SetMesh(new Mesh("Content/Meshes/cerberus.fbx"));
 		m_SphereMesh.reset(new Mesh("Content/Models/Sphere.fbx"));
-
+		
 		// Editor
 		m_CheckerboardTexture.reset(Texture2D::Create("Content/Editor/Checkerboard.tga"));
 
@@ -91,7 +92,6 @@ public:
 
 		m_Light.Direction = { -0.5f, -0.5f, 1.0f };
 		m_Light.Radiance = { 1.0f, 1.0f, 1.0f };
-
 	}
 
 	/**
@@ -105,24 +105,29 @@ public:
 		struct QuadVertex
 		{
 			Vector3f Position;
-			Vector2f TexCoord;
+			Vector2f TextureCoordinates;
 		};
 
-		QuadVertex* data = new QuadVertex[4];
-
+		// Create the vertex data
+		auto* data = new QuadVertex[4];
 		data[0].Position = Vector3f(x, y, 0);
-		data[0].TexCoord = Vector2f(0, 0);
+		data[0].TextureCoordinates = Vector2f(0, 0);
 		data[1].Position = Vector3f(x + width, y, 0);
-		data[1].TexCoord = Vector2f(1, 0);
+		data[1].TextureCoordinates = Vector2f(1, 0);
 		data[2].Position = Vector3f(x + width, y + height, 0);
-		data[2].TexCoord = Vector2f(1, 1);
+		data[2].TextureCoordinates = Vector2f(1, 1);
 		data[3].Position = Vector3f(x, y + height, 0);
-		data[3].TexCoord = Vector2f(0, 1);
+		data[3].TextureCoordinates = Vector2f(0, 1);
 
 		m_QuadVertexBuffer.reset(VertexBuffer::Create());
 		m_QuadVertexBuffer->SetData(data, 4 * sizeof(QuadVertex));
 
-		uint32_t* indices = new uint32_t[6]{ 0, 1, 2, 2, 3, 0, };
+		// Setup simple indices for a quad primitive.
+		unsigned* indices = new uint32_t[6]
+		{
+			0, 1, 2, 2, 3, 0,
+		};
+
 		m_QuadIndexBuffer.reset(IndexBuffer::Create());
 		m_QuadIndexBuffer->SetData(indices, 6 * sizeof(unsigned int));
 	}
@@ -154,7 +159,7 @@ public:
 		m_BRDFLUT->Bind(15);
 
 		m_PBRShader->Bind();
-		m_Material->BindTextureMaps();
+		m_ModelObject->GetMaterial()->BindTextureMaps();
 
 		UpdateScene();
 
@@ -187,7 +192,7 @@ public:
 		// Setup the materials for each scene type accordingly.
 		// The Spheres scene type is simply a showcase of different
 		// material properties on the same mesh: a sphere.
-		if (m_Scene == SceneType::Spheres)
+		if (m_SceneType == SceneType::Spheres)
 		{
 			// Metals
 			float roughness = 0.0f;
@@ -220,9 +225,13 @@ public:
 		}
 		// The Model scene type allows the user to select
 		// any model...
-		else if (m_Scene == SceneType::Model)
+		else if (m_SceneType == SceneType::Model)
 		{
-			m_Mesh->Render();
+			const std::shared_ptr<Mesh> mesh = m_ModelObject->GetMesh();
+			// Make sure that we actually have a mesh to render...
+			if (!mesh) return;
+
+			m_ModelObject->GetMesh()->Render();
 		}
 	}
 
@@ -240,19 +249,21 @@ public:
 		// as a single iteration over the items.
 		ShaderUniformBufferDeclaration<sizeof(Matrix4f) * 2 + sizeof(Vector3f) * 4 + sizeof(float) * 8, 14> uniformBuffer;
 
+		const std::shared_ptr<Material> material = m_ModelObject->GetMaterial();
+
 		uniformBuffer.Push("u_ViewProjectionMatrix", viewProjection);
 		uniformBuffer.Push("u_ModelMatrix", Matrix4f());
-		uniformBuffer.Push("u_AlbedoColor", m_Material->Albedo.Color);
-		uniformBuffer.Push("u_Metalness", m_Material->Metalness.Value);
-		uniformBuffer.Push("u_Roughness", m_Material->Roughness.Value);
+		uniformBuffer.Push("u_AlbedoColor", material->Albedo.Color);
+		uniformBuffer.Push("u_Metalness", material->Metalness.Value);
+		uniformBuffer.Push("u_Roughness", material->Roughness.Value);
 		uniformBuffer.Push("lights.Direction", m_Light.Direction);
 		uniformBuffer.Push("lights.Radiance", m_Light.Radiance * m_LightMultiplier);
 		uniformBuffer.Push("u_CameraPosition", m_Camera.GetPosition());
 		uniformBuffer.Push("u_RadiancePrefilter", m_RadiancePrefilter ? 1.0f : 0.0f);
-		uniformBuffer.Push("u_AlbedoTexToggle", m_Material->Albedo.UseTexture ? 1.0f : 0.0f);
-		uniformBuffer.Push("u_NormalTexToggle", m_Material->Normal.UseTexture ? 1.0f : 0.0f);
-		uniformBuffer.Push("u_MetalnessTexToggle", m_Material->Metalness.UseTexture ? 1.0f : 0.0f);
-		uniformBuffer.Push("u_RoughnessTexToggle", m_Material->Roughness.UseTexture ? 1.0f : 0.0f);
+		uniformBuffer.Push("u_AlbedoTexToggle", material->Albedo.UseTexture ? 1.0f : 0.0f);
+		uniformBuffer.Push("u_NormalTexToggle", material->Normal.UseTexture ? 1.0f : 0.0f);
+		uniformBuffer.Push("u_MetalnessTexToggle", material->Metalness.UseTexture ? 1.0f : 0.0f);
+		uniformBuffer.Push("u_RoughnessTexToggle", material->Roughness.UseTexture ? 1.0f : 0.0f);
 		uniformBuffer.Push("u_EnvMapRotation", m_EnvMapRotation);
 
 		m_PBRShader->UploadUniformBuffer(uniformBuffer);
@@ -263,7 +274,7 @@ public:
 	 */
 	static void HelpMenuEntry(const char* name, const char* description)
 	{
-		ImGui::TextDisabled(name);
+		ImGui::TextDisabled("%s", name);
 		if (ImGui::IsItemHovered())
 		{
 			ImGui::BeginTooltip();
@@ -317,9 +328,9 @@ public:
 	void OnImGuiRender() override
 	{
 		static bool pOpen = true;
-		static bool optFullscreenPersistant = true;
+		static bool optFullscreenPersistent = true;
 		static ImGuiDockNodeFlags flags = ImGuiDockNodeFlags_None;
-		const bool optFullscreen = optFullscreenPersistant;
+		const bool optFullscreen = optFullscreenPersistent;
 
 		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 		// because it would be confusing to have two docking targets within each others.
@@ -365,9 +376,9 @@ public:
 
 		// Editor Panel ------------------------------------------------------------------------------
 		ImGui::Begin("Model");
-		ImGui::RadioButton("Spheres", reinterpret_cast<int*>(&m_Scene), static_cast<int>(SceneType::Spheres));
+		ImGui::RadioButton("Spheres", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::Spheres));
 		ImGui::SameLine();
-		ImGui::RadioButton("Model", reinterpret_cast<int*>(&m_Scene), static_cast<int>(SceneType::Model));
+		ImGui::RadioButton("Model", reinterpret_cast<int*>(&m_SceneType), static_cast<int>(SceneType::Model));
 
 		ImGui::Begin("Environment");
 
@@ -389,20 +400,22 @@ public:
 		{
 			ImGui::Text("Mesh");
 
+			std::shared_ptr<Mesh> mesh = m_ModelObject->GetMesh();
+
 			// Get the filepath of the mesh if one is currently loaded.
-			std::string fullpath = m_Mesh ? m_Mesh->GetFilepath() : "None";
+			const std::string fullpaths = mesh ? mesh->GetFilepath() : "None";
 
 			// We need to get the content path so we can load the mesh.
-			const size_t found = fullpath.find_last_of("/\\");
-			std::string path = found != std::string::npos ? fullpath.substr(found + 1) : fullpath;
-			ImGui::Text(path.c_str());
+			const size_t found = fullpaths.find_last_of("/\\");
+			const std::string path = found != std::string::npos ? fullpaths.substr(found + 1) : fullpaths;
+			ImGui::Text("%s", path.c_str());
 			ImGui::SameLine();
 			if (ImGui::Button("...##Mesh"))
 			{
-				std::string filename = Application::Get().OpenFile("");
+				const std::string filename = Application::Get().OpenFile("");
 				if (!filename.empty())
 				{
-					m_Mesh.reset(new Mesh(filename));
+					m_ModelObject->SetMesh(new Mesh(filename));
 				}
 			}
 		}
@@ -411,24 +424,29 @@ public:
 
 		// Material input UIs
 		// Textures ------------------------------------------------------------------------------
+		// We should only draw this if the scene type is model since you can't change the materials
+		// of the sphere demo.
+		if (m_SceneType == SceneType::Model)
 		{
+			const std::shared_ptr<Material> material = m_ModelObject->GetMaterial();
+
 			// Albedo
 			if (ImGui::CollapsingHeader("Albedo", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(m_Material->Albedo.TextureMap ? reinterpret_cast<void*>(m_Material->Albedo.TextureMap->GetHandle()) :
+				ImGui::Image(material->Albedo.TextureMap ? reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()) :
 					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
 
 				ImGui::PopStyleVar();
 				if (ImGui::IsItemHovered())
 				{
-					if (m_Material->Albedo.TextureMap)
+					if (material->Albedo.TextureMap)
 					{
 						ImGui::BeginTooltip();
 						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(m_Material->Albedo.TextureMap->GetFilepath().c_str());
+						ImGui::TextUnformatted(material->Albedo.TextureMap->GetFilepath().c_str());
 						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(m_Material->Albedo.TextureMap->GetHandle()), ImVec2(384, 384));
+						ImGui::Image(reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()), ImVec2(384, 384));
 						ImGui::EndTooltip();
 					}
 
@@ -437,44 +455,44 @@ public:
 						const std::string filename = Application::Get().OpenFile("");
 						if (!filename.empty())
 						{
-							m_Material->Albedo.TextureMap.reset(Texture2D::Create(filename, m_Material->Albedo.SRGB));
+							material->Albedo.TextureMap.reset(Texture2D::Create(filename, material->Albedo.SRGB));
 						}
 					}
 				}
 
 				ImGui::SameLine();
 				ImGui::BeginGroup();
-				ImGui::Checkbox("Use##AlbedoMap", &m_Material->Albedo.UseTexture);
-				if (ImGui::Checkbox("sRGB##AlbedoMap", &m_Material->Albedo.SRGB))
+				ImGui::Checkbox("Use##AlbedoMap", &material->Albedo.UseTexture);
+				if (ImGui::Checkbox("sRGB##AlbedoMap", &material->Albedo.SRGB))
 				{
-					if (m_Material->Albedo.TextureMap)
+					if (material->Albedo.TextureMap)
 					{
-						m_Material->Albedo.TextureMap.reset(Texture2D::Create(m_Material->Albedo.TextureMap->GetFilepath(), m_Material->Albedo.SRGB));
+						material->Albedo.TextureMap.reset(Texture2D::Create(material->Albedo.TextureMap->GetFilepath(), 
+							material->Albedo.SRGB));
 					}
 				}
 
 				ImGui::EndGroup();
 				ImGui::SameLine();
-				ImGui::ColorEdit3("Color##Albedo", m_Material->Albedo.Color.Data.data(), ImGuiColorEditFlags_NoInputs);
+				ImGui::ColorEdit3("Color##Albedo", material->Albedo.Color.Data.data(), ImGuiColorEditFlags_NoInputs);
 			}
-		}
-		{
+		
 			// Normals
 			if (ImGui::CollapsingHeader("Normals", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(m_Material->Normal.TextureMap ? reinterpret_cast<void*>(m_Material->Normal.TextureMap->GetHandle()) :
+				ImGui::Image(material->Normal.TextureMap ? reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()) :
 					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
 				ImGui::PopStyleVar();
 				if (ImGui::IsItemHovered())
 				{
-					if (m_Material->Normal.TextureMap)
+					if (material->Normal.TextureMap)
 					{
 						ImGui::BeginTooltip();
 						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(m_Material->Normal.TextureMap->GetFilepath().c_str());
+						ImGui::TextUnformatted(material->Normal.TextureMap->GetFilepath().c_str());
 						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(m_Material->Normal.TextureMap->GetHandle()), ImVec2(384, 384));
+						ImGui::Image(reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()), ImVec2(384, 384));
 						ImGui::EndTooltip();
 					}
 
@@ -483,33 +501,32 @@ public:
 						const std::string filename = Application::Get().OpenFile("");
 						if (!filename.empty())
 						{
-							m_Material->Normal.TextureMap.reset(Texture2D::Create(filename));
+							material->Normal.TextureMap.reset(Texture2D::Create(filename));
 						}
 					}
 				}
 
 				ImGui::SameLine();
-				ImGui::Checkbox("Use##NormalMap", &m_Material->Normal.UseTexture);
+				ImGui::Checkbox("Use##NormalMap", &material->Normal.UseTexture);
 			}
-		}
-		{
+
 			// Metalness
 			if (ImGui::CollapsingHeader("Metalness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(m_Material->Metalness.TextureMap ? reinterpret_cast<void*>(m_Material->Metalness.TextureMap->GetHandle()) :
+				ImGui::Image(material->Metalness.TextureMap ? reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()) :
 					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
 
 				ImGui::PopStyleVar();
 				if (ImGui::IsItemHovered())
 				{
-					if (m_Material->Metalness.TextureMap)
+					if (material->Metalness.TextureMap)
 					{
 						ImGui::BeginTooltip();
 						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(m_Material->Metalness.TextureMap->GetFilepath().c_str());
+						ImGui::TextUnformatted(material->Metalness.TextureMap->GetFilepath().c_str());
 						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(m_Material->Metalness.TextureMap->GetHandle()), ImVec2(384, 384));
+						ImGui::Image(reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()), ImVec2(384, 384));
 						ImGui::EndTooltip();
 					}
 
@@ -518,35 +535,35 @@ public:
 						std::string filename = Application::Get().OpenFile("");
 						if (!filename.empty())
 						{
-							m_Material->Metalness.TextureMap.reset(Texture2D::Create(filename));
+							material->Metalness.TextureMap.reset(Texture2D::Create(filename));
 						}
 					}
 				}
 
 				ImGui::SameLine();
-				ImGui::Checkbox("Use##MetalnessMap", &m_Material->Metalness.UseTexture);
+				ImGui::Checkbox("Use##MetalnessMap", &material->Metalness.UseTexture);
 				ImGui::SameLine();
-				ImGui::SliderFloat("Value##MetalnessInput", &m_Material->Metalness.Value, 0.0f, 1.0f);
+				ImGui::SliderFloat("Value##MetalnessInput", &material->Metalness.Value, 0.0f, 1.0f);
 			}
-		}
-		{
+
 			// Roughness
 			if (ImGui::CollapsingHeader("Roughness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(m_Material->Roughness.TextureMap ? reinterpret_cast<void*>(m_Material->Roughness.TextureMap->GetHandle()) :
+				ImGui::Image(material->Roughness.TextureMap ? reinterpret_cast<void*>(
+					material->Roughness.TextureMap->GetHandle()) :
 					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
 
 				ImGui::PopStyleVar();
 				if (ImGui::IsItemHovered())
 				{
-					if (m_Material->Roughness.TextureMap)
+					if (material->Roughness.TextureMap)
 					{
 						ImGui::BeginTooltip();
 						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(m_Material->Roughness.TextureMap->GetFilepath().c_str());
+						ImGui::TextUnformatted(material->Roughness.TextureMap->GetFilepath().c_str());
 						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(m_Material->Roughness.TextureMap->GetHandle()), ImVec2(384, 384));
+						ImGui::Image(reinterpret_cast<void*>(material->Roughness.TextureMap->GetHandle()), ImVec2(384, 384));
 						ImGui::EndTooltip();
 					}
 
@@ -555,15 +572,15 @@ public:
 						std::string filename = Application::Get().OpenFile("");
 						if (!filename.empty())
 						{
-							m_Material->Roughness.TextureMap.reset(Texture2D::Create(filename));
+							material->Roughness.TextureMap.reset(Texture2D::Create(filename));
 						}
 					}
 				}
 
 				ImGui::SameLine();
-				ImGui::Checkbox("Use##RoughnessMap", &m_Material->Roughness.UseTexture);
+				ImGui::Checkbox("Use##RoughnessMap", &material->Roughness.UseTexture);
 				ImGui::SameLine();
-				ImGui::SliderFloat("Value##RoughnessInput", &m_Material->Roughness.Value, 0.0f, 1.0f);
+				ImGui::SliderFloat("Value##RoughnessInput", &material->Roughness.Value, 0.0f, 1.0f);
 			}
 		}
 
@@ -589,7 +606,6 @@ public:
 		}
 
 		ImGui::End();
-
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
 		// Render the viewport window.
@@ -615,7 +631,6 @@ private:
 	std::unique_ptr<Shader> m_PBRShader;
 	std::unique_ptr<Shader> m_EnvironmentQuadShader;
 	std::unique_ptr<Shader> m_HDRShader;
-	std::unique_ptr<Mesh> m_Mesh;
 	std::unique_ptr<Mesh> m_SphereMesh;
 	std::unique_ptr<Texture2D> m_BRDFLUT;
 
@@ -629,7 +644,6 @@ private:
 	std::unique_ptr<Cubemap> m_EnvironmentIrradiance;
 	
 	Camera m_Camera;
-	std::unique_ptr<Material> m_Material;
 
 	struct Light
 	{
@@ -651,6 +665,8 @@ private:
 		Spheres = 0, Model = 1
 	};
 
-	SceneType m_Scene;
+	SceneType m_SceneType;
+
+	std::unique_ptr<SceneObject> m_ModelObject;
 	std::unique_ptr<Texture2D> m_CheckerboardTexture;
 };

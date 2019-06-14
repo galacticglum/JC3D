@@ -40,6 +40,9 @@ public:
 	 */
 	static const int AttributeCount = 5;
 
+	/**
+	 * @brief Vertex index.
+	 */
 	struct Index
 	{
 		uint32_t V1, V2, V3;
