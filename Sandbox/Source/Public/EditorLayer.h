@@ -303,8 +303,12 @@ public:
 			ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
 			ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
 			ImGui::Separator();
-			ImGui::Text("FPS: %s", Application::Get().GetFPS());
-			ImGui::Text("Frame Time: %s", Application::Get().GetDeltaTime());
+			// Conversion is messy here since we have to convert the fps and deltatime, which are arithmetic types,
+			// to a std::string and then convert those into C-style const char* strings.
+			ImGui::Text("FPS: %s", std::to_string(Application::Get().GetFPS()).c_str());
+			// Convert deltatime to milliseconds
+			const float deltaTimeMS = Application::Get().GetDeltaTime() * 1000;
+			ImGui::Text("Frame Time: %s seconds", std::to_string(deltaTimeMS).c_str());
 
 			ImGui::End();
 		}
