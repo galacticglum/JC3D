@@ -71,9 +71,33 @@ inline void ImGuiProperty(const std::string& name, float& value, float min = -1.
 }
 
 /**
- * @Brief Draw a Vector3f property with a minimum and maximum.
+ * @brief Draw a Vector3f property with a minimum and maximum.
  */
-inline void ImGuiProperty(const std::string& name, Vector3f& value, float min = -1.0f, float max = 1.0f, ImguiPropertyFlag flags = ImguiPropertyFlag::None)
+inline void ImGuiProperty(const std::string& name, Vector3f& value, ImguiPropertyFlag flags = ImguiPropertyFlag::None)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	std::string id = "##" + name;
+	// If the property has the colour flag on it, draw a color picker as well.
+	if (static_cast<int>(flags) & static_cast<int>(ImguiPropertyFlag::ColorProperty))
+	{
+		ImGui::ColorEdit3(id.c_str(), value.Data.data(), ImGuiColorEditFlags_NoInputs);
+	}
+	else
+	{
+		ImGui::InputFloat3(id.c_str(), value.Data.data());
+	}
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+}
+
+/**
+ * @brief Draw a Vector3f property with a minimum and maximum.
+ */
+inline void ImGuiPropertySlider(const std::string& name, Vector3f& value, float min = -1.0f, float max = 1.0f, ImguiPropertyFlag flags = ImguiPropertyFlag::None)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
@@ -113,6 +137,79 @@ inline void ImGuiProperty(const std::string& name, Vector4f& value, float min = 
 	{
 		ImGui::SliderFloat4(id.c_str(), value.Data.data(), min, max);
 	}
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+}
+
+/**
+ * @brief Draw a Vector4f property with a minimum and maximum.
+ */
+inline void ImGuiPropertySlider(const std::string& name, Vector4f& value, float min = -1.0f, float max = 1.0f, ImguiPropertyFlag flags = ImguiPropertyFlag::None)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	std::string id = "##" + name;
+	// Draw a colour picker if this property has the colour flag on it.
+	if (static_cast<int>(flags) & static_cast<int>(ImguiPropertyFlag::ColorProperty))
+	{
+		ImGui::ColorEdit4(id.c_str(), value.Data.data(), ImGuiColorEditFlags_NoInputs);
+	}
+	else
+	{
+		ImGui::SliderFloat4(id.c_str(), value.Data.data(), min, max);
+	}
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+}
+/**
+ * @brief Draw a Vector4f property.
+ */
+inline void ImGuiProperty(const std::string& name, Vector4f& value, ImguiPropertyFlag flags = ImguiPropertyFlag::None)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	std::string id = "##" + name;
+	// Draw a colour picker if this property has the colour flag on it.
+	if (static_cast<int>(flags) & static_cast<int>(ImguiPropertyFlag::ColorProperty))
+	{
+		ImGui::ColorEdit4(id.c_str(), value.Data.data(), ImGuiColorEditFlags_NoInputs);
+	}
+	else
+	{
+		ImGui::InputFloat4(id.c_str(), value.Data.data());
+	}
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+}
+
+/**
+ * @brief Draw a Quaternion property with a minimum and maximum.
+ */
+inline void ImGuiProperty(const std::string& name, Quaternion& value,
+                          const float min = -1.0f, const float max = 1.0f)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+
+	// This is a sort of hacky way of rendering quaternion properties.
+	// A better way would be to provide a direct access to the quaternion data buffers.
+	// Also, we could save on computation by checking whether the angles actually changed.
+
+	// Create a float buffer to store the quaternion euler rotation
+	Vector3f eulerAngles = value.ToEulerAngles();
+	ImGui::InputFloat3(id.c_str(), eulerAngles.Data.data(), min, max);
+	// Construct a new quaternion based on the euler angles...
+	value = Quaternion::FromEulerAngles(eulerAngles);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();

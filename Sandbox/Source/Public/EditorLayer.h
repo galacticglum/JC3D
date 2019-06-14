@@ -231,6 +231,8 @@ public:
 			// Make sure that we actually have a mesh to render...
 			if (!mesh) return;
 
+			// Update the model matrix of the shader
+			m_PBRShader->SetUniform("u_ModelMatrix", m_ModelObject->GetTransformationMatrix());
 			m_ModelObject->GetMesh()->Render();
 		}
 	}
@@ -323,6 +325,200 @@ public:
 	}
 
 	/**
+	 * @brief Render the material editor UI.
+	 */
+	void RenderMaterialUI() const
+	{
+		/**
+		 * TODO: Possibly simply this workflow by creating a base material input struct.
+		 *		 I think this solution would inevitably create a more modular material workflow
+		 *		 but it requires a lot of internal management and comes with significant overhead
+		 *		 (i.e. tracking and auto-binding material uniforms and other shader data).
+		 *		
+		 *		For now, we have to manually define the editor properties for a material.
+		 *		
+		 *		Documentation is sparse in the following function for it is mostly ImGui commands
+		 *		who express their purpose independent of comments; however, I will draw attention to
+		 *		some draw particular calls:
+		 *			1. PushStyleVar is used extensively to specify the style of a ImGui property
+		 *			2. Images are not rendered by passing in image data but rather through their GL
+		 *			   handles. Eventually, ImGui should be abstracted to support any graphics API with
+		 *			  minimal implementation.
+		 */
+
+		const std::shared_ptr<Material> material = m_ModelObject->GetMaterial();
+
+		// Albedo
+		if (ImGui::CollapsingHeader("Albedo", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
+			ImGui::Image(material->Albedo.TextureMap ? reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()) :
+				             reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
+
+			ImGui::PopStyleVar();
+			if (ImGui::IsItemHovered())
+			{
+				if (material->Albedo.TextureMap)
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted(material->Albedo.TextureMap->GetFilepath().c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::Image(reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()), ImVec2(384, 384));
+					ImGui::EndTooltip();
+				}
+
+				if (ImGui::IsItemClicked())
+				{
+					const std::string filename = Application::Get().OpenFile("");
+					if (!filename.empty())
+					{
+						material->Albedo.TextureMap.reset(Texture2D::Create(filename, material->Albedo.SRGB));
+					}
+				}
+			}
+
+			ImGui::SameLine();
+			ImGui::BeginGroup();
+			ImGui::Checkbox("Use##AlbedoMap", &material->Albedo.UseTexture);
+			if (ImGui::Checkbox("sRGB##AlbedoMap", &material->Albedo.SRGB))
+			{
+				if (material->Albedo.TextureMap)
+				{
+					material->Albedo.TextureMap.reset(Texture2D::Create(material->Albedo.TextureMap->GetFilepath(), 
+						material->Albedo.SRGB));
+				}
+			}
+
+			ImGui::EndGroup();
+			ImGui::SameLine();
+			ImGui::ColorEdit3("Color##Albedo", material->Albedo.Color.Data.data(), ImGuiColorEditFlags_NoInputs);
+		}
+		
+		// Normals
+		if (ImGui::CollapsingHeader("Normals", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// Render the image by getting a handle to the material texture
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
+			ImGui::Image(material->Normal.TextureMap ? reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()) :
+				             reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
+			ImGui::PopStyleVar();
+			if (ImGui::IsItemHovered())
+			{
+				if (material->Normal.TextureMap)
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted(material->Normal.TextureMap->GetFilepath().c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::Image(reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()), ImVec2(384, 384));
+					ImGui::EndTooltip();
+				}
+
+				if (ImGui::IsItemClicked())
+				{
+					const std::string filename = Application::Get().OpenFile("");
+					if (!filename.empty())
+					{
+						material->Normal.TextureMap.reset(Texture2D::Create(filename));
+					}
+				}
+			}
+
+			ImGui::SameLine();
+			ImGui::Checkbox("Use##NormalMap", &material->Normal.UseTexture);
+		}
+
+		// Metalness
+		if (ImGui::CollapsingHeader("Metalness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// Render the image by getting a handle to the material texture
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
+			ImGui::Image(material->Metalness.TextureMap ? reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()) :
+				             reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
+
+			ImGui::PopStyleVar();
+			if (ImGui::IsItemHovered())
+			{
+				if (material->Metalness.TextureMap)
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted(material->Metalness.TextureMap->GetFilepath().c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::Image(reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()), ImVec2(384, 384));
+					ImGui::EndTooltip();
+				}
+
+				if (ImGui::IsItemClicked())
+				{
+					std::string filename = Application::Get().OpenFile("");
+					if (!filename.empty())
+					{
+						material->Metalness.TextureMap.reset(Texture2D::Create(filename));
+					}
+				}
+			}
+
+			ImGui::SameLine();
+			ImGui::Checkbox("Use##MetalnessMap", &material->Metalness.UseTexture);
+			ImGui::SameLine();
+			ImGui::SliderFloat("Value##MetalnessInput", &material->Metalness.Value, 0.0f, 1.0f);
+		}
+
+		// Roughness
+		if (ImGui::CollapsingHeader("Roughness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
+			ImGui::Image(material->Roughness.TextureMap ? reinterpret_cast<void*>(
+					             material->Roughness.TextureMap->GetHandle()) :
+				             reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
+
+			ImGui::PopStyleVar();
+			if (ImGui::IsItemHovered())
+			{
+				if (material->Roughness.TextureMap)
+				{
+					ImGui::BeginTooltip();
+					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+					ImGui::TextUnformatted(material->Roughness.TextureMap->GetFilepath().c_str());
+					ImGui::PopTextWrapPos();
+					ImGui::Image(reinterpret_cast<void*>(material->Roughness.TextureMap->GetHandle()), ImVec2(384, 384));
+					ImGui::EndTooltip();
+				}
+
+				if (ImGui::IsItemClicked())
+				{
+					std::string filename = Application::Get().OpenFile("");
+					if (!filename.empty())
+					{
+						material->Roughness.TextureMap.reset(Texture2D::Create(filename));
+					}
+				}
+			}
+
+			ImGui::SameLine();
+			ImGui::Checkbox("Use##RoughnessMap", &material->Roughness.UseTexture);
+			ImGui::SameLine();
+			ImGui::SliderFloat("Value##RoughnessInput", &material->Roughness.Value, 0.0f, 1.0f);
+		}
+	}
+
+	/**
+	 * @Render the scene object editor.
+	 */
+	void RenderSceneObjectUI() const
+	{
+		// Albedo
+		if (ImGui::CollapsingHeader("Transform", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGuiProperty("Position", m_ModelObject->Position);
+			ImGuiProperty("Rotation", m_ModelObject->Rotation);
+			ImGuiProperty("Scale", m_ModelObject->Scale);
+		}
+	}
+
+	/**
 	 * @brief Render the editor UI.
 	 */
 	void OnImGuiRender() override
@@ -387,7 +583,7 @@ public:
 
 		// Lighting properties
 		ImGuiProperty("Light Direction", m_Light.Direction);
-		ImGuiProperty("Light Radiance", m_Light.Radiance, -1, 1, ImguiPropertyFlag::ColorProperty);
+		ImGuiPropertySlider("Light Radiance", m_Light.Radiance, -1, 1, ImguiPropertyFlag::ColorProperty);
 		ImGuiProperty("Light Multiplier", m_LightMultiplier, 0.0f, 5.0f);
 		ImGuiProperty("Exposure", m_Exposure, 0.0f, 5.0f);
 		ImGuiProperty("Radiance Prefiltering", m_RadiancePrefilter);
@@ -428,160 +624,8 @@ public:
 		// of the sphere demo.
 		if (m_SceneType == SceneType::Model)
 		{
-			const std::shared_ptr<Material> material = m_ModelObject->GetMaterial();
-
-			// Albedo
-			if (ImGui::CollapsingHeader("Albedo", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(material->Albedo.TextureMap ? reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()) :
-					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
-
-				ImGui::PopStyleVar();
-				if (ImGui::IsItemHovered())
-				{
-					if (material->Albedo.TextureMap)
-					{
-						ImGui::BeginTooltip();
-						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(material->Albedo.TextureMap->GetFilepath().c_str());
-						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(material->Albedo.TextureMap->GetHandle()), ImVec2(384, 384));
-						ImGui::EndTooltip();
-					}
-
-					if (ImGui::IsItemClicked())
-					{
-						const std::string filename = Application::Get().OpenFile("");
-						if (!filename.empty())
-						{
-							material->Albedo.TextureMap.reset(Texture2D::Create(filename, material->Albedo.SRGB));
-						}
-					}
-				}
-
-				ImGui::SameLine();
-				ImGui::BeginGroup();
-				ImGui::Checkbox("Use##AlbedoMap", &material->Albedo.UseTexture);
-				if (ImGui::Checkbox("sRGB##AlbedoMap", &material->Albedo.SRGB))
-				{
-					if (material->Albedo.TextureMap)
-					{
-						material->Albedo.TextureMap.reset(Texture2D::Create(material->Albedo.TextureMap->GetFilepath(), 
-							material->Albedo.SRGB));
-					}
-				}
-
-				ImGui::EndGroup();
-				ImGui::SameLine();
-				ImGui::ColorEdit3("Color##Albedo", material->Albedo.Color.Data.data(), ImGuiColorEditFlags_NoInputs);
-			}
-		
-			// Normals
-			if (ImGui::CollapsingHeader("Normals", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(material->Normal.TextureMap ? reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()) :
-					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
-				ImGui::PopStyleVar();
-				if (ImGui::IsItemHovered())
-				{
-					if (material->Normal.TextureMap)
-					{
-						ImGui::BeginTooltip();
-						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(material->Normal.TextureMap->GetFilepath().c_str());
-						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(material->Normal.TextureMap->GetHandle()), ImVec2(384, 384));
-						ImGui::EndTooltip();
-					}
-
-					if (ImGui::IsItemClicked())
-					{
-						const std::string filename = Application::Get().OpenFile("");
-						if (!filename.empty())
-						{
-							material->Normal.TextureMap.reset(Texture2D::Create(filename));
-						}
-					}
-				}
-
-				ImGui::SameLine();
-				ImGui::Checkbox("Use##NormalMap", &material->Normal.UseTexture);
-			}
-
-			// Metalness
-			if (ImGui::CollapsingHeader("Metalness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(material->Metalness.TextureMap ? reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()) :
-					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
-
-				ImGui::PopStyleVar();
-				if (ImGui::IsItemHovered())
-				{
-					if (material->Metalness.TextureMap)
-					{
-						ImGui::BeginTooltip();
-						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(material->Metalness.TextureMap->GetFilepath().c_str());
-						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(material->Metalness.TextureMap->GetHandle()), ImVec2(384, 384));
-						ImGui::EndTooltip();
-					}
-
-					if (ImGui::IsItemClicked())
-					{
-						std::string filename = Application::Get().OpenFile("");
-						if (!filename.empty())
-						{
-							material->Metalness.TextureMap.reset(Texture2D::Create(filename));
-						}
-					}
-				}
-
-				ImGui::SameLine();
-				ImGui::Checkbox("Use##MetalnessMap", &material->Metalness.UseTexture);
-				ImGui::SameLine();
-				ImGui::SliderFloat("Value##MetalnessInput", &material->Metalness.Value, 0.0f, 1.0f);
-			}
-
-			// Roughness
-			if (ImGui::CollapsingHeader("Roughness", nullptr, ImGuiTreeNodeFlags_DefaultOpen))
-			{
-				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-				ImGui::Image(material->Roughness.TextureMap ? reinterpret_cast<void*>(
-					material->Roughness.TextureMap->GetHandle()) :
-					reinterpret_cast<void*>(m_CheckerboardTexture->GetHandle()), ImVec2(64, 64));
-
-				ImGui::PopStyleVar();
-				if (ImGui::IsItemHovered())
-				{
-					if (material->Roughness.TextureMap)
-					{
-						ImGui::BeginTooltip();
-						ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-						ImGui::TextUnformatted(material->Roughness.TextureMap->GetFilepath().c_str());
-						ImGui::PopTextWrapPos();
-						ImGui::Image(reinterpret_cast<void*>(material->Roughness.TextureMap->GetHandle()), ImVec2(384, 384));
-						ImGui::EndTooltip();
-					}
-
-					if (ImGui::IsItemClicked())
-					{
-						std::string filename = Application::Get().OpenFile("");
-						if (!filename.empty())
-						{
-							material->Roughness.TextureMap.reset(Texture2D::Create(filename));
-						}
-					}
-				}
-
-				ImGui::SameLine();
-				ImGui::Checkbox("Use##RoughnessMap", &material->Roughness.UseTexture);
-				ImGui::SameLine();
-				ImGui::SliderFloat("Value##RoughnessInput", &material->Roughness.Value, 0.0f, 1.0f);
-			}
+			RenderSceneObjectUI();
+			RenderMaterialUI();
 		}
 
 		// List all the shaders and give the option to reload them

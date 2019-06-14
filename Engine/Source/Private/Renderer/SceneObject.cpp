@@ -6,6 +6,9 @@ SceneObject::SceneObject(Material* material)
 	m_Material = nullptr;
 
 	SetMaterial(material);
+	Scale = Vector3f(1);
+	Position = Vector3f(0);
+	Rotation = Quaternion::Identity;
 }
 
 Matrix4f SceneObject::GetTransformationMatrix() const
