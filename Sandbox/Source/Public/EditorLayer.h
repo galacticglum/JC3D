@@ -259,6 +259,22 @@ public:
 	}
 
 	/**
+	 * @brief Renders a help tooltip with the specified @p name and @p description in ImGui.
+	 */
+	static void HelpMenuEntry(const char* name, const char* description)
+	{
+		ImGui::TextDisabled(name);
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::BeginTooltip();
+			ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+			ImGui::TextUnformatted(description);
+			ImGui::PopTextWrapPos();
+			ImGui::EndTooltip();
+		}
+	}
+
+	/**
 	 * @brief Renders the help menu.
 	 */
 	static void RenderHelpMenu()
@@ -269,42 +285,24 @@ public:
 			if (ImGui::BeginMenu("Help"))
 			{
 				// About section
-				ImGui::TextDisabled("About");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("A modular and extensible real-time physically based rendering engine library built in modern C++ and OpenGL.\n"
-						"At its core, a deferred rendering pipeline powers the engine enabling it to render realistically lit scenes.");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
+				HelpMenuEntry("About", "A modular and extensible real-time physically based rendering engine library built in modern C++ and OpenGL.\n"
+					"At its core, a deferred rendering pipeline powers the engine enabling it to render realistically lit scenes.");
 
 				// What is PBR section
-				ImGui::TextDisabled("What is PBR?");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("At the core of the engine sits PBR: a physically-based lighting technique."
-						"PBR is based on the theory of microfacets. These are reflective surfaces, that at a microscopic scale,"
-						"dictate the appearance of a surface due to various physical properties (e.g. roughness).");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
+				HelpMenuEntry("What is PBR?", "At the core of the engine sits PBR: a physically-based lighting technique."
+					"PBR is based on the theory of microfacets. These are reflective surfaces, that at a microscopic scale,"
+					"dictate the appearance of a surface due to various physical properties (e.g. roughness).");
 
 				// Editor explanation section.
-				ImGui::TextDisabled("The Editor");
-				if (ImGui::IsItemHovered())
-				{
-					ImGui::BeginTooltip();
-					ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-					ImGui::TextUnformatted("The Editor allows you to play around with the engine giving two modes: sphere and models."
-						"The sphere scene type presents a matrix of spheres showcasing the material properties of PBR."
-						"The model scene type allows you to import your own model to play around with the engine.");
-					ImGui::PopTextWrapPos();
-					ImGui::EndTooltip();
-				}
+				HelpMenuEntry("The Editor", "The Editor allows you to play around with the engine giving two modes: sphere and models."
+					"The sphere scene type presents a matrix of spheres showcasing the material properties of PBR."
+					"The model scene type allows you to import your own model to play around with the engine.");
+
+				// Camera controls section
+				HelpMenuEntry("Camera Controls", "The camera allows you to inspect the currently loaded scene.\n"
+					"In order to use the camera, the left ALT key must be held down. To pan, use the middle mouse"
+					"button. To rotate, use the left mouse button and then drag. To zoom use the right mouse button"
+					"while dragging vertical (up to zoom in, down to zoom out).");
 
 				ImGui::EndMenu();
 			}
