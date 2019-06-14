@@ -192,8 +192,7 @@ inline void ImGuiProperty(const std::string& name, Vector4f& value, ImguiPropert
 /**
  * @brief Draw a Quaternion property with a minimum and maximum.
  */
-inline void ImGuiProperty(const std::string& name, Quaternion& value,
-                          const float min = -1.0f, const float max = 1.0f)
+inline void ImGuiProperty(const std::string& name, Quaternion& value, bool useDegrees = true)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
@@ -207,7 +206,24 @@ inline void ImGuiProperty(const std::string& name, Quaternion& value,
 
 	// Create a float buffer to store the quaternion euler rotation
 	Vector3f eulerAngles = value.ToEulerAngles();
-	ImGui::InputFloat3(id.c_str(), eulerAngles.Data.data(), min, max);
+	if (useDegrees)
+	{
+		// Convert to degrses if the property should be rendered in degrees
+		eulerAngles.X = MathFunctions::RadiansToDegree(eulerAngles.X);
+		eulerAngles.Y = MathFunctions::RadiansToDegree(eulerAngles.Y);
+		eulerAngles.Z = MathFunctions::RadiansToDegree(eulerAngles.Z);
+	}
+
+	ImGui::InputFloat3(id.c_str(), eulerAngles.Data.data());
+
+	if(useDegrees)
+	{
+		// Convert back to radians for the quaternion
+		eulerAngles.X = MathFunctions::DegreesToRadians(eulerAngles.X);
+		eulerAngles.Y = MathFunctions::DegreesToRadians(eulerAngles.Y);
+		eulerAngles.Z = MathFunctions::DegreesToRadians(eulerAngles.Z);
+	}
+
 	// Construct a new quaternion based on the euler angles...
 	value = Quaternion::FromEulerAngles(eulerAngles);
 
