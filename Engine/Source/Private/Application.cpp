@@ -20,14 +20,14 @@
 
 Application* Application::s_Instance = nullptr;
 
-Application::Application() : m_DeltaTime(0)
+Application::Application(const WindowProperties& windowProperties) : m_DeltaTime(0)
 {
 	// Ensure that there is only application instance
 	LOG_CATEGORY_ASSERT(!s_Instance, "Engine", "Application already exists!");
 	s_Instance = this;
 
 	// Create and initialize the window
-	m_Window = std::unique_ptr<Window>(Window::Create());
+	m_Window = std::unique_ptr<Window>(Window::Create(windowProperties));
 	m_Window->SetEventCallback(BIND_EVENT(Application::OnEvent));
 
 	// Initialize the ImGuiLayer instance
@@ -47,12 +47,26 @@ void Application::Run()
 {
 	OnInitialize();
 
+	int frameCount = 0;
+
 	float lastFrame = 0;
+	float previousFpsTime = 0;
+
 	while (m_IsRunning)
 	{
 		const float currentFrame = static_cast<float>(m_TimeContext->GetTime());
 		m_DeltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+
+		frameCount++;
+		if(currentFrame - previousFpsTime >= 1.0)
+		{
+			m_FPS = frameCount;
+
+			// Reset the timer.
+			previousFpsTime = currentFrame;
+			frameCount = 0;
+		}
 
 		// We only render if the screen is not minimized
 		if (!m_Minimized)
@@ -82,13 +96,6 @@ void Application::Run()
 void Application::RenderImGui()
 {
 	m_ImGuiLayer->Begin();
-
-	ImGui::Begin("Renderer");
-	auto& renderApiCapabilities = RendererAPI::GetCapabilities();
-	ImGui::Text("Vendor: %s", renderApiCapabilities.Vendor.c_str());
-	ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
-	ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
-	ImGui::End();
 
 	for (Layer* layer : m_LayerStack)
 	{

@@ -290,7 +290,7 @@ public:
 	/**
 	 * @brief Renders the help menu.
 	 */
-	static void RenderHelpMenu()
+	static void RenderHelpMenuBar()
 	{
 		// Help menu bar
 		if (ImGui::BeginMenuBar())
@@ -318,6 +318,17 @@ public:
 					"while dragging vertical (up to zoom in, down to zoom out).");
 
 				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Info"))
+			{
+				// Open a new ImGui window that displays render stats.
+				ImGui::Begin("Renderer");
+				RenderAPICapabilities& renderApiCapabilities = RendererAPI::GetCapabilities();
+				ImGui::Text("Vendor: %s", renderApiCapabilities.Vendor.c_str());
+				ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
+				ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
+				ImGui::End();
 			}
 
 			ImGui::EndMenuBar();
@@ -667,7 +678,7 @@ public:
 		ImGui::End();
 		ImGui::PopStyleVar();
 
-		RenderHelpMenu();
+		RenderHelpMenuBar();
 
 		ImGui::End();
 	}

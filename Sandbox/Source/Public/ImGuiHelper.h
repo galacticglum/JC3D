@@ -208,7 +208,7 @@ inline void ImGuiProperty(const std::string& name, Quaternion& value, bool useDe
 	Vector3f eulerAngles = value.ToEulerAngles();
 	if (useDegrees)
 	{
-		// Convert to degrses if the property should be rendered in degrees
+		// Convert to degrees if the property should be rendered in degrees
 		eulerAngles.X = MathFunctions::RadiansToDegree(eulerAngles.X);
 		eulerAngles.Y = MathFunctions::RadiansToDegree(eulerAngles.Y);
 		eulerAngles.Z = MathFunctions::RadiansToDegree(eulerAngles.Z);

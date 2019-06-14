@@ -52,10 +52,20 @@ public:
 	 * @brief Initialize a new Mesh.
 	 */
 	explicit Mesh(const std::string& filepath);
+
+	/**
+	 * @brief Destroy this Mesh.
+	 */
 	~Mesh();
 
+	/**
+	 * @brief Render this Mesh.
+	 */
 	void Render();
 
+	/**
+	 * @brief Get the filepath.
+	 */
 	const std::string& GetFilepath() const
 	{
 		return m_Filepath;

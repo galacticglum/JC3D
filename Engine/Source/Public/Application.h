@@ -29,7 +29,7 @@ public:
 	/**
 	 * @brief Initialize a new Application.
 	 */
-	Application();
+	Application(const WindowProperties& windowProperties = WindowProperties());
 
 	/**
 	 * @brief Destroy this Application.
@@ -152,6 +152,11 @@ private:
 	 * @brief A boolean indicating whether this Application is minimized.
 	 */
 	bool m_Minimized = false;
+
+	/**
+	 * @brief The frames per second that the application is running.
+	 */
+	int m_FPS;
 
 	/**
 	 * @brief The time, in seconds, between consecutive frames.

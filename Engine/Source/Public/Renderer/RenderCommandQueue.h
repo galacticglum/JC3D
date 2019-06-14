@@ -16,12 +16,29 @@
 class RenderCommandQueue
 {
 public:
+	/**
+	 * @brief Render command event handler type.
+	 */
 	typedef void(*RenderCommandHandler)(void*);
 
+	/**
+	 * @brief Initialize this RenderCommandQueue.
+	 */
 	RenderCommandQueue();
+
+	/**
+	 * @brief Destroy this RenderCommandQueue.
+	 */
 	~RenderCommandQueue();
 
+	/**
+	 * @brief Allocate a data buffer for the specified render command.
+	 */
 	void* Allocate(RenderCommandHandler func, unsigned int size);
+
+	/**
+	 * @brief Invoke the render commands.
+	 */
 	void Execute();
 private:
 	unsigned char* m_CommandBuffer;

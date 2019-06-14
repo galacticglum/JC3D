@@ -10,14 +10,10 @@
 #include <Application.h>
 #include <EditorLayer.h>
 
-#include <Math/Quaternion.h>
-#include <Math/Matrix.h>
-#include <Math/Vector.h>
-
-class Sandbox : public Application
+class Sandbox final : public Application
 {
 public:
-	Sandbox()
+	Sandbox() : Application(WindowProperties("Epik Renderer", 1280, 720))
 	{
 		PushLayer(new EditorLayer());
 	}
