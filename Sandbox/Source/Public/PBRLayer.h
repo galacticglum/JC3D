@@ -538,7 +538,6 @@ public:
 		m_Framebuffer->Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 		m_FinalPresentBuffer->Resize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 
-
 		m_Camera.SetProjectionMatrix(Matrix4f::Perspective(45, viewportSize.x / viewportSize.y, 0.1f, 10000.0f));
 		ImGui::Image(reinterpret_cast<void*>(m_FinalPresentBuffer->GetColorAttachmentHandle()), viewportSize, { 0, 1 }, { 1, 0 });
 		ImGui::End();
@@ -582,7 +581,7 @@ public:
 		ImGui::End();
 	}
 
-	virtual void OnEvent(Event& event) override
+	void OnEvent(Event& event) override
 	{
 	}
 private:
