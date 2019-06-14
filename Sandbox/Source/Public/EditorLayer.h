@@ -292,6 +292,23 @@ public:
 	 */
 	static void RenderHelpMenuBar()
 	{
+		static bool showInfoMenu = false;
+		if(showInfoMenu)
+		{
+			// Open a new ImGui window that displays render stats.
+			ImGui::Begin("Renderer Information", &showInfoMenu);
+
+			RenderAPICapabilities& renderApiCapabilities = RendererAPI::GetCapabilities();
+			ImGui::Text("Vendor: %s", renderApiCapabilities.Vendor.c_str());
+			ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
+			ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
+			ImGui::Separator();
+			ImGui::Text("FPS: %s", Application::Get().GetFPS());
+			ImGui::Text("Frame Time: %s", Application::Get().GetDeltaTime());
+
+			ImGui::End();
+		}
+
 		// Help menu bar
 		if (ImGui::BeginMenuBar())
 		{
@@ -320,17 +337,7 @@ public:
 				ImGui::EndMenu();
 			}
 
-			if(ImGui::BeginMenu("Info"))
-			{
-				// Open a new ImGui window that displays render stats.
-				ImGui::Begin("Renderer");
-				RenderAPICapabilities& renderApiCapabilities = RendererAPI::GetCapabilities();
-				ImGui::Text("Vendor: %s", renderApiCapabilities.Vendor.c_str());
-				ImGui::Text("Renderer: %s", renderApiCapabilities.Renderer.c_str());
-				ImGui::Text("Version: %s", renderApiCapabilities.Version.c_str());
-				ImGui::End();
-			}
-
+			ImGui::MenuItem("Info", nullptr, &showInfoMenu);
 			ImGui::EndMenuBar();
 		}
 	}

@@ -109,6 +109,14 @@ public:
 	}
 
 	/**
+	 * @brief Get the frames per second.
+	 */
+	int GetFPS() const
+	{
+		return m_FPS;
+	}
+
+	/**
 	 * @brief Get the TimeContext instance.
 	 */
 	TimeContext& GetTimeContext() const
