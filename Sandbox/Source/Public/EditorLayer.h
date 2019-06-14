@@ -308,7 +308,7 @@ public:
 			ImGui::Text("FPS: %s", std::to_string(Application::Get().GetFPS()).c_str());
 			// Convert deltatime to milliseconds
 			const float deltaTimeMS = Application::Get().GetDeltaTime() * 1000;
-			ImGui::Text("Frame Time: %s seconds", std::to_string(deltaTimeMS).c_str());
+			ImGui::Text("Frame Time: %s ms", std::to_string(deltaTimeMS).c_str());
 
 			ImGui::End();
 		}
