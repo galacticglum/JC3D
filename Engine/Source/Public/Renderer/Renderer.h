@@ -19,24 +19,47 @@
 class Renderer
 {
 public:
+	/**
+	 * @brief The function pointer for render commands.
+	 */
 	typedef void(*RenderCommandHandler)(void*);
 
+	/**
+	 * @brief Clear the screen.
+	 */
 	static void Clear();
+
+	/**
+	 * @brief Clear the screen given a colour.
+	 */
 	static void Clear(float r, float g, float b, float a = 1.0f);
-	static void SetClearColor(float r, float g, float b, float a = 1.0f);
 
+	/**
+	 * @brief Draw the contents of an index buffer.
+	 */
 	static void DrawIndexed(unsigned int count, bool depthTest = true);
-	static void ClearMagenta();
 
+	/**
+	 * @brief Initialize the Renderer.
+	 */
 	static void Initialize();
 
+	/**
+	 * @brief Submit a render command.
+	 */
 	static void* Submit(const RenderCommandHandler func, const unsigned int size)
 	{
 		return s_Instance->m_CommandQueue.Allocate(func, size);
 	}
 
+	/**
+	 * @brief Synchronous render call.
+	 */
 	static void WaitAndRender();
 
+	/**
+	 * @brief Get the current render instance.
+	 */
 	static Renderer& Get()
 	{
 		return *s_Instance;
@@ -46,6 +69,12 @@ private:
 	RenderCommandQueue m_CommandQueue;
 };
 
+/**
+ * The following macros allow for a very pleasant render API by wrapping the ugly 
+ * function binding code and render command calls in one single function.
+ */
+
+// Utilities to generate a unique name
 #define ENGINE_RENDER_PASTE2(a, b) a ## b
 #define ENGINE_RENDER_PASTE(a, b) ENGINE_RENDER_PASTE2(a, b)
 #define ENGINE_RENDER_UNIQUE(x) ENGINE_RENDER_PASTE(x, __LINE__)

@@ -35,6 +35,9 @@ struct ShaderDataTypeMapping
 	static constexpr ShaderDataType Type = ShaderDataType::Unknown;
 };
 
+/**
+ * @brief A macro for mapping a C++ type to a ShaderDataType.
+ */
 #define MAP_SHADER_DATA_TYPE(cppType, shaderDataType)			            \
 template<>														            \
 struct ShaderDataTypeMapping<cppType>							            \

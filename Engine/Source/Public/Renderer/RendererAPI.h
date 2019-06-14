@@ -47,20 +47,43 @@ struct RenderAPICapabilities
 class RendererAPI
 {
 public:
+	/**
+	 * @brief Initialize this RendererAPI.
+	 */
 	static void Initialize();
+
+	/**
+	 * brief Shutdown the RendererAPI.
+	 */
 	static void Shutdown();
 
+	/**
+	 * @brief Clear the screen given a colour.
+	 */
 	static void Clear(float r, float g, float b, float a);
+
+	/**
+	 * @brief Set the clear colour.
+	 */
 	static void SetClearColor(float r, float g, float b, float a);
 
+	/**
+	 * @brief Draw the contents of the IndexBuffer.
+	 */
 	static void DrawIndexed(unsigned int count, bool depthTest = true);
 
+	/**
+	 * @brief Get the capabilities of this RendererAPI.
+	 */
 	static RenderAPICapabilities& GetCapabilities()
 	{
 		static RenderAPICapabilities capabilities;
 		return capabilities;
 	}
 
+	/**
+	 * @brief Get the current RendererAPIType.
+	 */
 	static RendererAPIType Current()
 	{
 		return s_CurrentRendererAPI;
