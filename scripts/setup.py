@@ -7,7 +7,8 @@ setup(
     install_requires=[
         'Click',
         'jsonschema',
-        'requests'
+        'requests',
+        'colorama'
     ],
     entry_points='''
         [console_scripts]
