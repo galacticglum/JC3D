@@ -18,11 +18,11 @@ JesusChrstIn3D uses a custom Python build tool which requires external dependenc
 * Navigate to the root project directory (e.g. ``.../JesusChristIn3D/``; this directory should contain the ``README.md`` and build tool batch files: ``Windows-Clean.bat`` and ``Windows-GenProject.bat``).
 * Run ``virtualenv venv`` to create a new virtualenv in the current directory with the name of ``venv``.
 
-Once you have setup the virtual environment, make sure it works by activating it (see [virtualenv documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/): for specific instructions on how to activate the virtual environment on your platform). You an deactivate the virtual environment by using the command ``deactivate``.
+Once you have setup the virtual environment, make sure it works by activating it (see [virtualenv documentation](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/): for specific instructions on how to activate the virtual environment on your platform). You can deactivate the virtual environment by using the command ``deactivate``.
 
 collect_dependencies is the build script responsible for collecting the dependencies of the project. In particular, it scans for a ``dependencies.json`` file in the current directory. This file contains dependency information which it uses to download, extract, build, and finally organize the dependencies into a file sturcture that the CMake script(s) can reference.
 
-In the case of the engine, the main ``dependencies.json`` actually specifies no dependencies itself; rather, it defines ``/.Engine`` as a subdirectory. The configuration file  ``/Engine/dependencies.json`` is the one that actually contains the dependencies for the Engine project. The dependency data is put into a new folder called ``Dependencies`` with its parent being the same directory as where the ``dependencies.json`` file that produced the dependency is located.
+In the case of the engine, the main ``dependencies.json`` specifies no dependencies itself; rather, it defines ``/.Engine`` as a subdirectory. The configuration file  ``/Engine/dependencies.json`` is the one that actually contains the dependencies for the Engine project. The dependency data is put into a new folder called ``Dependencies`` with its parent being the same directory as where the ``dependencies.json`` file that produced the dependency is located.
 
 Setting up collect_dependencies is rather simple due to Python's workflow:
 * Open a terminal or command prompt window and activate the virtual environment
@@ -34,13 +34,13 @@ From the root project directory, with the virtual environment activated, run ``c
 Rerun collect_dependencies to gather new dependencies or, using the force parameter (``-f``), to update preexisting ones.
 
 ### Generating the Visual Studio Projects (Windows)
-From the root project directory, run the ``Windows-GenProject.bat`` file which weill generate the solution and project files in a new ``Build`` folder. The solution file (``JesusChristIn3D.sln``) is located inside the ``Build`` directory.
+From the root project directory, run the ``Windows-GenProject.bat`` file which will generate the solution and project files in a new ``Build`` folder. The solution file (``JesusChristIn3D.sln``) is located inside the ``Build`` directory.
 
 ### Adding files to the project
-Since the project is managed by CMake, files should be added through the filesystem **NOT** through Visual Studio. When a file is added, the rpoject should be regenerated...
+Since the project is managed by CMake, files should be added through the filesystem, **NOT** through Visual Studio. When a file is added, the project should be regenerated...
 
 ## FAQ
-### "I added content but it is copied over" **OR** "a binnary is not found!"
+### "I added content but it is copied over" **OR** "a binary is not found!"
 By default, the Sandbox project is configured to recursively copy the ``Sandbox/Content`` directory and any dependency binaries to the output directory; however, these commands will run only after a successful build. If Visual Studio skips a build, these commands will not run. Therefore, if you add content and it doesn't copy, either manually copy the content to the output directory or **force** a rebuild of the entire solution.
 
 ### "During dependency collection, I get a ``zipfile.BadZipFile`` error"
