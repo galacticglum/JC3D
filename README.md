@@ -48,7 +48,7 @@ This error indicates that the dependency archive that was gathered is **NOT** a 
 * First try rerunning the ``collect_dependencies`` command. Rerunning the command, assuming no force parameter is applied, will only gather the dependencies that have yet to be gathered (according to the ``dependency.lock`` file).
 * Try changing the archive URL of the dependency to a server that is faster and more reliable.
 
-### "When I run the engine, the widnow layout is all messed up!"
+### "When I run the engine, the window layout is all messed up!"
 The first time that you run the Sandbox project, you will find that the window layout is very messy. This is because no default layout is specified with ImGui; however, since ImGui uses an ini file to save UI information, you can use the specified [imgui.ini](https://drive.google.com/file/d/1fgVzpSlPZfj_FRiHzyvwH4HX1yN7Uqxm/view?usp=sharing) file to get a nice window layout. Simply place the file in the output directory.
 
 For reference: the output directory of the sandbox project is ``Build/Sandbox/bin/<config>/``. Place the attached file in the same directory as ``Sandbox.exe``.
