@@ -114,9 +114,9 @@ Quaternion Quaternion::FromEulerAngles(const Vector<3, float>& angles)
 	const float cy = std::cosf(angles.Y * 0.5f);
 	const float cz = std::cosf(angles.Z * 0.5f);
 
-	const float sx = std::sin(angles.X * 0.5f);
-	const float sy = std::sin(angles.Y * 0.5f);
-	const float sz = std::sin(angles.Z * 0.5f);
+	const float sx = std::sinf(angles.X * 0.5f);
+	const float sy = std::sinf(angles.Y * 0.5f);
+	const float sz = std::sinf(angles.Z * 0.5f);
 
 	Quaternion result;
 	result.W = cx * cy * cz + sx * sy * sz;
