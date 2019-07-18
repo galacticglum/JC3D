@@ -40,7 +40,7 @@ From the root project directory, run the ``Windows-GenProject.bat`` file which w
 Since the project is managed by CMake, files should be added through the filesystem, **NOT** through Visual Studio. When a file is added, the project should be regenerated...
 
 ## FAQ
-### "I added content but it is copied over" **OR** "a binary is not found!"
+### "I added content but it is not copied over" **OR** "a binary is not found!"
 By default, the Sandbox project is configured to recursively copy the ``Sandbox/Content`` directory and any dependency binaries to the output directory; however, these commands will run only after a successful build. If Visual Studio skips a build, these commands will not run. Therefore, if you add content and it doesn't copy, either manually copy the content to the output directory or **force** a rebuild of the entire solution.
 
 ### "During dependency collection, I get a ``zipfile.BadZipFile`` error"
