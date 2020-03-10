@@ -53,5 +53,5 @@ The first time that you run the Sandbox project, you will find that the window l
 
 For reference: the output directory of the sandbox project is ``Build/Sandbox/bin/<config>/``. Place the attached file in the same directory as ``Sandbox.exe``.
 
-### Credits
-Thank you Shon Vivier for helping me, so much, with coming up with the project title! Without you, I would be lost, in the ground, six feet under as they say. Who sayys that? Mr. Lane. 
+## Credits
+Thank you [Shon Vivier](https://github.com/shonvivier) for helping me, so much, with coming up with the project title! Without you, I would be lost, in the ground, six feet under as they say. Who says that? Mr. Lane. 
