@@ -52,3 +52,6 @@ This error indicates that the dependency archive that was gathered is **NOT** a 
 The first time that you run the Sandbox project, you will find that the window layout is very messy. This is because no default layout is specified with ImGui; however, since ImGui uses an ini file to save UI information, you can use the specified [imgui.ini](https://drive.google.com/file/d/1fgVzpSlPZfj_FRiHzyvwH4HX1yN7Uqxm/view?usp=sharing) file to get a nice window layout. Simply place the file in the output directory.
 
 For reference: the output directory of the sandbox project is ``Build/Sandbox/bin/<config>/``. Place the attached file in the same directory as ``Sandbox.exe``.
+
+### Credits
+Thank you Shon Vivier for helping me, so much, with coming up with the project title! Without you, I would be lost, in the ground, six feet under as they say. Who sayys that? Mr. Lane. 
