@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 * [CMake](https://cmake.org/runningcmake/)
 
 ### Setting up the dependency managment system
-JesusChrstIn3D uses a custom Python build tool which requires external dependencies to function. Fortunately, this process is very simple using Python virtual environments. In order to use the dependency management tool, you must setup a virtual environment:
+JC3D uses a custom Python build tool which requires external dependencies to function. Fortunately, this process is very simple using Python virtual environments. In order to use the dependency management tool, you must setup a virtual environment:
 * Open a terminal or command prompt window
 * Run ``pip install virtualenv`` to install the virtualenv Python package.
 * Navigate to the root project directory (e.g. ``.../JesusChristIn3D/``; this directory should contain the ``README.md`` and build tool batch files: ``Windows-Clean.bat`` and ``Windows-GenProject.bat``).
